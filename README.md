@@ -4,7 +4,7 @@ The Emergency Response Guide (ERG) widget allows users to determine potential ha
 
 The ERG widget references the [ERG Guidebook 2016](https://www.phmsa.dot.gov/hazmat/outreach-training/erg). Note: Table 3 of the 2016 Guidebook is not implemented in the current version of the widget.
 
-![Image of ERG Widget][ss]
+
 
 ## Sections
 
@@ -83,5 +83,3 @@ limitations under the License.
 
 A copy of the license is available in the repository's
 [license.txt](license.txt) file.
-
-[ss]: images/screenshot.jpg
