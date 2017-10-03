@@ -33,10 +33,14 @@ The ERG widget references the [ERG Guidebook 2016](https://www.phmsa.dot.gov/haz
 
 ## Instructions
 
-* Update/Publish the Geoprocessing and Map services
+* Publish the Geoprocessing and Map services from the .sd files
     * The widget relies on Geoprocessing and Map services. The SD files for those services can be found in the EmergencyOperations.zip file in the [services folder](./ERG/services). 
-    * The zip file contains ERG.sd which is the Geoprocessing service along with the EmergencyOperation.sd which is the accompanying map service. Please update the ERG [config.json](./ERG/config.json) file once these SD files are published in ArcGIS Server.
-
+    * Copy and paste the .zip file to a location on your local machine and extract the .sd files. The zip file contains ERG.sd which is the Geoprocessing service along with the EmergencyOperation.sd which is the accompanying map service. 
+    * One way to publish these .sd files is by using [ArcGIS Server Manager](http://server.arcgis.com/en/server/latest/publish-services/linux/publishing-a-service-definition-to-the-server-in-manager.htm). You can also [publish the .sd files from ArcMap](http://server.arcgis.com/en/server/latest/publish-services/linux/publishing-a-service-definition-to-the-server-in-arcgis-for-desktop.htm)
+    * Once you've successfully created the ERG Geoprocessing Service and EmergencyOperations Map Service from ArcGIS Server Manager, navigate through the ArcGIS REST Services Dictionary (replace `manager` with `rest` in your url). You'll find that the ERG Geoprocessing Service contains 3 Tasks, and the EmergencyOperations Map Service contains 12 layers and 1 table.
+    * Open the [config.json](./ERG/config.json) file in a text editor. Copy the urls of the three Tasks in the ERG Geoprocessing service and paste them in their corresponding locations in the config.json file. You will need to replace existing urls. The three Tasks are `FindNearestWeatherStation`, `ERG by Placard`, and `ERG by Chemical`. 
+    * In the same config.json file, copy and paste the urls of three of the layers in the EmergencyOperations Map Service. The three layers are `ERG Facilities`, `NOAA METAR Current Wind Speed and Direction`, and `Total Population`. Save and close the config.json file. You are now ready to deploy the widget. Note these sample layers only contain data over Naperville, IL. 
+    
 * Deploying Widgets
     * To deploy a widget, copy the folder of the desired deployment widget to the stemapp/widgets directory. This is located in %webappbuilder_install%/client directory.
     * For more resources on developing, modifying, and deploying widgets please visit the
