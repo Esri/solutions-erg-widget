@@ -59,7 +59,7 @@ define([
   'esri/geometry/geometryEngine',
   'esri/geometry/Extent',
   'esri/geometry/Point',  
-  'esri/geometry/Polyline',
+  'esri/geometry/Polygon',
   'esri/geometry/webMercatorUtils',
   'esri/layers/FeatureLayer',
   'esri/layers/GraphicsLayer',
@@ -70,7 +70,6 @@ define([
   'esri/symbols/SimpleFillSymbol',
   'esri/symbols/TextSymbol',
   'esri/toolbars/draw',
-  'esri/toolbars/edit',
   'esri/renderers/SimpleRenderer',
   'esri/tasks/query',
   'esri/request',
@@ -79,8 +78,6 @@ define([
   './js/CoordinateInput',
   './js/DrawFeedBack',
   './js/EditOutputCoordinate',
-  './js/geometry-utils',
-  './js/geometryUtils',
   './js/jquery.easy-autocomplete',
   './js/WeatherInfo',
   
@@ -130,7 +127,7 @@ define([
     GeometryEngine,
     Extent,
     Point,
-    Polyline,
+    Polygon,
     WebMercatorUtils,
     FeatureLayer,
     GraphicsLayer,
@@ -141,7 +138,6 @@ define([
     SimpleFillSymbol,
     TextSymbol,
     Draw,
-    Edit,
     SimpleRenderer,
     Query,
     esriRequest,
@@ -149,8 +145,6 @@ define([
     coordInput,
     drawFeedBackPoint,
     editOutputCoordinate,
-    gridGeomUtils,
-    geometryUtils,
     autoComplete,    
     WeatherInfo
   ) {
@@ -190,13 +184,10 @@ define([
       },
 
       postCreate: function () {
-        
-       
         this.inherited(arguments);
         
-        //set up weather info        
-        this._resetWeatherInfo();
-        
+        //set up blank weather info        
+        this._resetWeatherInfo();        
         
         //set up the symbology used for the interactive polygon draw tools
         this.extentAreaFillSymbol = {
@@ -293,7 +284,7 @@ define([
         //set up coordinate input dijit for ERG Point by Size
         this.ERGCoordTool = new coordInput({nls: this.nls, appConfig: this.appConfig}, this.newERGPointOriginCoords);      
         this.ERGCoordTool.inputCoordinate.formatType = 'DD';
-        this.ERGPointBySizeCoordinateFormat = new dijitTooltipDialog({
+        this.ERGCoordinateFormat = new dijitTooltipDialog({
           content: new editOutputCoordinate({nls: this.nls}),
           style: 'width: 400px'
         });
@@ -301,10 +292,10 @@ define([
         //we need an extra class added the the coordinate format node for the Dart theme 
         if(this.appConfig.theme.name === 'DartTheme')
         {
-          domClass.add(this.ERGPointBySizeCoordinateFormat.domNode, 'dartThemeClaroDijitTooltipContainerOverride');
+          domClass.add(this.ERGCoordinateFormat.domNode, 'dartThemeClaroDijitTooltipContainerOverride');
         }
         
-        // add extended toolbar for drawing ERG Point by Size
+        // add extended toolbar for drawing ERG Spill Location
         this.dt = new drawFeedBackPoint(this.map,this.ERGCoordTool.inputCoordinate.util);
                                      
         this._initLoading();
@@ -320,6 +311,7 @@ define([
         this.busyIndicator = busyIndicator.create({target: this.domNode.parentNode.parentNode.parentNode, backgroundOpacity: 0});
         this._setTheme(); 
         
+        //load in the materials json file
         this._materialsData = JSON.parse(materials);
         
         var options = {
@@ -328,11 +320,17 @@ define([
           getValue: function(element) {
             return element.IDNum === 0?element.Material: element.IDNum + " | " + element.Material;
           },
+          template: {
+            type: "custom",
+            method: lang.hitch(this, function(value, item) {
+              return "<a href='" + this.folderUrl + "guide/" + item.GuideNum + ".pdf' target='_blank'><img height='18px' src='" + this.folderUrl + "images/pdf.png' /></a>  " + value;
+            })
+          },
           list: {
             match: {
               enabled: true
             },
-            onClickEvent: lang.hitch(this, function() {
+            onChooseEvent: lang.hitch(this, function() {
               var index = $(this.materialType).getSelectedItemIndex();
               this._selectedMaterial = $(this.materialType).getSelectedItemData(index);
               if ($(this.materialType).getSelectedItemData(index).TABLE3){
@@ -345,18 +343,19 @@ define([
                 this.windSpeed.set('disabled', true);
                 this.transportContainer.set('disabled', true);
               }
+            }),            
+            onShowListEvent: lang.hitch(this, function() {
+              this._selectedMaterial = null;
             })            
           }          
         };
         
-        $(this.materialType).easyAutocomplete(options); 
-
+        $(this.materialType).easyAutocomplete(options);
         this._weatherInfo = new WeatherInfo(this.weather, this);
       },
 
       /**
       * Performs activities like resizing widget components, connect map click etc on widget open
-      * @memberOf widgets/ERG/Widget
       */
       onOpen: function () {
         console.log('widget opened');
@@ -364,7 +363,6 @@ define([
 
       /**
       * Performs activities like disconnect map handlers, close popup etc on widget close
-      * @memberOf widgets/ERG/Widget
       */
       onClose: function () {
         console.log('widget closed');
@@ -372,7 +370,6 @@ define([
 
       /**
       * This function used for loading indicator
-      * @memberOf widgets/ERG/Widget
       */
       _initLoading: function () {
         this.loading = new LoadingIndicator({hidden: true});
@@ -382,15 +379,14 @@ define([
 
       /**
       * Handle click events for different controls
-      * @memberOf widgets/ERG/Widget
       **/
       _handleClickEvents: function () {
         /**
-        * ERG from Point by Size panel
+        * ERG panel
         **/        
-            //handle Grid Settings button
+            //handle Settings button
             if(!this.config.erg.lockSettings) {
-              //handle Grid Settings button
+              //handle Settings button
               this.own(on(this.ERGSettingsButton, "click", lang.hitch(this, function () {
                 this._showPanel("settingsPage");
               })));
@@ -399,31 +395,22 @@ define([
               //html.addClass(this.ERGSettingsButton, 'controlGroupHidden');
             }
             
-            //Handle click event of clear ERG Point button        
-            this.own(on(this.ERGPointBySizeCreateERGButton, 'click', lang.hitch(this, function () {
-              console.log(this._selectedMaterial);
-              var alertMessage = new Message({
-                  message: JSON.stringify(this._selectedMaterial)
-                });
-            })));
-                        
-            //Handle click event of create ERG point button        
-            //this.own(on(this.ERGPointBySizeCreateERGButton, 'click', lang.hitch(this, 
-              //this._ERGPointBySizeCreateERGButtonClicked)));
+            //Handle click event of create ERG button        
+            this.own(on(this.CreateERGButton, 'click', lang.hitch(this, 
+              this._CreateERGButtonClicked)));
               
-            //Handle click event of clear ERG Point button        
-            this.own(on(this.ERGPointBySizeClearERGButton, 'click', lang.hitch(this, function () {
+            //Handle click event of clear ERG button        
+            this.own(on(this.ClearERGButton, 'click', lang.hitch(this, function () {
               this._clearLayers(true);
             })));
             
-            //Handle click event of Add ERG Point draw button
-            this.own(on(this.ERGPointBySizeAddPointBtn, 'click', lang.hitch(this, 
-              this._ERGPointBySizeDrawButtonClicked)));
-            
+            //Handle click event of Add ERG draw button
+            this.own(on(this.ERGAddPointBtn, 'click', lang.hitch(this, 
+              this._ERGDrawButtonClicked)));
               
-            //Handle completion of ERG point drawing
+            //Handle completion of ERG drawing
             this.own(on(this.dt, 'draw-complete', lang.hitch(this,
-              this._dt_PointBySizeComplete)));
+              this._dt_Complete)));
               
             //Handle change in coord input      
             this.own(this.ERGCoordTool.inputCoordinate.watch('outputString', lang.hitch(this,
@@ -445,27 +432,27 @@ define([
             
             //Handle key up events in coord input
             this.own(on(this.ERGCoordTool, 'keyup', lang.hitch(this, 
-              this._ERGPointBySizeCoordToolKeyWasPressed)));
+              this._ERGCoordToolKeyWasPressed)));
             
             //Handle click event on coord format button
-            this.own(on(this.ERGPointBySizeCoordFormatButton, 'click', lang.hitch(this, 
-              this._ERGPointBySizeCoordFormatButtonClicked)));
+            this.own(on(this.ERGFormatButton, 'click', lang.hitch(this, 
+              this._ERGFormatButtonClicked)));
             
             //Handle click event on apply button of the coord format popup        
-            this.own(on(this.ERGPointBySizeCoordinateFormat.content.applyButton, 'click', lang.hitch(this,
-              this._ERGPointBySizeCoordFormatPopupApplyButtonClicked)));
+            this.own(on(this.ERGCoordinateFormat.content.applyButton, 'click', lang.hitch(this,
+              this._ERGFormatPopupApplyButtonClicked)));
             
             //Handle click event on cancel button of the coord format popup         
-            this.own(on(this.ERGPointBySizeCoordinateFormat.content.cancelButton, 'click', lang.hitch(this, 
+            this.own(on(this.ERGCoordinateFormat.content.cancelButton, 'click', lang.hitch(this, 
               function () {
-                dijitPopup.close(this.ERGPointBySizeCoordinateFormat);
+                dijitPopup.close(this.ERGCoordinateFormat);
               }
             )));
             
         /**
         * Settings panel
         **/        
-            //Handle click event of Grid settings back button
+            //Handle click event of settings back button
             this.own(on(this.gridSettingsPanelBackButton, "click", lang.hitch(this, function () {
               this._gridSettingsInstance.onClose();          
               this._showPanel(this._lastOpenPanel);
@@ -474,7 +461,7 @@ define([
         /**
         * Publish panel
         **/
-            //Handle click event of Grid settings back button
+            //Handle click event back button
             this.own(on(this.publishPanelBackButton, "click", lang.hitch(this, function () {
               //remove any messages
               this.publishMessage.innerHTML = '';
@@ -509,8 +496,6 @@ define([
       
       /**
       * Get panel node from panel name
-      * @param {string} panel name
-      * @memberOf widgets/ERG/Widget
       **/
       _getNodeByName: function (panelName) {
         var node;
@@ -530,7 +515,6 @@ define([
 
       /**
       * This function resets everything on navigating back to main page
-      * @memberOf widgets/ERG/Widget
       */
       _resetOnBackToMainPage: function () {
         //reset the tools
@@ -548,7 +532,7 @@ define([
         this.map.enableMapNavigation();
         
         //remove any active classes from the tool icons
-        dojo.removeClass(this.ERGPointBySizeAddPointBtn, 'jimu-edit-active');
+        dojo.removeClass(this.ERGAddPointBtn, 'jimu-edit-active');
       },
 
       _clearLayers: function (includeExtentLayer) {
@@ -560,15 +544,12 @@ define([
         
         //sometimes we only want to clear the ERGArea layer and not the graphic layer 
         if(includeExtentLayer) {
-          this._graphicsLayerERGExtent.clear();
-          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);
           this.dt.removeStartGraphic(this._graphicsLayerERGExtent);          
         }
       },
 
       /**
       * Creates grid settings
-      * @memberOf widgets/ERG/Widget
       **/
       _createGridSettings: function () {
         //Create GridSettings Instance
@@ -598,8 +579,6 @@ define([
               featureLayerInfo.hideLabels();
             }
             
-            
-
             //set grid colours
             var fillColor = new Color(updatedSettings.gridFillColor);
             fillColor.a = 1 - updatedSettings.gridFillTransparency;
@@ -676,8 +655,6 @@ define([
 
       /**
       * Displays selected panel
-      * @param {string} panel name
-      * @memberOf widgets/ERG/Widget
       **/
       _showPanel: function (currentPanel) {
         var prevNode, currentNode;
@@ -695,11 +672,10 @@ define([
       },
       
       /**
-      * Handle the draw point icon being clicked on the ERG Point by Size Panel
-      * @memberOf widgets/ERG/Widget
+      * Handle the draw point icon being clicked on the ERG Panel
       **/
-      _ERGPointBySizeDrawButtonClicked: function () {
-        if(domClass.contains(this.ERGPointBySizeAddPointBtn,'jimu-edit-active')) {
+      _ERGDrawButtonClicked: function () {
+        if(domClass.contains(this.ERGAddPointBtn,'jimu-edit-active')) {
           //already selected so deactivate draw tool
           this.dt.deactivate();
           this.map.enableMapNavigation();
@@ -715,45 +691,22 @@ define([
             tooltip.innerHTML = this.nls.drawPointToolTip;
           }          
         }
-        domClass.toggle(this.ERGPointBySizeAddPointBtn, 'jimu-edit-active');
+        domClass.toggle(this.ERGAddPointBtn, 'jimu-edit-active');
       },
       
       /**
-      * Handle the completion of the draw point tool on the ERG Point by Size
-      * @memberOf widgets/ERG/Widget
+      * Handle the completion of the draw spill location
       **/      
-      _dt_PointBySizeComplete: function () {          
-        domClass.remove(this.ERGPointBySizeAddPointBtn, 'jimu-edit-active');
+      _dt_Complete: function () {          
+        domClass.remove(this.ERGAddPointBtn, 'jimu-edit-active');
         this.dt.deactivate();
         this.map.enableMapNavigation();
       },
       
       /**
-      * Handle the completion of the draw point tool on the ERG Point by Reference System
-      * @memberOf widgets/ERG/Widget
+      * catch key press in spill location input
       **/
-      _dt_PointByRefSystemComplete: function () {          
-        domClass.remove(this.ERGPointByRefSystemAddPointBtn, 'jimu-edit-active');
-        this.dt.deactivate();
-        this.map.enableMapNavigation();
-      },
-      
-      /**
-      * Handle the completion of the draw extent tool on the ERG Area by Reference System
-      * @memberOf widgets/ERG/Widget
-      **/
-      _dt_AreaByRefSystemComplete: function (evt) {
-        domClass.remove(this.ERGAreaByRefSystemDrawIcon, 'jimu-extent-active');
-        var graphic = new Graphic(gridGeomUtils.extentToPolygon(evt.geometry), this._extentSym);
-        this._graphicsLayerERGExtent.add(graphic);
-        this.dt_AreaByRefSystem.deactivate();
-        this.map.enableMapNavigation();
-      },
-      
-      /**
-      * catch key press in start point for ERG Point by Size
-      **/
-      _ERGPointBySizeCoordToolKeyWasPressed: function (evt) {
+      _ERGCoordToolKeyWasPressed: function (evt) {
         this.ERGCoordTool.manualInput = true;
         if (evt.keyCode === keys.ENTER) {
           this.ERGCoordTool.inputCoordinate.getInputType().then(lang.hitch(this, 
@@ -768,8 +721,8 @@ define([
                   'ERG-center-point-input',
                   this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry
                 );
-                this._ERGPointBySizeSetCoordLabel(r.inputType);
-                var fs = this.ERGPointBySizeCoordinateFormat.content.formats[r.inputType];
+                this._ERGSetCoordLabel(r.inputType);
+                var fs = this.ERGCoordinateFormat.content.formats[r.inputType];
                 this.ERGCoordTool.inputCoordinate.set('formatString', fs.defaultFormat);
                 this.ERGCoordTool.inputCoordinate.set('formatType', r.inputType);
                 this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym, this._graphicsLayerERGExtent);
@@ -782,7 +735,7 @@ define([
       /**
       * Reformat coordinate label depend on what reference system is chosen
       **/
-      _ERGPointBySizeSetCoordLabel: function (toType) {
+      _ERGSetCoordLabel: function (toType) {
         this.ERGCoordInputLabel.innerHTML = dojoString.substitute(
           this.nls.coordInputLabel + ' (${crdType})', {
               crdType: toType
@@ -793,33 +746,115 @@ define([
       * Handle the format coordinate input popup opening
       * Point by Size Panel
       **/
-      _ERGPointBySizeCoordFormatButtonClicked: function () {
-        this.ERGPointBySizeCoordinateFormat.content.set('ct', this.ERGCoordTool.inputCoordinate.formatType);
+      _ERGFormatButtonClicked: function () {
+        this.ERGCoordinateFormat.content.set('ct', this.ERGCoordTool.inputCoordinate.formatType);
         dijitPopup.open({
-            popup: this.ERGPointBySizeCoordinateFormat,
-            around: this.ERGPointBySizeCoordFormatButton
+            popup: this.ERGCoordinateFormat,
+            around: this.ERGFormatButton
         });
       },
       
       /**
       * Handle the format coordinate input being applied
-      * Point by Size Panel
       **/
-      _ERGPointBySizeCoordFormatPopupApplyButtonClicked: function () {
-        var fs = this.ERGPointBySizeCoordinateFormat.content.formats[this.ERGPointBySizeCoordinateFormat.content.ct];
+      _ERGFormatPopupApplyButtonClicked: function () {
+        var fs = this.ERGCoordinateFormat.content.formats[this.ERGCoordinateFormat.content.ct];
         var cfs = fs.defaultFormat;
-        var fv = this.ERGPointBySizeCoordinateFormat.content.frmtSelect.get('value');
+        var fv = this.ERGCoordinateFormat.content.frmtSelect.get('value');
         if (fs.useCustom) {
             cfs = fs.customFormat;
         }
         this.ERGCoordTool.inputCoordinate.set(
           'formatPrefix',
-          this.ERGPointBySizeCoordinateFormat.content.addSignChkBox.checked
+          this.ERGCoordinateFormat.content.addSignChkBox.checked
         );
         this.ERGCoordTool.inputCoordinate.set('formatString', cfs);
         this.ERGCoordTool.inputCoordinate.set('formatType', fv);
-        this._ERGPointBySizeSetCoordLabel(fv);
-        dijitPopup.close(this.ERGPointBySizeCoordinateFormat);        
+        this._ERGSetCoordLabel(fv);
+        dijitPopup.close(this.ERGCoordinateFormat);        
+      },
+      
+      /**
+      * Handle the create ERG button being clicked
+      **/
+      _CreateERGButtonClicked: function () {
+        // clear any existing ERG overlays
+        this._clearLayers(false);
+        var spatialReference = new SpatialReference({wkid:102100});
+        
+        //get the spill location
+        var spillLocation = WebMercatorUtils.geographicToWebMercator(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
+        
+        var IIAttributeValue, PAAttributeValue, IIDistance, PADistance;
+        var features = [];
+        
+        //check if you need to refer to table 3
+        if(!this._selectedMaterial.TABLE3) {
+          IIAttributeValue = this.spillSize.getValue() + "_ISO"; 
+          PAAttributeValue = this.spillSize.getValue() + "_" + this.spillTime.getValue();
+        } else {
+          IIAttributeValue = this.transportContainer.getValue() + "_ISO";
+          PAAttributeValue = this.transportContainer.getValue() + this.spillTime.getValue() + this.windSpeed.getValue();
+        }
+        
+        IIDistance = this._selectedMaterial[IIAttributeValue];
+        PADistance = this._selectedMaterial[PAAttributeValue];
+        
+        // determine the initial isolation zone
+        var IIBuffer = GeometryEngine.buffer(spillLocation,IIDistance,'meters');        
+        var IIGraphic = new Graphic(IIBuffer,this._extentSym);
+        features.push(IIGraphic);        
+        
+        // Given the wind direction and the protective action distance,
+        // compute the X and Y components of the associated vectors for II & PP
+        var IIvectorX = IIDistance * Math.sin(this.windDirection.getValue() / (180 / Math.PI));
+        var IIvectorY = IIDistance * Math.cos(this.windDirection.getValue() / (180 / Math.PI));
+        
+        var PAvectorX = PADistance * Math.sin(this.windDirection.getValue() / (180 / Math.PI));
+        var PAvectorY = PADistance * Math.cos(this.windDirection.getValue() / (180 / Math.PI));
+        
+        // Calculate the 4 corners of the protective action zone
+        var paPoint1 = new Point(spillLocation.x - PAvectorY/2, spillLocation.y + PAvectorX/2, spatialReference)
+        var paPoint4 = new Point(spillLocation.x + PAvectorY/2, spillLocation.y - PAvectorX/2, spatialReference)
+        var paPoint2 = new Point(paPoint1.x + PAvectorX, paPoint1.y + PAvectorY, spatialReference)
+        var paPoint3 = new Point(paPoint4.x + PAvectorX, paPoint4.y + PAvectorY, spatialReference)
+        
+        // Calculate the 2 coordinates of where the initial isolation zone intersects with the protective action distance        
+        var iiPoint1 = new Point(spillLocation.x - IIvectorY, spillLocation.y + IIvectorX, spatialReference)
+        var iiPoint2 = new Point(spillLocation.x + IIvectorY, spillLocation.y - IIvectorX, spatialReference)
+        
+        // Generate the protective action zone        
+        var polygon = new Polygon(spatialReference);        
+        polygon.addRing([paPoint1,paPoint2,paPoint3,paPoint4,paPoint1]);
+        var PAGraphic = new Graphic(polygon,this._extentSym);
+        features.push(PAGraphic);
+
+        // Compute the "protective action arc" - the arc at the limit of the protective action zone
+        var paBuffer = GeometryEngine.buffer(spillLocation,PADistance,'meters')
+        var protectiveActionArc = GeometryEngine.intersect(paBuffer,polygon)
+        
+        // Swap out the two outer points
+        for(var i = 0; i < protectiveActionArc.rings[0].length; i++)
+        {
+          if(protectiveActionArc.getPoint(0, i).x === paPoint1.x && protectiveActionArc.getPoint(0, i).y === paPoint1.y) {
+            protectiveActionArc.setPoint(0, i, iiPoint1);
+          }
+        }
+        
+        for(var i = 0; i < protectiveActionArc.rings[0].length; i++)
+        {
+          if(protectiveActionArc.getPoint(0, i).x === paPoint4.x && protectiveActionArc.getPoint(0, i).y === paPoint4.y) {
+            protectiveActionArc.setPoint(0, i, iiPoint2);
+          }
+        }
+
+        var protectiveActionArea = GeometryEngine.difference(protectiveActionArc,IIBuffer);
+        var PAAGraphic = new Graphic(protectiveActionArea,this._extentSym);
+        features.push(PAAGraphic);
+        
+        this.ERGArea.applyEdits(features, null, null);
+        
+        this.map.setExtent(polygon.getExtent().expand(2),false);
       },
             
       /**
@@ -848,51 +883,14 @@ define([
         domClass.add(div2, "IMTcolSmall");
         
         // credits
-        var txt = '<br/><br/><br/><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' +
-        '<a style="color:#6e6e6e;text-decoration:none" ' +
-        'href="https://darksky.net/poweredby/" title="Dark Sky" target="_blank">' +
-        'Dark Sky</a></span>';
+        var txt = "<a style='color:#6e6e6e;text-decoration:none' href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'><img style='height:36px;margin-top: 10px;' src='" 
+          + this.folderUrl + "images/darksky.png' />" + '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 'Dark Sky</a></span>';
         var divCredit  = domConstruct.create("div", {
           innerHTML: txt
         }, tpc);
         domClass.add(divCredit, "IMTcolSmall");
         domClass.add(divCredit, "IMTcolLast");
       },
-      
-     
-      
-
-      
-
-      
-      /**
-      * Create right click context delete option on graphics
-      **/
-      createGraphicDeleteMenu: function () {
-          // Creates right-click context menu for GRAPHICS
-          ctxMenuForGraphics = new Menu({}); 
-                  
-          ctxMenuForGraphics.addChild(new MenuItem({ 
-            label: "Delete",
-            onClick: lang.hitch(this, function() {
-              this.ERGArea.remove(selected);
-              //refresh each of the feature/graphic layers to enusre labels are removed
-              this.ERGArea.refresh();             
-            })
-          }));
-
-          ctxMenuForGraphics.startup();
-
-          this.ERGArea.on("mouse-over", function(evt) {
-            selected = evt.graphic;           
-            ctxMenuForGraphics.bindDomNode(evt.graphic.getDojoShape().getNode());
-          });
-
-          this.ERGArea.on("mouse-out", function(evt) {
-            ctxMenuForGraphics.unBindDomNode(evt.graphic.getDojoShape().getNode());
-          });
-        },
-      
       
       /**
       * Handle different theme styles

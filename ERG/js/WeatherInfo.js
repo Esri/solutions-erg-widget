@@ -143,9 +143,9 @@ define([
         }
         
         if(timeInfo === 1) {
-          this.parent.spillTime.setValue('day');
+          this.parent.spillTime.setValue('DY');
         } else {
-          this.parent.spillTime.setValue('night');
+          this.parent.spillTime.setValue('NTE');
         }
 
         // current
@@ -235,21 +235,19 @@ define([
         }
         
         if(cur.windspeedMiles <= 6){          
-          this.parent.windSpeed.setValue('low');
+          this.parent.windSpeed.setValue('LOW');
         } else if (windSpeed > 6 && windSpeed <= 12) {
-          this.parent.windSpeed.setValue('moderate');
+          this.parent.windSpeed.setValue('MOD');
         } else {
-          this.parent.windSpeed.setValue('high');
+          this.parent.windSpeed.setValue('HI');
         }
         
 
       }
 
       // credits
-      var txt = '<br/><br/><br/><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' +
-      '<a style="color:#6e6e6e;text-decoration:none" ' +
-      'href="https://darksky.net/poweredby/" title="Dark Sky" target="_blank">' +
-      'Dark Sky</a></span>';
+      var txt = "<a style='color:#6e6e6e;text-decoration:none' href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'><img style='height:36px;margin-top: 10px;' src='" 
+          + this.parent.folderUrl + "images/darksky.png' />" + '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 'Dark Sky</a></span>';
       var divCredit  = domConstruct.create("div", {
         innerHTML: txt
       }, tpc);

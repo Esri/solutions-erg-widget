@@ -989,7 +989,10 @@
   box-shadow: none;
 }
 .easy-autocomplete a {
-  display: block;
+  display: inline-flex;
+}
+.easy-autocomplete a:hover {
+  cursor: help;
 }
 .easy-autocomplete.eac-blue-light input:hover, .easy-autocomplete.eac-blue-light input:focus {
   border-color: #66afe9;

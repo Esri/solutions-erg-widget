@@ -20,8 +20,8 @@
                       <div class="ERGInputLabel ERGEllipsis" style="width: 100%" title="${nls.coordInputLabelStart}" data-dojo-attach-point="ERGCoordInputLabel">${nls.coordInputLabelStart}</div>                      
                         <div>
                           <input class="jimu-input textInput" data-dojo-attach-point="newERGPointOriginCoords" />                        
-                          <div  title="${nls.formatIconTooltip}" class="jimu-icon settingBtn" data-dojo-attach-point="ERGPointBySizeCoordFormatButton"></div>
-                          <div title="${nls.addPointToolTip}" class="jimu-icon editBtn" data-dojo-attach-point="ERGPointBySizeAddPointBtn"></div>
+                          <div  title="${nls.formatIconTooltip}" class="jimu-icon settingBtn" data-dojo-attach-point="ERGFormatButton"></div>
+                          <div title="${nls.addPointToolTip}" class="jimu-icon editBtn" data-dojo-attach-point="ERGAddPointBtn"></div>
                         </div>  
                   </div>                        
                   <!-- Material Input -->
@@ -33,8 +33,8 @@
                   <div class="ERGFullWidth ERGSettingRow">
                     <div class="ERGInputLabel ERGEllipsis" title="${nls.spillSize}">${nls.spillSize}</div>
                       <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillSize">
-                        <option value="small">${nls.small}</option>
-                        <option value="large">${nls.large}</option>
+                        <option value="SM">${nls.small}</option>
+                        <option value="LG">${nls.large}</option>
                       </select>
                   </div>
                   <!-- Current Weather -->
@@ -55,8 +55,8 @@
                     <div class="ERGHalfWidthRight ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis"  title="${nls.timeOfSpill}">${nls.timeOfSpill}</div>
                       <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillTime">
-                        <option value="day">${nls.day}</option>
-                        <option value="night">${nls.night}</option>                        
+                        <option value="DY">${nls.day}</option>
+                        <option value="NTE">${nls.night}</option>                        
                       </select>                      
                     </div>
                   </div>
@@ -65,30 +65,30 @@
                     <div class="ERGHalfWidthLeft ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis"  title="${nls.windSpeed}">${nls.windSpeed}</div>
                       <select style="width: 100%" data-dojo-type="dijit/form/Select" disabled='true' data-dojo-attach-point="windSpeed">
-                        <option value="low">${nls.low}</option>
-                        <option value="moderate">${nls.moderate}</option>
-                        <option value="high">${nls.high}</option>
+                        <option value="LOW">${nls.low}</option>
+                        <option value="MOD">${nls.moderate}</option>
+                        <option value="HIGH">${nls.high}</option>
                       </select>
                     </div>
                     <div class="ERGHalfWidthRight ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis" title="${nls.transportContainer}">${nls.transportContainer}</div>
                       <select style="width: 100%" data-dojo-type="dijit/form/Select" disabled='true' data-dojo-attach-point="transportContainer">
-                        <option value="rail">${nls.rail}</option>
-                        <option value="semi">${nls.semi}</option>
-                        <option value="mton">${nls.mton}</option>
-                        <option value="ston">${nls.ston}</option>
-                        <option value="ag">${nls.ag}</option>
-                        <option value="msm">${nls.msm}</option>
+                        <option value="RAIL">${nls.rail}</option>
+                        <option value="SEMI">${nls.semi}</option>
+                        <option value="MTON">${nls.mton}</option>
+                        <option value="STON">${nls.ston}</option>
+                        <option value="AG">${nls.ag}</option>
+                        <option value="MSM">${nls.msm}</option>
                       </select>                     
                     </div>
                   </div>
                   <!-- Create & Clear ERG Buttons -->
                   <div class="ERGHalfWidthContainer">
                     <div class="ERGBtnContainer ERGHalfWidthLeft">
-                      <div class='jimu-btn' data-dojo-attach-point='ERGPointBySizeCreateERGButton'>${nls.createERGBtn}</div>
+                      <div class='jimu-btn' data-dojo-attach-point='CreateERGButton'>${nls.createERGBtn}</div>
                     </div>
                     <div class="ERGBtnContainer ERGHalfWidthRight">
-                      <div class='jimu-btn' data-dojo-attach-point='ERGPointBySizeClearERGButton'>${nls.clearERGBtn}</div>
+                      <div class='jimu-btn' data-dojo-attach-point='ClearERGButton'>${nls.clearERGBtn}</div>
                     </div>
                   </div>
                 </div>
