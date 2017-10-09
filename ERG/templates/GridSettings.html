@@ -1,0 +1,102 @@
+﻿<div>
+    <!-- Grid Settings DropDown -->
+    <div class="ERGSettingsRow">
+        <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.gridSettingsLabel}">
+            ${nls.gridSettingsLabel}</div>
+        <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.gridSettingsButtonLabel}" data-dojo-attach-point="gridSettingsButton">
+        </div>
+    </div>
+    
+    <div class="controlGroupHidden" data-dojo-attach-point="gridSettingsContainer">
+        <!-- Grid Shape -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="gridShapeContainer">
+            <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.cellShape}">
+                ${nls.gridSettings.cellShape}</div>
+            <select data-dojo-attach-point="cellShape" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Units -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="gridUnitsContainer">
+            <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.cellUnits}">
+                ${nls.gridSettings.cellUnits}</div>
+            <select data-dojo-attach-point="cellUnits" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Grid Origin -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="gridOriginContainer">
+            <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.gridOrigin}">
+                ${nls.gridSettings.gridOrigin}</div>
+            <select data-dojo-attach-point="gridOrigin" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Reference System -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="gridRefSystemContainer">
+            <div class="ERGDropdownLabel ERGEllipsis labelLeft" title="${nls.gridSettings.gridReferenceSystem}">
+                ${nls.gridSettings.gridReferenceSystem}</div>
+            <div class="ERGDropdownLabel ERGEllipsis labelRight" title="${nls.gridSettings.gridDatum}">
+                ${nls.gridSettings.gridDatum}</div>
+            <select data-dojo-attach-point="referenceSystem" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Cell Outline Color -->
+        <div class="ERGFullWidth ERGSettingRow">
+          <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.cellOutline}">
+                ${nls.gridSettings.cellOutline}</div>
+          <div class="colorPicker" data-dojo-attach-point="cellOutlineColorPicker"></div>
+        </div>
+        
+        <!-- Cell fill Color -->
+        <div class="ERGFullWidth ERGSettingRow SettingsLastRow">
+          <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.cellFill}">
+                ${nls.gridSettings.cellFill}</div>
+          <div class="colorPicker" data-dojo-attach-point="cellFillColorPicker"></div>
+        </div>
+    </div>
+    
+    <!-- Label Settings DropDown -->
+    <div class="ERGSettingsRow">
+        <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.labelSettingsLabel}">
+            ${nls.labelSettingsLabel}</div>
+        <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.labelSettingsButtonLabel}" data-dojo-attach-point="labelSettingsButton">
+        </div>
+    </div>
+    
+    <div class="controlGroupHidden" data-dojo-attach-point="labelSettingsContainer">
+        
+        <!-- Label Start Position Selector -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="labelStartPositionContainer">
+            <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.labelStartPosition}">
+                ${nls.gridSettings.labelStartPosition}</div>
+            <select data-dojo-attach-point="labelStartPosition" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Labelling Style -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="labelStyleContainer">
+            <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.labelType}">
+                ${nls.gridSettings.labelType}</div>
+            <select data-dojo-attach-point="labelType" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Labelling direction -->
+        <div class="ERGFullWidth ERGSettingRow" data-dojo-attach-point="labelDirectionContainer">
+            <div class="ERGDropdownLabel ERGEllipsis" title="${nls.gridSettings.labelDirection}">
+                ${nls.gridSettings.labelDirection}</div>
+            <select data-dojo-attach-point="labelDirection" style="width: 100%" data-dojo-type="dijit/form/Select">
+            </select>
+        </div>
+        
+        <!-- Font Settings -->
+        <div class="ERGFullWidth ERGSettingRow SettingsLastRow" data-dojo-attach-point="fontSettingsContainer">
+          <div class="ERGDropdownLabel ERGEllipsis" title="${nls.labelStyle}">
+                ${nls.labelStyle}</div>
+          <div data-dojo-attach-point="fontSettingNode"></div>
+        </div>        
+        
+    </div>
+</div>

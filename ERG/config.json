@@ -1,49 +1,34 @@
 {
-    "chemicalGPService": {
-        "url": "http://arcgis-emergencymanagement-2057568539.us-east-1.elb.amazonaws.com/arcgis/rest/services/COP/ERGByChemical/GPServer/ERG%20By%20Chemical"
+  "erg": {
+    "cellFill": {
+      "color": "#ffffff",
+      "transparency": 1
     },
-    "placardGPService": {
-        "url": "http://arcgis-emergencymanagement-2057568539.us-east-1.elb.amazonaws.com/arcgis/rest/services/COP/ERGByPlacard/GPServer/ERG%20By%20Placard"    
+    "cellOutline": {
+      "color": "#000080",
+      "transparency": 0
     },
-    "weatherStationGPService": {
-        "url": "http://arcgis-emergencymanagement-2057568539.us-east-1.elb.amazonaws.com/arcgis/rest/services/COP/FindNearestWS/GPServer/FindNearestWeatherStation"
+    "cellShape": "default",
+    "cellUnits": "meters",
+    "gridOrigin": "center",
+    "font": {
+      "font": {
+        "fontFamily": "Arial",
+        "bold": true,
+        "italic": false,
+        "underline": false
+      },
+      "fontSize": "12",
+      "textColor": "#000000",
+      "haloSize": "1",
+      "haloColor": "#ffffff",
+      "haloOn": true,
+      "labelTransparency": 0
     },
-    "windDirectionLayer": {
-        "url": "http://arcgis-emergencymanagement-2057568539.us-east-1.elb.amazonaws.com/arcgis/rest/services/COP/EmergencyOperations/MapServer/11",
-        "windDirectionField": "WindDirection",
-        "stationNameField": "StationName",
-        "dateTimeField": "UTC_DateTime"
-    },
-    "facilitiesLayer": {
-        "url": "http://arcgis-emergencymanagement-2057568539.us-east-1.elb.amazonaws.com/arcgis/rest/services/COP/EmergencyOperations/MapServer/0",
-        "fields": ["NAME","FEATURECODE","STATE"],
-        "labelField": "NAME"
-    },
-    "demographicLayer": {
-        "url": "http://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/1",
-        "label": "Demographic Data",
-        "labelField": "NAME",
-        "fields": ["*"],
-        "medias": [{
-            "chartField": "POP2007",
-            "title": "Total Population",
-            "description": "Total population for selected census blocks for 2007",
-            "type": "columnschart"
-        },{
-            "chartField": "MALES",
-            "title": "Population Males",
-            "description": "Total male population for selected census blocks in 2007",
-            "type": "columnschart"
-        },{
-            "chartField": "FEMALES",
-            "title": "Population Females",
-            "description": "Total female population for selected census blocks in 2007",
-            "type": "columnschart"
-        },{
-            "chartField": "HOUSEHOLDS",
-            "title": "Number of Households",
-            "description": "Total number of households for selected census blocks in 2007",
-            "type": "columnschart"
-        }]
-    }
+    "labelType": "alphaNumeric",
+    "labelDirection": "horizontal",
+    "labelOrigin": "lowerLeft",
+    "referenceSystem": "MGRS",
+    "lockSettings": false
+  }
 }
