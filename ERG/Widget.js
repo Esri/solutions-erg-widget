@@ -540,11 +540,12 @@ define([
         //refresh ERG layer to make sure any labels are removed
         this.ERGArea.refresh();          
         
-        this._resetWeatherInfo();
         
-        //sometimes we only want to clear the ERGArea layer and not the graphic layer 
+        
+        //sometimes we only want to clear the ERG overlay and not the spill location 
         if(includeExtentLayer) {
-          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);          
+          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);
+          this._resetWeatherInfo();          
         }
       },
 
