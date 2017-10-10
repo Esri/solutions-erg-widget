@@ -32,7 +32,7 @@ define([
   'dojo/store/Memory',
   'dojo/topic',
   'dojo/_base/html',
-  'dojo/text!./materials.json',
+  'dojo/text!./guide/materials.json',
   
   'dijit/form/FilteringSelect',
   'dijit/_WidgetBase',
