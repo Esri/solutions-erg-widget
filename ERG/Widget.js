@@ -60,7 +60,9 @@ define([
   'esri/geometry/Extent',
   'esri/geometry/Point',  
   'esri/geometry/Polygon',
+  'esri/geometry/Circle',
   'esri/geometry/webMercatorUtils',
+  'esri/graphicsUtils',
   'esri/layers/FeatureLayer',
   'esri/layers/GraphicsLayer',
   'esri/layers/LabelClass',
@@ -70,7 +72,7 @@ define([
   'esri/symbols/SimpleFillSymbol',
   'esri/symbols/TextSymbol',
   'esri/toolbars/draw',
-  'esri/renderers/SimpleRenderer',
+  'esri/renderers/UniqueValueRenderer',
   'esri/tasks/query',
   'esri/request',
   
@@ -128,7 +130,9 @@ define([
     Extent,
     Point,
     Polygon,
+    Circle,
     WebMercatorUtils,
+    graphicsUtils,
     FeatureLayer,
     GraphicsLayer,
     LabelClass,
@@ -138,7 +142,7 @@ define([
     SimpleFillSymbol,
     TextSymbol,
     Draw,
-    SimpleRenderer,
+    UniqueValueRenderer,
     Query,
     esriRequest,
     GridSettings,
@@ -235,30 +239,10 @@ define([
               "alias": "ObjectID",
               "type": "esriFieldTypeOID"
               }, {
-              "name": "grid",
-              "alias": "grid",
+              "name": "type",
+              "alias": "type",
               "type": "esriFieldTypeString"
-            }],
-            "drawingInfo": {
-              "renderer": {
-                "type": "simple",
-                "symbol": this.gridSymbol
-              },
-              "transparency": 0,
-              "labelingInfo": [{
-                "labelExpression": "[grid]",
-                "labelExpressionInfo": {"value": "{grid}"},
-                "format": null,
-                "fieldInfos": null,
-                "useCodedValues": false,
-                "maxScale": 0,
-                "minScale": 0,
-                "where": null,
-                "sizeInfo": null,
-                "labelPlacement": "esriServerPolygonPlacementAlwaysHorizontal",
-                "symbol": this._cellTextSymbol
-                }]
-            },
+            }],            
             "extent": {
               "xmin":-18746028.312877923,
               "ymin":-6027547.894280539,
@@ -333,7 +317,8 @@ define([
             onChooseEvent: lang.hitch(this, function() {
               var index = $(this.materialType).getSelectedItemIndex();
               this._selectedMaterial = $(this.materialType).getSelectedItemData(index);
-              if ($(this.materialType).getSelectedItemData(index).TABLE3){
+              
+              if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
                 var alertMessage = new Message({
                   message: this.nls.table3Message
                 })
@@ -343,9 +328,31 @@ define([
                 this.windSpeed.set('disabled', true);
                 this.transportContainer.set('disabled', true);
               }
+              
+              if (this._selectedMaterial.BLEVE){
+                var alertMessage = new Message({
+                  message: this.nls.bleveMessage
+                })
+                this.useBleve.set('disabled', false);
+                this.tankCapacity.set('disabled', false);
+              } else {
+                this.useBleve.set('disabled', true);
+                this.tankCapacity.set('disabled', true);
+              }
+              
+              if(this._selectedMaterial.Material.includes('Substances')) {
+                this.spillSize.setValue('SM');
+                this.spillSize.set('disabled', true);
+              }
+              
+              if(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry) {
+                dojo.removeClass(this.CreateERGButton, 'jimu-state-disabled');
+              }
             }),            
             onShowListEvent: lang.hitch(this, function() {
               this._selectedMaterial = null;
+              this.spillSize.set('disabled', false);
+              dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
             })            
           }          
         };
@@ -401,6 +408,12 @@ define([
               
             //Handle click event of clear ERG button        
             this.own(on(this.ClearERGButton, 'click', lang.hitch(this, function () {
+              this.materialType.value = '';
+              this.windSpeed.set('disabled', true);
+              this.transportContainer.set('disabled', true);
+              this.useBleve.set('disabled', true);
+              this.tankCapacity.set('disabled', true);
+              this._selectedMaterial = null;
               this._clearLayers(true);
             })));
             
@@ -449,6 +462,22 @@ define([
               }
             )));
             
+            //Handle spill size dropdown change
+            this.own(on(this.spillSize, 'change', lang.hitch(this, function () { 
+              if(this._selectedMaterial) {
+                if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
+                  var alertMessage = new Message({
+                    message: this.nls.table3Message
+                  })
+                  this.windSpeed.set('disabled', false);
+                  this.transportContainer.set('disabled', false);
+                } else {
+                  this.windSpeed.set('disabled', true);
+                  this.transportContainer.set('disabled', true);
+                }
+              }
+            })));
+            
         /**
         * Settings panel
         **/        
@@ -482,16 +511,6 @@ define([
               }
             })));
             
-            //Handle click event of show labels toggle button
-            this.own(on(this.settingsShowLabelsToggle, 'click', lang.hitch(this, function () {
-              var featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById("Gridded-Reference-Graphic");
-              this._showLabels = this.settingsShowLabelsToggle.checked;
-              if(this.settingsShowLabelsToggle.checked) {                
-                featureLayerInfo.showLabels();
-              } else {
-                featureLayerInfo.hideLabels();
-              }
-            })));
       },
       
       /**
@@ -538,13 +557,13 @@ define([
       _clearLayers: function (includeExtentLayer) {
         this.ERGArea.clear();
         //refresh ERG layer to make sure any labels are removed
-        this.ERGArea.refresh();          
-        
-        
+        this.ERGArea.refresh();
         
         //sometimes we only want to clear the ERG overlay and not the spill location 
         if(includeExtentLayer) {
-          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);
+          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);                    
+          dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
+          this.ERGCoordTool.clear();
           this._resetWeatherInfo();          
         }
       },
@@ -571,15 +590,6 @@ define([
             this._gridOrigin = updatedSettings.gridOrigin;
             this._referenceSystem = updatedSettings.referenceSystem;
             
-            // show or hide labels
-            featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById("Gridded-Reference-Graphic");
-            featureLayerInfo.enablePopup();
-            if(this._showLabels) {
-              featureLayerInfo.showLabels();
-            } else {
-              featureLayerInfo.hideLabels();
-            }
-            
             //set grid colours
             var fillColor = new Color(updatedSettings.gridFillColor);
             fillColor.a = 1 - updatedSettings.gridFillTransparency;
@@ -599,55 +609,104 @@ define([
               }
             };
             
-            // create a renderer for the ERG layer to override default symbology
-            var gridSymbol = new SimpleFillSymbol(this._ERGAreaFillSymbol); 
-            var gridRenderer = new SimpleRenderer(gridSymbol);
-            this.ERGArea.setRenderer(gridRenderer);
-            
-            //set label properties
-            var textColor = new Color(updatedSettings.fontSettings.textColor);            
-            var labelTrans = (1 - updatedSettings.fontSettings.labelTransparency) * 255;
-            
-            if(updatedSettings.fontSettings.haloOn){
-              var haloSize = parseInt(updatedSettings.fontSettings.haloSize);
-            } else {
-              var haloSize = 0;
+            var uvrJson = {"type": "uniqueValue",
+              "field1": "Type",
+              "defaultSymbol": {
+                "color": [255, 153, 0, 128],
+                "outline": {
+                  "color": [255, 153, 0, 255],
+                  "width": 1,
+                  "type": "esriSLS",
+                  "style": "esriSLSSolid"
+                },
+                "type": "esriSFS",
+                "style": "esriSFSSolid"
+              },
+              "uniqueValueInfos": [{
+                "value": "Spill Location",
+                "symbol": {
+                  "color": [0, 0, 0, 255],
+                  "outline": {
+                    "color": [0, 0, 0, 255],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": "esriSLSSolid"
+                  },
+                  "type": "esriSFS",
+                  "style": "esriSFSSolid"
+                }
+              }, {
+                "value": "II Zone",
+                "symbol": {
+                  "color": [255, 153, 0, 128],
+                  "outline": {
+                    "color": [255, 153, 0, 255],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": "esriSLSSolid"
+                  },
+                  "type": "esriSFS",
+                  "style": "esriSFSSolid"
+                }
+              }, {
+                "value": "Bleve",
+                "symbol": {
+                  "color": [255, 153, 0, 128],
+                  "outline": {
+                    "color": [255, 153, 0, 255],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": "esriSLSSolid"
+                  },
+                  "type": "esriSFS",
+                  "style": "esriSFSSolid"
+                }
+              }, {
+                "value": "Fire",
+                "symbol": {
+                  "color": [255, 153, 0, 128],
+                  "outline": {
+                    "color": [255, 153, 0, 255],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": "esriSLSSolid"
+                  },
+                  "type": "esriSFS",
+                  "style": "esriSFSSolid"
+                }
+              }, {
+                "value": "Down Wind",
+                "symbol": {
+                  "color": [255, 153, 0, 128],
+                  "outline": {
+                    "color": [255, 153, 0, 255],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": "esriSLSSolid"
+                  },
+                  "type": "esriSFS",
+                  "style": "esriSFSSolid"
+                }
+              }, {
+                "value": "Protective Action Area",
+                "symbol": {
+                  "color": [255, 153, 0, 128],
+                  "outline": {
+                    "color": [255, 153, 0, 255],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": "esriSLSSolid"
+                  },
+                  "type": "esriSFS",
+                  "style": "esriSFSSolid"
+                }
+              }]
             }
             
-            var haloColor = new Color(updatedSettings.fontSettings.haloColor);
-            
-            //override the text symbol with the new settings
-            this._cellTextSymbol = {
-              "type": "esriTS",
-              "color": [
-                textColor.r,
-                textColor.g,
-                textColor.b,
-                labelTrans
-              ],
-              "haloSize": haloSize,
-              "haloColor": [
-                haloColor.r,
-                haloColor.g,
-                haloColor.b,
-                labelTrans
-              ],              
-              "horizontalAlignment": "center",
-              "font": {
-                "size": parseInt(updatedSettings.fontSettings.fontSize),
-                "style": updatedSettings.fontSettings.font.italic?"italic":"normal",
-                "weight": updatedSettings.fontSettings.font.bold?"bold":"normal",
-                "family": updatedSettings.fontSettings.font.fontFamily,
-                "decoration" : updatedSettings.fontSettings.font.underline?"underline":"none"
-              }              
-            };
-                        
-            // create a text symbol to define the style of labels
-            var json = {"labelExpressionInfo": {"value" : "{grid}"}};
-            var labelClass = new LabelClass(json);
-            labelClass.symbol = new TextSymbol(this._cellTextSymbol);
-            this.ERGArea.setLabelingInfo([labelClass]);
-            
+            // create a renderer for the ERG layer to override default symbology
+            var renderer = new UniqueValueRenderer(uvrJson);
+            this.ERGArea.setRenderer(renderer);
+           
             //refresh the layer to apply the settings
             this.ERGArea.refresh();              
           })));
@@ -702,6 +761,9 @@ define([
         domClass.remove(this.ERGAddPointBtn, 'jimu-edit-active');
         this.dt.deactivate();
         this.map.enableMapNavigation();
+        if(this._selectedMaterial) {
+          dojo.removeClass(this.CreateERGButton, 'jimu-state-disabled');
+        }
       },
       
       /**
@@ -779,85 +841,131 @@ define([
       * Handle the create ERG button being clicked
       **/
       _CreateERGButtonClicked: function () {
-        // clear any existing ERG overlays
-        this._clearLayers(false);
-        var spatialReference = new SpatialReference({wkid:102100});
-        
-        //get the spill location
-        var spillLocation = WebMercatorUtils.geographicToWebMercator(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
-        
-        var IIAttributeValue, PAAttributeValue, IIDistance, PADistance;
-        var features = [];
-        
-        //check if you need to refer to table 3
-        if(!this._selectedMaterial.TABLE3) {
-          IIAttributeValue = this.spillSize.getValue() + "_ISO"; 
-          PAAttributeValue = this.spillSize.getValue() + "_" + this.spillTime.getValue();
-        } else {
-          IIAttributeValue = this.transportContainer.getValue() + "_ISO";
-          PAAttributeValue = this.transportContainer.getValue() + this.spillTime.getValue() + this.windSpeed.getValue();
-        }
-        
-        IIDistance = this._selectedMaterial[IIAttributeValue];
-        PADistance = this._selectedMaterial[PAAttributeValue];
-        
-        // determine the initial isolation zone
-        var IIBuffer = GeometryEngine.buffer(spillLocation,IIDistance,'meters');        
-        var IIGraphic = new Graphic(IIBuffer,this._extentSym);
-        features.push(IIGraphic);        
-        
-        // Given the wind direction and the protective action distance,
-        // compute the X and Y components of the associated vectors for II & PP
-        var IIvectorX = IIDistance * Math.sin(this.windDirection.getValue() / (180 / Math.PI));
-        var IIvectorY = IIDistance * Math.cos(this.windDirection.getValue() / (180 / Math.PI));
-        
-        var PAvectorX = PADistance * Math.sin(this.windDirection.getValue() / (180 / Math.PI));
-        var PAvectorY = PADistance * Math.cos(this.windDirection.getValue() / (180 / Math.PI));
-        
-        // Calculate the 4 corners of the protective action zone
-        var paPoint1 = new Point(spillLocation.x - PAvectorY/2, spillLocation.y + PAvectorX/2, spatialReference)
-        var paPoint4 = new Point(spillLocation.x + PAvectorY/2, spillLocation.y - PAvectorX/2, spatialReference)
-        var paPoint2 = new Point(paPoint1.x + PAvectorX, paPoint1.y + PAvectorY, spatialReference)
-        var paPoint3 = new Point(paPoint4.x + PAvectorX, paPoint4.y + PAvectorY, spatialReference)
-        
-        // Calculate the 2 coordinates of where the initial isolation zone intersects with the protective action distance        
-        var iiPoint1 = new Point(spillLocation.x - IIvectorY, spillLocation.y + IIvectorX, spatialReference)
-        var iiPoint2 = new Point(spillLocation.x + IIvectorY, spillLocation.y - IIvectorX, spatialReference)
-        
-        // Generate the protective action zone        
-        var polygon = new Polygon(spatialReference);        
-        polygon.addRing([paPoint1,paPoint2,paPoint3,paPoint4,paPoint1]);
-        var PAGraphic = new Graphic(polygon,this._extentSym);
-        features.push(PAGraphic);
-
-        // Compute the "protective action arc" - the arc at the limit of the protective action zone
-        var paBuffer = GeometryEngine.buffer(spillLocation,PADistance,'meters')
-        var protectiveActionArc = GeometryEngine.intersect(paBuffer,polygon)
-        
-        // Swap out the two outer points
-        for(var i = 0; i < protectiveActionArc.rings[0].length; i++)
-        {
-          if(protectiveActionArc.getPoint(0, i).x === paPoint1.x && protectiveActionArc.getPoint(0, i).y === paPoint1.y) {
-            protectiveActionArc.setPoint(0, i, iiPoint1);
+        if(this._selectedMaterial && this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry) {
+          var IIAttributeValue, PAAttributeValue, bleveAttributeValue, IIDistance, PADistance;
+          var features = [];
+          
+          var spatialReference = new SpatialReference({wkid:102100});
+          
+          //get the spill location
+          var spillLocation = WebMercatorUtils.geographicToWebMercator(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
+          
+          // clear any existing ERG overlays
+          this._clearLayers(true);
+          
+          //check if you need to refer to table 3
+          if(!this._selectedMaterial.TABLE3) {
+            IIAttributeValue = this.spillSize.getValue() + "_ISO";
+            PAAttributeValue = this.spillSize.getValue() + "_" + this.spillTime.getValue();
+          } else {
+            IIAttributeValue = this.transportContainer.getValue() + "_ISO";
+            PAAttributeValue = this.transportContainer.getValue() + this.spillTime.getValue() + this.windSpeed.getValue();
           }
-        }
-        
-        for(var i = 0; i < protectiveActionArc.rings[0].length; i++)
-        {
-          if(protectiveActionArc.getPoint(0, i).x === paPoint4.x && protectiveActionArc.getPoint(0, i).y === paPoint4.y) {
-            protectiveActionArc.setPoint(0, i, iiPoint2);
+          
+          IIDistance = this._selectedMaterial[IIAttributeValue];
+          PADistance = this._selectedMaterial[PAAttributeValue];
+          
+          // determine the initial isolation zone
+          var IIZone = new Circle({
+            center: spillLocation,
+            radius: IIDistance,
+            geodesic: true,
+            numberOfPoints: 360
+          });        
+          var IIGraphic = new Graphic(IIZone);
+          IIGraphic.setAttributes({"type": "II Zone"});
+          features.push(IIGraphic);
+          
+          // show BLEVE zone
+          if(this.useBleve.getValue() === 'yes' && this._selectedMaterial.BLEVE){            
+            bleveAttributeValue = this.tankCapacity.getValue();
+            var bleveZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial[bleveAttributeValue],'meters');
+            var bleveZoneGraphic = new Graphic(bleveZone);
+            bleveZoneGraphic.setAttributes({"type": "Bleve"});
+            features.push(bleveZoneGraphic);
           }
-        }
-
-        var protectiveActionArea = GeometryEngine.difference(protectiveActionArc,IIBuffer);
-        var PAAGraphic = new Graphic(protectiveActionArea,this._extentSym);
-        features.push(PAAGraphic);
-        
-        this.ERGArea.applyEdits(features, null, null);
-        
-        this.map.setExtent(polygon.getExtent().expand(2),false);
-      },
+          
+          // show fire evaction zone
+          if(this.fire.getValue() === 'yes'){
+            var fireZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial['FIRE_ISO'],'meters');
+            var fireZoneGraphic = new Graphic(fireZone);
+            fireZoneGraphic.setAttributes({"type": "Fire"});
+            features.push(fireZoneGraphic);
+          }
+          
+          if(this._selectedMaterial.Material.includes('Substances') || this._selectedMaterial.BLEVE) {
+            // Materials with the word Substances in their title or BLEVE values do not have any PA distances
+            // warn the user to this then zoom to the II Zone
+            var alertMessage = new Message({
+              message: this.nls.noPAZoneMessage
+            }); 
+          } else {          
+            // create a circle from the spill location that we can use to calculate
+            // the center point that will be used for the Protective Action (PA) Zone
+            var PACircle = new Circle({
+                center: spillLocation,
+                radius: PADistance/2,
+                geodesic: true,
+                numberOfPoints: 360
+            });
             
+            // Get the center point for the PA Zone (first point of the circle due north)
+            var PACenter = PACircle.getPoint(0,0);
+            
+            // Create another circle from this center point, the extent of which will be the PA Zone
+            var PAZone = new Circle({
+                center: PACenter,
+                radius: PADistance/2,
+                geodesic: true,
+            });
+            
+            // get the two bottom corners of the PA Zone - these will be swapped out below
+            var PAZoneExtent = PAZone.getExtent();
+            var PAPoint1 = new Point(PAZoneExtent.xmin,PAZoneExtent.ymin,spatialReference);
+            var PAPoint2 = new Point(PAZoneExtent.xmax,PAZoneExtent.ymin,spatialReference);
+            
+            // Compute the "protective action arc" - the arc at the limit of the protective action zone
+            var paBuffer = GeometryEngine.geodesicBuffer(spillLocation,PADistance,'meters');
+            var protectiveActionArc = GeometryEngine.intersect(paBuffer,Polygon.fromExtent(PAZoneExtent));
+                      
+            // get the 2 coordinates where the initial isolation zone intersects with the protective action distance
+            var iiPoint1 = IIZone.getPoint(0,270);
+            var iiPoint2 = IIZone.getPoint(0,90);
+            
+            // Swap out the two bottom corners to create the fan
+            array.forEach(protectiveActionArc.rings[0],lang.hitch(this, function(point, i){
+              if(point[0] === PAPoint1.x && point[1] === PAPoint1.y) {
+                protectiveActionArc.setPoint(0, i, iiPoint1);
+              } else if(point[0] === PAPoint2.x && point[1] === PAPoint2.y) {
+                protectiveActionArc.setPoint(0, i, iiPoint2);
+              }
+            }));
+            
+            var protectiveActionArea = GeometryEngine.difference(protectiveActionArc,IIZone);
+            
+            // all geometry so far is orientated north so rotate what we need to the wind direction
+            protectiveActionArea = GeometryEngine.rotate(protectiveActionArea,this.windDirection.getValue() * -1,spillLocation);         
+            PAZoneArea = GeometryEngine.rotate(Polygon.fromExtent(PAZoneExtent),this.windDirection.getValue() * -1,spillLocation);
+                      
+            var PAAGraphic = new Graphic(protectiveActionArea);
+            PAAGraphic.setAttributes({"type": "Down Wind"});
+            var PAZoneGraphic = new Graphic(PAZoneArea);
+            PAZoneGraphic.setAttributes({"type": "Protective Action Area"});
+            
+            features.push(PAAGraphic,PAZoneGraphic);
+            } 
+
+          // draw a small polygon to show spill location
+          var spillLocationPoly = GeometryEngine.geodesicBuffer(spillLocation,2.5,'meters');
+          var spillLocationGraphic = new Graphic(spillLocationPoly);
+          spillLocationGraphic.setAttributes({"type": "Spill Location"}); 
+          features.push(spillLocationGraphic);
+          
+          this.ERGArea.applyEdits(features, null, null);
+          this.map.setExtent(graphicsUtils.graphicsExtent(this.ERGArea.graphics).expand(2),false);
+        }
+      },
+                  
       /**
       * reset the weather info
       **/
@@ -990,26 +1098,7 @@ define([
                           outFields: ["*"],
                               
                          });                        
-                        this.map.addLayers([newFeatureLayer]);                        
-                        
-                        //must ensure the layer is loaded before we can access it to turn on the labels if required
-                        if(newFeatureLayer.loaded){
-                          // show or hide labels
-                          featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
-                          featureLayerInfo.enablePopup();
-                          if(this._showLabels) {
-                            featureLayerInfo.showLabels();
-                          }
-                        } else {
-                          newFeatureLayer.on("load", lang.hitch(this, function () {
-                            // show or hide labels
-                            featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
-                            featureLayerInfo.enablePopup();
-                            if(this._showLabels) {
-                              featureLayerInfo.showLabels();
-                            }
-                          }));
-                        }
+                        this.map.addLayers([newFeatureLayer]);
                         
                         var newGraphics = [];
                         array.forEach(this.ERGArea.graphics, function (g) {

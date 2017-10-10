@@ -29,7 +29,8 @@ define([
   'dojo/dom-class',
   'dojo/query',
   'dijit/registry',
-  'dijit/form/Select'  
+  'dijit/form/Select',
+  'jimu/dijit/SymbolChooser',  
 ],
   function (
     declare,
@@ -51,19 +52,7 @@ define([
       baseClass: 'jimu-widget-ERG-Settings',
       templateString: GridSettingsTemplate,
       selectedGridSettings: {}, //Holds selected Settings
-      _defaultColor: '#1a299c',
-      _defaultTextSize: 12,
-      _defaultFont: {"font": {"fontFamily": "Arial","bold": false,"italic": false,"underline": false},"fontSize": 12,"textColor": "#2f4f4f"},
-      gridSettingsOptions:  {
-          "cellShape": ["default", "hexagon"],
-          "cellUnits": ["meters", "kilometers", "miles", "nautical-miles", "yards", "feet"],
-          "labelStartPosition": ["lowerLeft", "lowerRight", "upperLeft", "upperRight"],      
-          "labelType": ["alphaNumeric", "alphaAlpha", "numeric"],
-          "labelDirection": ["horizontal", "vertical"],
-          "gridOrigin": ["center", "lowerLeft", "lowerRight", "upperLeft", "upperRight"],
-          "referenceSystem": ["MGRS", "USNG"]
-        }, //Object that holds all the options and their keys
-
+      
       constructor: function (options) {
         lang.mixin(this, options);
       },
@@ -71,53 +60,8 @@ define([
       //Load all the options on startup
       startup: function () {
         
-        this.gridOutlineColorPicker = new ColorPickerEditor({nls: this.nls}, this.cellOutlineColorPicker);
-        this.gridOutlineColorPicker.setValues({
-            "color": this.config.erg.cellOutline.color,
-            "transparency": this.config.erg.cellOutline.transparency
-          });
-        this.gridOutlineColorPicker.startup();
-        
-          
-        this.gridFillColorPicker = new ColorPickerEditor({nls: this.nls}, this.cellFillColorPicker);
-        this.gridFillColorPicker.setValues({
-            "color": this.config.erg.cellFill.color,
-            "transparency": this.config.erg.cellFill.transparency
-          });
-        this.gridFillColorPicker.startup();
-        
-          
-        this.fontSetting = new FontSetting({
-            config: this.config.erg.font || this._defaultFont,
-            nls: this.nls
-          }, this.fontSettingNode);
-        
-        this.fontSetting.startup();
-          
-        //load options for all drop downs
-        this._loadOptionsForDropDown(this.cellShape, this.gridSettingsOptions.cellShape);
-        this._loadOptionsForDropDown(this.labelStartPosition, this.gridSettingsOptions.labelStartPosition);
-        this._loadOptionsForDropDown(this.cellUnits, this.gridSettingsOptions.cellUnits);
-        this._loadOptionsForDropDown(this.labelType, this.gridSettingsOptions.labelType);
-        this._loadOptionsForDropDown(this.labelDirection, this.gridSettingsOptions.labelDirection);
-        this._loadOptionsForDropDown(this.gridOrigin, this.gridSettingsOptions.gridOrigin);
-        this._loadOptionsForDropDown(this.referenceSystem, this.gridSettingsOptions.referenceSystem);
-        
         if(this.config.erg) {          
-          this.cellShape.setValue(this.config.erg.cellShape);
-          this.cellUnits.setValue(this.config.erg.cellUnits);
-          this.gridOrigin.setValue(this.config.erg.gridOrigin);
-          this.labelType.setValue(this.config.erg.labelType);
-          this.labelDirection.setValue(this.config.erg.labelDirection);
-          this.labelStartPosition.setValue(this.config.erg.labelOrigin);
-          this.referenceSystem.setValue(this.config.erg.referenceSystem);
-
-          if(this.cellShape.get('value') == 'hexagon') {
-            this.labelDirection.set('disabled',true);
-            this.labelDirection.setValue('horizontal');
-          } else {
-            this.labelDirection.set('disabled',false);
-          }          
+                  
         }
         
         //send by default updated parameters
@@ -137,73 +81,45 @@ define([
       * Handle click events for different controls
       * @memberOf widgets/ERG/Widget
       **/
-      _handleClickEvents: function () {        
-        //handle grid settings button clicked
-        this.own(on(this.gridSettingsButton, "click", lang.hitch(this, function () {
-          if(domClass.contains(this.gridSettingsButton,'ERGLabelSettingsDownButton')) {
-            //in closed state - so open and change arrow to up
-            html.removeClass(this.gridSettingsContainer, 'controlGroupHidden');
-            html.removeClass(this.gridSettingsButton, 'ERGLabelSettingsDownButton');
-            html.addClass(this.gridSettingsButton, 'ERGLabelSettingsUpButton');
-            //close label settings if open
-            html.addClass(this.labelSettingsContainer, 'controlGroupHidden');
-            html.removeClass(this.labelSettingsButton, 'ERGLabelSettingsUpButton');
-            html.addClass(this.labelSettingsButton, 'ERGLabelSettingsDownButton');
-          } else {
-            //in open state - so close and change arrow to down
-            html.addClass(this.gridSettingsContainer, 'controlGroupHidden');
-            html.addClass(this.gridSettingsButton, 'ERGLabelSettingsDownButton');
-            html.removeClass(this.gridSettingsButton, 'ERGLabelSettingsUpButton');
-          }
+      _handleClickEvents: function () {
+        //handle spill location button clicked
+        this.own(on(this.spillLocationSettingsButton, "click", lang.hitch(this, function () {
+          this._openCloseNodes(this.spillLocationSettingsButton,this.spillLocationContainer);
         })));
-        
-        //handle label settings button clicked
-        this.own(on(this.labelSettingsButton, "click", lang.hitch(this, function () {
-          if(domClass.contains(this.labelSettingsButton,'ERGLabelSettingsDownButton')) {
-            //in closed state - so open and change arrow to up
-            html.removeClass(this.labelSettingsContainer, 'controlGroupHidden');
-            html.removeClass(this.labelSettingsButton, 'ERGLabelSettingsDownButton');
-            html.addClass(this.labelSettingsButton, 'ERGLabelSettingsUpButton');
-            //close label settings if open
-            html.addClass(this.gridSettingsContainer, 'controlGroupHidden');
-            html.removeClass(this.gridSettingsButton, 'ERGLabelSettingsUpButton');
-            html.addClass(this.gridSettingsButton, 'ERGLabelSettingsDownButton');
-          } else {
-            //in open state - so close and change arrow to down
-            html.addClass(this.labelSettingsContainer, 'controlGroupHidden');
-            html.addClass(this.labelSettingsButton, 'ERGLabelSettingsDownButton');
-            html.removeClass(this.labelSettingsButton, 'ERGLabelSettingsUpButton');
-          }
+        //handle spill location button clicked
+        this.own(on(this.IISettingsButton, "click", lang.hitch(this, function () {
+          this._openCloseNodes(this.IISettingsButton,this.IIZoneContainer);
         })));
-        
-        this.own(on(this.cellShape, 'change', lang.hitch(this, function () {
-          if(this.cellShape.get('value') == 'hexagon') {
-            this.labelDirection.set('disabled',true);
-            this.labelDirection.setValue('horizontal');
-          } else {
-            this.labelDirection.set('disabled',false);
-          }
+        //handle spill location button clicked
+        this.own(on(this.fireSettingsButton, "click", lang.hitch(this, function () {
+          this._openCloseNodes(this.fireSettingsButton,this.fireZoneContainer);
         })));
       },
-
-
-      /**
-      * Add options to passed dropdown
-      * @memberOf widgets/ERG/Settings
-      **/
-      _loadOptionsForDropDown: function (dropDown, dropDownOptions) {
-        var options = [], option;
-        //Add options for selected dropdown
-        array.forEach(dropDownOptions, lang.hitch(this, function (type) {
-          if (this.nls.gridSettings[type].hasOwnProperty("label")) {
-            option = { value: type, label: this.nls.gridSettings[type].label };
-          } else {
-            option = { value: type, label: this.nls.gridSettings[type] };
-          }
-          options.push(option);
+      
+      _openCloseNodes: function (node,container) {
+        var containers = [this.spillLocationContainer,this.IIZoneContainer,this.fireZoneContainer];
+        var nodes = [this.spillLocationSettingsButton,this.IISettingsButton,this.fireSettingsButton];
+        var nodeOpen = false;
+        
+        if(domClass.contains(node,'ERGLabelSettingsDownButton')) {nodeOpen = true;}
+        
+        //close all dropdowns
+        array.forEach(containers,lang.hitch(this, function(otherContainer){
+          html.addClass(otherContainer, 'controlGroupHidden');          
         }));
-        dropDown.addOption(options);
+        array.forEach(nodes,lang.hitch(this, function(otherNode){
+          html.removeClass(otherNode, 'ERGLabelSettingsUpButton');
+          html.addClass(otherNode, 'ERGLabelSettingsDownButton');          
+        }));
+        
+        if(nodeOpen) {
+          //in closed state - so open and change arrow to up
+          html.removeClass(container, 'controlGroupHidden');
+          html.removeClass(node, 'ERGLabelSettingsDownButton');
+          html.addClass(node, 'ERGLabelSettingsUpButton');
+        }       
       },
+      
 
       /**
       * Return's flag based on plan settings are changed or not
@@ -211,6 +127,7 @@ define([
       **/
       _isSettingsChanged: function () {
         var isDataChanged = false;
+        /*
         //check if cellShape is changed
         if (this.selectedGridSettings.cellShape !==
           this.cellShape.get('value')) {
@@ -260,6 +177,7 @@ define([
           //check if font settings is changed
           isDataChanged = true;
         }
+        */
         return isDataChanged;
       },
 
@@ -271,12 +189,6 @@ define([
         if (this._isSettingsChanged()) {
           this.onGridsettingsChanged();
         }
-        html.addClass(this.gridSettingsContainer, 'controlGroupHidden');
-        html.addClass(this.labelSettingsButton, 'ERGLabelSettingsDownButton');
-        html.removeClass(this.labelSettingsButton, 'ERGLabelSettingsUpButton');
-        html.addClass(this.labelSettingsContainer, 'controlGroupHidden');
-        html.addClass(this.gridSettingsButton, 'ERGLabelSettingsDownButton');
-        html.removeClass(this.gridSettingsButton, 'ERGLabelSettingsUpButton');
       },
 
       /**
@@ -284,7 +196,7 @@ define([
       * @memberOf widgets/ERG/Settings
       **/
       onGridsettingsChanged: function () {
-        this.selectedGridSettings = {
+        /*this.selectedGridSettings = {
           "cellShape": this.cellShape.get('value'),
           "labelStartPosition": this.labelStartPosition.get('value'),
           "cellUnits": this.cellUnits.get('value'),
@@ -298,6 +210,7 @@ define([
           "gridFillTransparency": this.gridFillColorPicker.getValues().transparency,
           "fontSettings": lang.clone(this.fontSetting.getConfig()),
         };
+        */
         this.emit("gridSettingsChanged", this.selectedGridSettings);
       }
     });

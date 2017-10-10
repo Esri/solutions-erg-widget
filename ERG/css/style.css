@@ -170,6 +170,15 @@
 /*------------------------- Styles for ERG Pages-----------------------*/
 .jimu-widget-ERG .claro .dijitSelect, .claro .dijitSelect .dijitButtonContents, .claro .dijitTextBox, {
     width: calc(100% - 60px);
+    overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jimu-widget-ERG  .noResize .dijitSelectLabel, .jimu-widget-ERG .noResize .dijitTextBox .dijitInputInner, .jimu-widget-ERG  .noResize .dijitValidationTextBox .dijitValidationContainer {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 80px;
+    text-align: left;
 }
 
 .jimu-widget-ERG .ERGNewERGHeader
