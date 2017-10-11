@@ -105,7 +105,8 @@
 {
     float: left;
     line-height: 28px;
-    padding: 5px 5px 0px 0;
+    padding: 5px 0px 0px 0px;
+    width: 100%;
 }
 
 .jimu-widget-ERG .ERGDrafterDropdownLabel
@@ -1360,10 +1361,6 @@
   text-overflow: ellipsis;
   width: 100%;
 }
-
-
-
-
 
 .jimu-widget-ERG .loading {
   background-image: url('images/loading.gif');
