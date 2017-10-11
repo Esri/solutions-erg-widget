@@ -1,65 +1,30 @@
 define({
   root: ({
     //Tab Labels
-    "gridTabLabel": "Grid", // Shown as tab label for grid settings
-    "labelTabLabel": "Labels", // Shown as tab label for label settings
-    "referenceSystemTabLabel": "Reference System", // Shown as tab label for reference system settings
+    "layersTabLabel": "Configure Layers", // Shown as tab label for layers settings
+    "symbolologyTabLabel": "Configure Symbology", // Shown as tab label for symbolology settings
     
     
-    //Grid Tab Contents
-    "gridTabDescription": "Set the appearance and behavior of the grid cells.", // Shown as description for grid settings
-    "cellOutlineColor": "Cell Outine color", // Shown as label above cell outline color picker
-    "cellFillColor": "Cell Fill color", // Shown as label above cell fill color picker
-    "transparency": "Transparency", // Shown as label for transparency
+    //Settings Panel
+    "settingsTitle": "Settings", // Shown as Title for Grid Settings page and label on settings buttons
     
-    "cellShapeDropDown": "Cell Shape", // Shown as label above cell shape dropdown    
-    "default": "Rectangle", // Shown as label for default in cell shape dropdown
-    "hexagon": "Hexagon", // Shown as label for hexagon in cell shape  dropdown
+    "spillLocationLabel": 'Spill Location', // Shown as Title for Spill Location Settings dropdown
+    "spillLocationButtonLabel": 'Configure Spill Location Settings', // Shown as tooltip for Spill Location Settings dropdown
     
-    "cellUnitsDropDown": "Cell Units", // Shown as label above cell units dropdown 
-    "miles": 'Miles', // Shown as label for miles in cell units dropdown
-    "kilometers": 'Kilometers', // Shown as label for kilometers in cell units dropdown
-    "feet": 'Feet', // Shown as label for feet in cell units dropdown
-    "meters": 'Meters', // Shown as label for meters in cell units dropdown
-    "yards": 'Yards', // Shown as label for yards in cell units dropdown
-    "nautical-miles": 'Nautical Miles', // Shown as label for nauticalMiles in cell units dropdown
+    "IISettingsLabel": 'Initial Isolation Zone', // Shown as Title for Initial Isolation Zone Settings dropdown
+    "IIButtonLabel": 'Configure Initial Isolation Settings', // Shown as tooltip for Initial Isolation Zone Settings dropdown
     
-    "gridOriginDropDown": "Grid Origin", // Shown as label above grid origin dropdown
-    "lowerLeft": 'Lower-Left', // Shown as label for lower left in label start position and grid origin dropdowns
-    "lowerRight": 'Lower-Right', // Shown as label for lower right in label start position and grid origin dropdowns
-    "upperLeft": 'Upper-Left', // Shown as label for upper left in label start position and grid origin dropdowns
-    "upperRight": 'Upper-Right', // Shown as label for upper right in label start position and grid origin dropdowns
-    "center": 'Center', // Shown as label for center in grid origin dropdown    
+    "PASettingsLabel": 'Protective Action Zone', // Shown as Title for Protective Action Zone Settings dropdown
+    "PAButtonLabel": 'Configure Protective Action Settings', // Shown as tooltip for Protective Action Zone Settings dropdown
     
+    "downwindSettingsLabel": 'Down Wind Zone', // Shown as Title for Down Wind Zone Settings dropdown
+    "downwindButtonLabel": 'Configure Down Wind Settings', // Shown as tooltip for Down Wind Zone Settings dropdown
+        
+    "fireSettingsLabel": 'Fire Isolation Zone', // Shown as Title for Fire Isolation Zone Settings dropdown
+    "fireButtonLabel": 'Configure Fire Isolation Settings', // Shown as tooltip for Fire Isolation Zone Settings dropdown
     
-    //Label Tab Contents
-    "labelTabDescription": "Set the appearance and behavior of the grid labels.", // Shown as description for grid settings    
-    "labelSettings": "Label Style", // Shown as label above label settings
-    "font": 'Font', // Shown as label for font type
-    "textSize": 'Text Size', // Shown as label for font size
-    "textColor": 'Text Color', // Shown as label for font colour
-    "halo": 'Halo', // Shown as label for halo settings    
-    "show": 'Show', // Shown as label for halo settings
+    "bleveSettingsLabel": 'BLEVE Isolation Zone', // Shown as Title for BLEVE Isolation Zone Settings dropdown
+    "bleveButtonLabel": 'Configure BLEVE Settings' // Shown as tooltip for BLEVE Isolation Zone Settings dropdown
     
-    "labelTypeDropDown": "Label Type", // Shown as label above label type dropdown
-    "alphaNumeric": 'Alpha-Numeric', // Shown as label for Alpha-Numeric in label type dropdown
-    "alphaAlpha": 'Alpha-Alpha', // Shown as label for Alpha-Alpha in label type dropdown
-    "numeric": 'Numeric', // Shown as label for Numeric in label type dropdown
-    
-    "labelDirectionDropDown": "Label Direction", // Shown as label above label direction dropdown
-    "horizontal": 'Horizontal', // Shown as label for Horizontal in label direction dropdown
-    "vertical": 'Vertical', // Shown as label for Vertical in label direction dropdown
-    
-    "labelOriginDropDown": "Label Origin", // Shown as label above label type dropdown
-    
-    //Reference System Tab Contents
-    "referenceSystemlTabDescription": "Set the default reference system.", // Shown as description for grid settings    
-    
-    "MGRS": 'MGRS', // Shown as label for MGRS in reference system dropdown
-    "USNG": 'USNG', // Shown as label for USNG in reference system dropdown
-      
-      
-    // Lock Settings
-    "lockSettings": "Lock Settings - This will prevent the user from being able to change any of the configured settings within the widget"  // Shown as description next to locak settings toggle   
-  })
+    })
 });

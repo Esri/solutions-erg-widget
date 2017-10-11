@@ -17,9 +17,7 @@ define({
     "small": "Small", // Shown as label for small in spill size dropdown
     "large": "Large", // Shown as label for large in spill size dropdown
     
-    "fireLabel": "Show Fire Isolation Zone", // Shown as label for fire dropdown
-    "yes": "Yes", // Shown as label for yes in fire dropdown
-    "no": "No", // Shown as label for no in fire dropdown
+    "fireLabel": "Show Fire Isolation Zone", // Shown as label for fire toggle
     
     "weatherLabel": "Current Weather at Spill Location", // Shown as title for weather container
     "weatherIntialText": "Updated once a spill location has been idenitified", // Shown in the weather panel before location has been set
@@ -48,26 +46,59 @@ define({
     "ag": "Agricultural nurse tank",
     "msm": "Multiple small cylinders",
     
-    "bleveLabel": "Show BLEVE Evac Zone", // Shown as label for fire dropdown
-    "capacity": "Container Capacity (litres)", // Shown as label for fire dropdown
+    "bleveLabel": "Show BLEVE Evac Zone", // Shown as label for BLEVE toggle
+    
+    "capacity": "Container Capacity (litres)", // Shown as label for Container Capacity dropdown
+    
     "bleveMessage": "For the material you have selected an additional evacuation distance can be shown for BLEVE.\n\nTo enable this, set the Show BLEVE Evac Zone dropdown to yes and select the appropiate container capacity.",
     "noPAZoneMessage": "There are no Protective Action distances for this material. Only the Initial Isolation and evacuation zones has been calculated",
     
-    
-    //Point ERG By Reference System Panel    
-    "newERGPointByRefSystemTitle": "ERG from Point by Reference System", // Shown as title for new ERG from reference system panel
-
     //Settings Panel
     "settingsTitle": "Settings", // Shown as Title for Grid Settings page and label on settings buttons
     
-    "spillLocationLabel": 'Spill Location', // Shown as Title for Label Settings dropdown
-    "spillLocationButtonLabel": 'Configure Spill Location Settings', // Shown as tooltip for Label Settings dropdown
+    "spillLocationLabel": 'Spill Location', // Shown as Title for Spill Location Settings dropdown
+    "spillLocationButtonLabel": 'Configure Spill Location Settings', // Shown as tooltip for Spill Location Settings dropdown
     
-    "IISettingsLabel": 'Initial Isolation Zone', // Shown as Title for Label Settings dropdown
-    "IIButtonLabel": 'Configure Initial Isolation Settings', // Shown as tooltip for Label Settings dropdown
+    "IISettingsLabel": 'Initial Isolation Zone', // Shown as Title for Initial Isolation Zone Settings dropdown
+    "IIButtonLabel": 'Configure Initial Isolation Settings', // Shown as tooltip for Initial Isolation Zone Settings dropdown
     
-    "fireSettingsLabel": 'Fire Isolation Zone', // Shown as Title for Label Settings dropdown
-    "fireButtonLabel": 'Configure Initial Isolation Settings', // Shown as tooltip for Label Settings dropdown
+    "PASettingsLabel": 'Protective Action Zone', // Shown as Title for Protective Action Zone Settings dropdown
+    "PAButtonLabel": 'Configure Protective Action Settings', // Shown as tooltip for Protective Action Zone Settings dropdown
+    
+    "downwindSettingsLabel": 'Down Wind Zone', // Shown as Title for Down Wind Zone Settings dropdown
+    "downwindButtonLabel": 'Configure Down Wind Settings', // Shown as tooltip for Down Wind Zone Settings dropdown
+        
+    "fireSettingsLabel": 'Fire Isolation Zone', // Shown as Title for Fire Isolation Zone Settings dropdown
+    "fireButtonLabel": 'Configure Fire Isolation Settings', // Shown as tooltip for Fire Isolation Zone Settings dropdown
+    
+    "bleveSettingsLabel": 'BLEVE Isolation Zone', // Shown as Title for BLEVE Isolation Zone Settings dropdown
+    "bleveButtonLabel": 'Configure BLEVE Settings', // Shown as tooltip for BLEVE Isolation Zone Settings dropdown
+    
+    "outlineStyle": 'Outline Style', // Shown as Title for Fill Style dropdown
+    
+    "dash": 'Dash',
+    "dashdot": 'Dash Dot',
+    "dashdotdot": 'Dash Dot Dot',
+    "dot": 'Dot',
+    "longdash": 'Long Dash',
+    "longdashdot": 'Long Dash Dot',
+    "null": 'Null',
+    "shortdash": 'Short Dash',
+    "shortdashdot": 'Short Dash Dot',
+    "shortdashdotdot": 'Short Dash Dot Dot',
+    "shortdot": 'Short Dot',
+    "solid": 'Solid',
+    
+    "fillStyle": 'Fill Style', // Shown as Title for Fill Style dropdown
+    
+    "backward": 'Backward',
+    "cross": 'Cross',
+    "diagonal": 'Diagonal',
+    "forward": 'Forward',
+    "horizontal": 'Horizontal',
+    "null": 'Null',
+    "solid": 'Solid',
+    "vertical": 'Vertical',
     
     
     //Publish Panel
@@ -86,6 +117,9 @@ define({
     "successfullyPublished": 'Successfully published web layer{0}Manage the web layer', //{0} will be replaced in the code so do not remove
     
     //common
+    "transparency": 'Transparency', // Shown as label on transparency sliders
+    "outline": 'Outline', // Shown as label for outline color picker
+    "fill": 'Fill', // Shown as label for outline color picker
     "createERGBtn": 'Create II and PA Distances', // Shown as label on create button
     "clearERGBtn": 'Clear', // Shown as label on clear button
     "labelFormat": 'Label Format', // Shown as label above label format input box

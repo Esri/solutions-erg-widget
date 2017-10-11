@@ -19,22 +19,27 @@ define([
     "dojo/_base/lang",
     'dojo/_base/html',
     'dojo/on',
-    './ColorPickerEditor',
-    './FontSetting',
+    'dojo/dom-construct',
     'dijit/_WidgetsInTemplateMixin',
     'jimu/utils',
     'jimu/BaseWidgetSetting',
     "jimu/dijit/CheckBox",
     'jimu/dijit/TabContainer',
-    'jimu/dijit/LoadingShelter'
+    'jimu/dijit/LoadingShelter',
+    './symbologySettings'
   ],
-  function(declare, lang, html, on, ColorPickerEditor, FontSetting, _WidgetsInTemplateMixin,
-           utils, BaseWidgetSetting, CheckBox, TabContainer, LoadingShelter) {
+  function(declare, lang, html, on, domConstruct, _WidgetsInTemplateMixin,
+           utils, BaseWidgetSetting, CheckBox, TabContainer, LoadingShelter, symbologySettings) {
     return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
       baseClass: 'jimu-widget-ERG-setting',
-      _defaultCellOutlineColor: "#1a299c",
-      _defaultCellFillColor: "#ffffff",
-
+      _SettingsInstance: null, //Object to hold Settings instance
+      _spillLocationSym: null, //Object to hold spill Location Symbol
+      _IIZoneSym: null, //Object to hold II Zone Symbol
+      _PAZoneSym: null, //Object to hold PA Zone Symbol
+      _downwindZone: null, //Object to hold Down Wind Zone Symbol
+      _fireZoneSym: null, //Object to hold FIRE Zone Symbol
+      _bleveZoneSym: null, //Object to hold BLEVE Zone Symbol
+      
       postMixInProperties: function() {
         this.nls = lang.mixin(this.nls, window.jimuNls.common);
       },
@@ -45,46 +50,29 @@ define([
         });
         this.shelter.placeAt(this.domNode);
         this.shelter.startup();
-
+        
         this.tab = new TabContainer({
           tabs: [{
-            title: this.nls.gridTabLabel,
-            content: this.gridTab
+            title: this.nls.layersTabLabel,
+            content: this.layersTab
           }, {
-            title: this.nls.labelTabLabel,
-            content: this.labelTab
-          }, {
-            title: this.nls.referenceSystemTabLabel,
-            content: this.referenceSystemTab
+            title: this.nls.symbolologyTabLabel,
+            content: this.symbologyTab
           }],
           selected: this.nls.gridTabLabel
         });
         this.tab.placeAt(this.tabsContainer);
         this.tab.startup();
-        this.inherited(arguments);
+        this.inherited(arguments);        
         
-        //Handle change event of draw extent icon
-        this.own(on(this.cellShapeDropDown, 'change', lang.hitch(this, function () {
-          if(this.cellShapeDropDown.get('value') == 'hexagon') {
-            this.labelDirectionDropDown.set('disabled',true);
-            this.labelDirectionDropDown.setValue('horizontal');
-          } else {
-            this.labelDirectionDropDown.set('disabled',false);
-          }
-        })));
       },
       
       initGridTab: function() {
-        this.cellOutlineColorPicker = new ColorPickerEditor({nls: this.nls}, this.cellOutlineColorPickerEditor);
-        this.cellOutlineColorPicker.startup();
-
-        this.cellFillColorPicker = new ColorPickerEditor({nls: this.nls}, this.cellFillColorPickerEditor);
-        this.cellFillColorPicker.startup();
+        
       },
       
       initLabelTab: function() {
-        this.fontSetting = new FontSetting({config: this.config.erg.font, nls: this.nls}, this.fontSettingNode);        
-        this.fontSetting.startup();
+        
       },
       
       initReferenceSystemTab: function() {
@@ -99,83 +87,58 @@ define([
         }        
         this.initGridTab();
         this.initLabelTab();
-        this.initReferenceSystemTab();        
+        this.initReferenceSystemTab();
+
+        
+        this._createSettings();
         this.setConfig(this.config);        
+                
       },
 
       setConfig: function(config) {
-        
         this.config = config;
-        
-        this.cellOutlineColorPicker.setValues({
-          "color": config.erg.cellOutline.color,
-          "transparency": config.erg.cellOutline.transparency
-        });
-        
-        this.cellFillColorPicker.setValues({
-          "color": config.erg.cellFill.color,
-          "transparency": config.erg.cellFill.transparency
-        });
-        
-        this.cellShapeDropDown.setValue(this.config.erg.cellShape);
-        
-        this.cellUnitsDropDown.setValue(this.config.erg.cellUnits);
-        
-        this.gridOriginDropDown.setValue(this.config.erg.gridOrigin);        
-        
-        this.fontSetting.config = this.config.erg.font;
-
-        this.labelTypeDropDown.setValue(this.config.erg.labelType);
-        
-        this.labelDirectionDropDown.setValue(this.config.erg.labelDirection);
-        
-        this.labelOriginDropDown.setValue(this.config.erg.labelOrigin);
-        
-        this.referenceSystemDropDown.setValue(this.config.erg.referenceSystem);
-
-        this.lockSettings.set("checked",this.config.erg.lockSettings);        
+        this._SettingsInstance.spillLocationSymChooser.symbol.setColor(this.config.erg.symbology.spillLocation.color);
         
         this.shelter.hide();
       },      
 
       getConfig: function() {
-        
-        var cellOutlineColor = this.cellOutlineColorPicker.getValues();
-        if (cellOutlineColor) {
-          this.config.erg.cellOutline.color = cellOutlineColor.color;
-          this.config.erg.cellOutline.transparency = cellOutlineColor.transparency;
-        }
-        
-        var cellFillColor = this.cellFillColorPicker.getValues();
-        if (cellFillColor) {
-          this.config.erg.cellFill.color = cellFillColor.color;
-          this.config.erg.cellFill.transparency = cellFillColor.transparency;
-        }
-        
-        this.config.erg.cellShape = this.cellShapeDropDown.getValue();
-        
-        this.config.erg.cellUnits = this.cellUnitsDropDown.getValue();
-        
-        this.config.erg.gridOrigin = this.gridOriginDropDown.getValue();
-
-        this.config.erg.font = this.fontSetting.config;
-        
-        this.config.erg.labelType = this.labelTypeDropDown.getValue();
-        
-        this.config.erg.labelDirection = this.labelDirectionDropDown.getValue();
-        
-        this.config.erg.labelOrigin = this.labelOriginDropDown.getValue();
-        
-        this.config.erg.referenceSystem = this.referenceSystemDropDown.getValue();
-        
-        this.config.erg.lockSettings = this.lockSettings.checked;
-        
+        this._SettingsInstance.updateSettings();
+        this.config.erg.symbology.spillLocation = this._spillLocationSym;
+        this.config.erg.symbology.IIZone = this._IIZoneSym;
+        this.config.erg.symbology.PAZone = this._PAZoneSym;
+        this.config.erg.symbology.downwind = this._downwindZoneSym;
+        this.config.erg.symbology.fireZone = this._fireZoneSym;
+        this.config.erg.symbology.bleveZone = this._bleveZoneSym;        
         return this.config;
       },
       
       destroy: function(){
         this.inherited(arguments);
-      }
+      },
       
+      /**
+      * Creates settings
+      **/
+      _createSettings: function () {
+        //Create Settings Instance
+        this._SettingsInstance = new symbologySettings({
+          nls: this.nls,
+          config: this.config,
+          appConfig: this.appConfig
+        }, domConstruct.create("div", {}, this.SettingsNode));        
+        
+        //add a listener for a change in settings
+        this.own(this._SettingsInstance.on("settingsChanged",
+          lang.hitch(this, function (updatedSettings) {
+            this._spillLocationSym = updatedSettings.spillLocation;
+            this._IIZoneSym = updatedSettings.IIZone;
+            this._PAZoneSym = updatedSettings.PAZone;
+            this._downwindZone = updatedSettings.downwindZone;
+            this._fireZoneSym = updatedSettings.fireZone;
+            this._bleveZoneSym = updatedSettings.bleveZone;
+          })));
+        this._SettingsInstance.startup();
+      }      
     });
   });

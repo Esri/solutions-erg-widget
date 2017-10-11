@@ -11,6 +11,75 @@
   letter-spacing: 0.38px;
 }
 
+.jimu-widget-ERG-setting .ERGSettingsRow {
+    width: 100%;
+    display: inline-block;
+}
+
+.jimu-widget-ERG-setting .ERGHalfWidthLeft {
+    width: 50%;
+}
+
+.jimu-widget-ERG-setting .ERGHalfWidthRight {
+    padding-left: 10px;
+    width: 50%;
+}
+
+.jimu-widget-ERG-setting .ERGHalfWidthContainer
+{
+    display: flex;
+}
+
+.jimu-widget-ERG-setting .ERGInputLabel
+{
+    float: left;
+    line-height: 28px;
+    padding: 5px 5px 0px 0;
+}
+
+.jimu-widget-ERG-setting .ERGEllipsis
+{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.SubTitle {
+  font-weight: bold;
+}
+
+.jimu-widget-ERG-setting .ERGPointer
+{
+    cursor: pointer;
+}
+
+.jimu-widget-ERG-setting .ERGSettingsButtonIcon {
+    margin-top: 10px;
+    margin-right: 130px;
+    height: 20px;
+    width: 25px;
+    float: right;
+    background-size: 45px;
+}
+
+.jimu-widget-ERG-setting .ERGLabelSettingsDownButton
+{
+    background: url("./images/down-arrow.png") no-repeat;
+}
+
+.jimu-widget-ERG-setting .ERGLabelSettingsUpButton
+{
+    background: url("./images/up-arrow.png") no-repeat;
+}
+
+.jimu-widget-ERG-setting .controlGroupHidden {
+    display: none;
+}
+
+
+
+
+
 .jimu-widget-ERG-setting .instruction {
 	margin-bottom: 10px;
 }
@@ -159,22 +228,22 @@
 
 
 /* 1 content */
-.jimu-widget-ERG-setting .content-tab{
+.jimu-widget-ERG-setting .layers-tab{
 
 }
-.jimu-widget-ERG-setting .content-tab .editor-container{
+.jimu-widget-ERG-setting .layers-tab .editor-container{
 }
-.jimu-widget-ERG-setting .content-tab .editor-container .dijitEditorIFrameContainer textarea {
+.jimu-widget-ERG-setting .layers-tab .editor-container .dijitEditorIFrameContainer textarea {
 	resize: none;
 }
 
 /* 2 appearance */
-.jimu-widget-ERG-setting .appearance-tab{
+.jimu-widget-ERG-setting .symbology-tab{
 	overflow-y: auto;
 	height: 490px;
 }
 
-.jimu-widget-ERG-setting .appearance-tab .size-selector .size-box-container{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .size-box-container{
 	display: inline-block;
 	text-align: center;
 	margin: 0 10px 0 0;
@@ -185,57 +254,57 @@
 	white-space: nowrap;
 }
 
-.jimu-widget-ERG-setting .appearance-tab .size-selector .size-box{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .size-box{
 	width:80px;
 	height:60px;
 	background: no-repeat;
 	margin-bottom: 5px;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent25{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent25{
 	background: url("../../images/percent25.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent25.selected{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent25.selected{
 	background: url("../../images/percent25_selected.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent50{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent50{
 	background: url("../../images/percent50.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent50.selected{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent50.selected{
 	background: url("../../images/percent50_selected.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent75{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent75{
 	background: url("../../images/percent75.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent75.selected{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent75.selected{
 	background: url("../../images/percent75_selected.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent100{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent100{
 	background: url("../../images/percent100.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .percent100.selected{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .percent100.selected{
 	background: url("../../images/percent100_selected.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .custom{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .custom{
 	background: url("../../images/custom.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .custom.selected{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .custom.selected{
 	background: url("../../images/custom_selected.svg") center center no-repeat;;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .custom-label{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .custom-label{
 	vertical-align: top;
 	line-height: 20px;
 }
-.jimu-rtl .jimu-widget-ERG-setting .appearance-tab .sizes>:first-child{
+.jimu-rtl .jimu-widget-ERG-setting .symbology-tab .sizes>:first-child{
 	margin-right: 0;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .wh{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .wh{
 	margin: 0 14px;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .wh .wh-item{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .wh .wh-item{
 	display: inline-block;
 	margin-right: 10px;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .wh .wh-item .lable{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .wh .wh-item .lable{
 	font-family: "Avenir Medium";
 	font-size: 12px;
 	color: #353535;
@@ -247,21 +316,21 @@
 	overflow: hidden;
 	white-space: nowrap;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .wh .inputs{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .wh .inputs{
 	width:96px;
 	border: 1px solid #d9dde0;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .wh .inputs .text-box{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .wh .inputs .text-box{
 	width: 70px;
 	border: none;
 }
-.jimu-widget-ERG-setting .appearance-tab .size-selector .wh .inputs .unit{
+.jimu-widget-ERG-setting .symbology-tab .size-selector .wh .inputs .unit{
 	color: #898989;
 	letter-spacing: 0;
 }
 
 /* alignment */
-.jimu-widget-ERG-setting .appearance-tab .align-selector .align-box-container{
+.jimu-widget-ERG-setting .symbology-tab .align-selector .align-box-container{
 	display: inline-block;
 	text-align: center;
 	margin: 0 10px;
@@ -272,54 +341,54 @@
 	white-space: nowrap;
 }
 
-.jimu-widget-ERG-setting .appearance-tab .align-selector .align-box{
+.jimu-widget-ERG-setting .symbology-tab .align-selector .align-box{
 	width:40px;
 	height:36px;
 	background: no-repeat;
 	margin: 0 5px 5px 5px;
 }
-.jimu-widget-ERG-setting .appearance-tab .align-selector .top{
+.jimu-widget-ERG-setting .symbology-tab .align-selector .top{
 	background: url("../../images/top.svg") center center no-repeat;
 	border: none;
 }
-.jimu-widget-ERG-setting .appearance-tab .align-selector .top.selected{
+.jimu-widget-ERG-setting .symbology-tab .align-selector .top.selected{
 	background: url("../../images/top_selected.svg") center center no-repeat;
 	border: 1px #24B5CC solid;
 }
-.jimu-widget-ERG-setting .appearance-tab .align-selector .middle{
+.jimu-widget-ERG-setting .symbology-tab .align-selector .middle{
 	background: url("../../images/middle.svg") center center no-repeat;
 	border: none;
 }
-.jimu-widget-ERG-setting .appearance-tab .align-selector .middle.selected{
+.jimu-widget-ERG-setting .symbology-tab .align-selector .middle.selected{
 	background: url("../../images/middle_selected.svg") center center no-repeat;
 	border: 1px #24B5CC solid;
 }
 
 
-.jimu-widget-ERG-setting .appearance-tab .jimu-image-chooser{
+.jimu-widget-ERG-setting .symbology-tab .jimu-image-chooser{
 	height:30px;
 	width:124px;
 	background: #24B5CC;
 	border: 1px solid #24B5CC;
 }
-.jimu-widget-ERG-setting .appearance-tab .file-name{
+.jimu-widget-ERG-setting .symbology-tab .file-name{
 	font-size: 12px;
 	line-height: 33px;
 	height: 33px;
 	color: #000000;
 	margin: 0 20px 0 20px;
 }
-.jimu-widget-ERG-setting .appearance-tab .types>:first-child{
+.jimu-widget-ERG-setting .symbology-tab .types>:first-child{
 	margin-left: 0;
 }
-.jimu-rtl .jimu-widget-ERG-setting .appearance-tab .types>:first-child{
+.jimu-rtl .jimu-widget-ERG-setting .symbology-tab .types>:first-child{
 	margin-right: 0;
 }
-.jimu-widget-ERG-setting .appearance-tab .fillstype{
+.jimu-widget-ERG-setting .symbology-tab .fillstype{
 	margin: 10px 20px 0 20px;
 }
 
-.jimu-widget-ERG-setting .appearance-tab .buttonText{
+.jimu-widget-ERG-setting .symbology-tab .buttonText{
   width: 290px;
   margin-bottom: 10px;
 }

@@ -76,7 +76,7 @@ define([
   'esri/tasks/query',
   'esri/request',
   
-  './js/GridSettings',
+  './js/Settings',
   './js/CoordinateInput',
   './js/DrawFeedBack',
   './js/EditOutputCoordinate',
@@ -145,7 +145,7 @@ define([
     UniqueValueRenderer,
     Query,
     esriRequest,
-    GridSettings,
+    Settings,
     coordInput,
     drawFeedBackPoint,
     editOutputCoordinate,
@@ -162,20 +162,16 @@ define([
       _lastOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _currentOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       
+      _SettingsInstance: null, //Object to hold Settings instance
+      _spillLocationSym: null, //Object to hold spill Location Symbol
+      _IIZoneSym: null, //Object to hold II Zone Symbol
+      _PAZoneSym: null, //Object to hold PA Zone Symbol
+      _downwindZoneSym: null, //Object to hold Down Wind Zone Symbol
+      _fireZoneSym: null, //Object to hold FIRE Zone Symbol
+      _bleveZoneSym: null, //Object to hold BLEVE Zone Symbol
       
-      _gridSettingsInstance: null, //Object to hold Grid Settings instance
-      _cellShape: "default", //Current selected grid cell shape
-      _labelStartPosition: "lowerLeft", //Current selected label start position
-      _cellUnits: "meters", //Current selected cell units
-      _labelType: "alphaNumeric", //Current selected label type
-      _labelDirection: "horizontal", //Current selected label direction
-      _gridOrigin: "center", //Current selected grid origin
-      _referenceSystem: 'MGRS', //Current selected reference system
-      _showLabels: true, //flag to hold whether labels should be shown 
       _ERGAreaFillSymbol: null, //Fill symbol used for ERG cells
-      _cellTextSymbol: null, //Text symbol used for ERG labeling
-      
-      featureLayerInfo: null,
+      _cellTextSymbol: null, //Text symbol used for ERG labeling      
       
       postMixInProperties: function () {
         //mixin default nls with widget nls
@@ -193,19 +189,6 @@ define([
         //set up blank weather info        
         this._resetWeatherInfo();        
         
-        //set up the symbology used for the interactive polygon draw tools
-        this.extentAreaFillSymbol = {
-          type: 'esriSFS',
-          style: 'esriSFSSolid',
-          color: [155,155,155,0],
-          outline: {
-            color: [0, 0, 255, 255],
-            width: 1.25,
-            type: 'esriSLS',
-            style: 'esriSLSSolid'
-          }
-        };
-        
         //set up the symbology used for the interactive point draw tools        
         this.pointSymbol = {
           'color': [255, 0, 0, 255],
@@ -220,11 +203,8 @@ define([
           }
         };        
         
-        //create graphics layer for grid extent and add to map
-        this._graphicsLayerERGExtent = new GraphicsLayer({id: "graphicsLayerERGExtent"});
-        
-        //set up symbology for polygon input
-        this._extentSym = new SimpleFillSymbol(this.extentAreaFillSymbol);        
+        //create graphics layer for spill location and add to map
+        this._spillLocation = new GraphicsLayer({id: "spillLocation"});        
         
         //set up symbology for point input
         this._ptSym = new SimpleMarkerSymbol(this.pointSymbol);
@@ -243,29 +223,20 @@ define([
               "alias": "type",
               "type": "esriFieldTypeString"
             }],            
-            "extent": {
-              "xmin":-18746028.312877923,
-              "ymin":-6027547.894280539,
-              "xmax":18824299.82984192,
-              "ymax":12561937.384669386,
-              "spatialReference":{
-                "wkid":102100
-              }
-            },
+            "extent": this.map.extent,
           }
         };
         
         //create a the ERG feature layer
         this.ERGArea = new FeatureLayer(featureCollection,{
-          id: "Gridded-Reference-Graphic",
-          outFields: ["*"],
-          showLabels: true
+          id: "ERG-Graphic",
+          outFields: ["*"]
         });   
         
         //add the ERG feature layer and the ERG extent graphics layer to the map 
-        this.map.addLayers([this.ERGArea,this._graphicsLayerERGExtent]);
+        this.map.addLayers([this.ERGArea,this._spillLocation]);
         
-        //set up coordinate input dijit for ERG Point by Size
+        //set up coordinate input dijit for ERG Spill Location
         this.ERGCoordTool = new coordInput({nls: this.nls, appConfig: this.appConfig}, this.newERGPointOriginCoords);      
         this.ERGCoordTool.inputCoordinate.formatType = 'DD';
         this.ERGCoordinateFormat = new dijitTooltipDialog({
@@ -287,7 +258,7 @@ define([
         //set up all the handlers for the different click events
         this._handleClickEvents();
         
-        this._createGridSettings();
+        this._createSettings();
       },
 
       startup: function () {
@@ -298,6 +269,7 @@ define([
         //load in the materials json file
         this._materialsData = JSON.parse(materials);
         
+        //set up the options for the material input selector
         var options = {
           data: this._materialsData,
           placeholder: this.nls.materialPlaceholder,
@@ -316,19 +288,18 @@ define([
             },
             onChooseEvent: lang.hitch(this, function() {
               var index = $(this.materialType).getSelectedItemIndex();
-              this._selectedMaterial = $(this.materialType).getSelectedItemData(index);
-              
+              this._selectedMaterial = $(this.materialType).getSelectedItemData(index);              
               if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
                 var alertMessage = new Message({
                   message: this.nls.table3Message
                 })
                 this.windSpeed.set('disabled', false);
-                this.transportContainer.set('disabled', false);
+                this.transportContainer.set('disabled', false);                
+                this._resetTransportContainerOptions();
               } else {
                 this.windSpeed.set('disabled', true);
                 this.transportContainer.set('disabled', true);
-              }
-              
+              }              
               if (this._selectedMaterial.BLEVE){
                 var alertMessage = new Message({
                   message: this.nls.bleveMessage
@@ -338,13 +309,11 @@ define([
               } else {
                 this.useBleve.set('disabled', true);
                 this.tankCapacity.set('disabled', true);
-              }
-              
+              }              
               if(this._selectedMaterial.Material.includes('Substances')) {
                 this.spillSize.setValue('SM');
                 this.spillSize.set('disabled', true);
-              }
-              
+              }              
               if(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry) {
                 dojo.removeClass(this.CreateERGButton, 'jimu-state-disabled');
               }
@@ -361,6 +330,42 @@ define([
         this._weatherInfo = new WeatherInfo(this.weather, this);
       },
 
+      /**
+      * The transport conatiner dropdown list changes depending on material
+      */
+      _resetTransportContainerOptions: function () {
+        //first of all reomve all options
+        for (var i = this.transportContainer.options.length - 1; i >= 0 ; i--) {
+          this.transportContainer.removeOption(i);
+        }
+        // rail and semi are common to all materials
+        var dropDownOptions = ["rail", "semi"];
+        // add other container options depending on material id 
+        switch(this._selectedMaterial.IDNum){
+          case 1005:
+            dropDownOptions.push("ag","msm");              
+            break;
+          case 1017:
+          case 1050:
+          case 2186:
+          case 1079:
+            dropDownOptions.push("mton","ston");              
+            break;
+          case 1040:
+          case 1052:
+            dropDownOptions.push("ston");              
+            break;
+        }
+                
+        var options = [], singleOption;
+        //Add options for selected dropdown
+        array.forEach(dropDownOptions, lang.hitch(this, function (type) {
+          singleOption = { value: type.toUpperCase(), label: this.nls[type]};   
+          options.push(singleOption);
+        }));
+        this.transportContainer.addOption(options);
+      },
+                
       /**
       * Performs activities like resizing widget components, connect map click etc on widget open
       */
@@ -412,6 +417,8 @@ define([
               this.windSpeed.set('disabled', true);
               this.transportContainer.set('disabled', true);
               this.useBleve.set('disabled', true);
+              this.useBleve.set('checked', false);
+              this.fire.set('checked', false);
               this.tankCapacity.set('disabled', true);
               this._selectedMaterial = null;
               this._clearLayers(true);
@@ -438,7 +445,7 @@ define([
             this.own(this.dt.watch('startPoint', lang.hitch(this, 
               function (r, ov, nv) {
                 this.ERGCoordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
-                this.dt.addStartGraphic(nv, this._ptSym, this._graphicsLayerERGExtent);
+                this.dt.addStartGraphic(nv, this._ptSym, this._spillLocation);
                 this._weatherInfo.updateForIncident(nv);                
               }
             )));
@@ -471,6 +478,7 @@ define([
                   })
                   this.windSpeed.set('disabled', false);
                   this.transportContainer.set('disabled', false);
+                  this._resetTransportContainerOptions();
                 } else {
                   this.windSpeed.set('disabled', true);
                   this.transportContainer.set('disabled', true);
@@ -482,8 +490,8 @@ define([
         * Settings panel
         **/        
             //Handle click event of settings back button
-            this.own(on(this.gridSettingsPanelBackButton, "click", lang.hitch(this, function () {
-              this._gridSettingsInstance.onClose();          
+            this.own(on(this.SettingsPanelBackButton, "click", lang.hitch(this, function () {
+              this._SettingsInstance.onClose();          
               this._showPanel(this._lastOpenPanel);
             })));        
         
@@ -496,7 +504,7 @@ define([
               this.publishMessage.innerHTML = '';
               //clear layer name
               this.addERGNameArea.setValue('');
-              this._graphicsLayerERGExtent.show();
+              this._spillLocation.show();
               this._showPanel(this._lastOpenPanel);              
             })));
             
@@ -509,8 +517,7 @@ define([
                 // Invalid entry
                 this.publishMessage.innerHTML = this.nls.missingLayerNameMessage;
               }
-            })));
-            
+            })));            
       },
       
       /**
@@ -531,16 +538,7 @@ define([
         }
         return node;
       },
-
-      /**
-      * This function resets everything on navigating back to main page
-      */
-      _resetOnBackToMainPage: function () {
-        //reset the tools
-        this._showPanel("mainPage");
-        this._reset();
-      },
-
+      
       _reset: function () {
         this._clearLayers(true);
         
@@ -557,11 +555,10 @@ define([
       _clearLayers: function (includeExtentLayer) {
         this.ERGArea.clear();
         //refresh ERG layer to make sure any labels are removed
-        this.ERGArea.refresh();
-        
+        this.ERGArea.refresh();        
         //sometimes we only want to clear the ERG overlay and not the spill location 
         if(includeExtentLayer) {
-          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);                    
+          this.dt.removeStartGraphic(this._spillLocation);                    
           dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
           this.ERGCoordTool.clear();
           this._resetWeatherInfo();          
@@ -569,45 +566,49 @@ define([
       },
 
       /**
-      * Creates grid settings
+      * Creates settings
       **/
-      _createGridSettings: function () {
-        //Create GridSettings Instance
-        this._gridSettingsInstance = new GridSettings({
+      _createSettings: function () {
+        //Create Settings Instance
+        this._SettingsInstance = new Settings({
           nls: this.nls,
           config: this.config,
           appConfig: this.appConfig
-        }, domConstruct.create("div", {}, this.gridSettingsNode));        
+        }, domConstruct.create("div", {}, this.SettingsNode));        
         
         //add a listener for a change in settings
-        this.own(this._gridSettingsInstance.on("gridSettingsChanged",
+        this.own(this._SettingsInstance.on("settingsChanged",
           lang.hitch(this, function (updatedSettings) {
-            this._cellShape = updatedSettings.cellShape;
-            this._labelStartPosition = updatedSettings.labelStartPosition;
-            this._cellUnits = updatedSettings.cellUnits;
-            this._labelType = updatedSettings.labelType;
-            this._labelDirection = updatedSettings.labelDirection;
-            this._gridOrigin = updatedSettings.gridOrigin;
-            this._referenceSystem = updatedSettings.referenceSystem;
             
-            //set grid colours
-            var fillColor = new Color(updatedSettings.gridFillColor);
-            fillColor.a = 1 - updatedSettings.gridFillTransparency;
+            var spillLocationFillColor = new Color(updatedSettings.spillLocationFillColor.color);            
+            var spillLocationFillTrans = (1 - updatedSettings.spillLocationFillColor.transparency) * 255;
+            var spillLocationOutlineColor = new Color(updatedSettings.spillLocationOutlineColor.color);            
+            var spillLocationOutlineTrans = (1 - updatedSettings.spillLocationOutlineColor.transparency) * 255;
             
-            var outlineColor = new Color(updatedSettings.gridOutlineColor);
-            outlineColor.a = 1 - updatedSettings.gridOutlineTransparency;
-                        
-            this._ERGAreaFillSymbol = {
-              type: 'esriSFS',
-              style: 'esriSFSSolid',
-              color: fillColor,
-              outline: {
-                color: outlineColor,
-                width: 2,
-                type: 'esriSLS',
-                style: 'esriSLSSolid'
-              }
-            };
+            var IIZoneFillColor = new Color(updatedSettings.IIZoneFillColor.color);            
+            var IIZoneFillTrans = (1 - updatedSettings.IIZoneFillColor.transparency) * 255;
+            var IIZoneOutlineColor = new Color(updatedSettings.IIZoneOutlineColor.color);            
+            var IIZoneOutlineTrans = (1 - updatedSettings.IIZoneOutlineColor.transparency) * 255;
+            
+            var PAZoneFillColor = new Color(updatedSettings.PAZoneFillColor.color);            
+            var PAZoneFillTrans = (1 - updatedSettings.PAZoneFillColor.transparency) * 255;
+            var PAZoneOutlineColor = new Color(updatedSettings.PAZoneOutlineColor.color);            
+            var PAZoneOutlineTrans = (1 - updatedSettings.PAZoneOutlineColor.transparency) * 255;
+            
+            var downwindZoneFillColor = new Color(updatedSettings.downwindZoneFillColor.color);            
+            var downwindZoneFillTrans = (1 - updatedSettings.downwindZoneFillColor.transparency) * 255;
+            var downwindZoneOutlineColor = new Color(updatedSettings.downwindZoneOutlineColor.color);            
+            var downwindZoneOutlineTrans = (1 - updatedSettings.downwindZoneOutlineColor.transparency) * 255;
+            
+            var fireZoneFillColor = new Color(updatedSettings.fireZoneFillColor.color);            
+            var fireZoneFillTrans = (1 - updatedSettings.fireZoneFillColor.transparency) * 255;
+            var fireZoneOutlineColor = new Color(updatedSettings.fireZoneOutlineColor.color);            
+            var fireZoneOutlineTrans = (1 - updatedSettings.fireZoneOutlineColor.transparency) * 255;
+            
+            var bleveZoneFillColor = new Color(updatedSettings.bleveZoneFillColor.color);            
+            var bleveZoneFillTrans = (1 - updatedSettings.bleveZoneFillColor.transparency) * 255;
+            var bleveZoneOutlineColor = new Color(updatedSettings.bleveZoneOutlineColor.color);            
+            var bleveZoneOutlineTrans = (1 - updatedSettings.bleveZoneOutlineColor.transparency) * 255;
             
             var uvrJson = {"type": "uniqueValue",
               "field1": "Type",
@@ -625,80 +626,80 @@ define([
               "uniqueValueInfos": [{
                 "value": "Spill Location",
                 "symbol": {
-                  "color": [0, 0, 0, 255],
+                  "color": [spillLocationFillColor.r,spillLocationFillColor.g,spillLocationFillColor.b,spillLocationFillTrans],
                   "outline": {
-                    "color": [0, 0, 0, 255],
+                    "color": [spillLocationOutlineColor.r,spillLocationOutlineColor.g,spillLocationOutlineColor.b,spillLocationOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
-                    "style": "esriSLSSolid"
+                    "style": updatedSettings.spillLocationOutlineColor.type
                   },
                   "type": "esriSFS",
-                  "style": "esriSFSSolid"
+                  "style": updatedSettings.spillLocationFillColor.type
                 }
               }, {
                 "value": "II Zone",
                 "symbol": {
-                  "color": [255, 153, 0, 128],
+                  "color": [IIZoneFillColor.r,IIZoneFillColor.g,IIZoneFillColor.b,IIZoneFillTrans],
                   "outline": {
-                    "color": [255, 153, 0, 255],
+                    "color": [IIZoneOutlineColor.r,IIZoneOutlineColor.g,IIZoneOutlineColor.b,IIZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
-                    "style": "esriSLSSolid"
+                    "style": updatedSettings.IIZoneOutlineColor.type
                   },
                   "type": "esriSFS",
-                  "style": "esriSFSSolid"
-                }
-              }, {
-                "value": "Bleve",
-                "symbol": {
-                  "color": [255, 153, 0, 128],
-                  "outline": {
-                    "color": [255, 153, 0, 255],
-                    "width": 1,
-                    "type": "esriSLS",
-                    "style": "esriSLSSolid"
-                  },
-                  "type": "esriSFS",
-                  "style": "esriSFSSolid"
-                }
-              }, {
-                "value": "Fire",
-                "symbol": {
-                  "color": [255, 153, 0, 128],
-                  "outline": {
-                    "color": [255, 153, 0, 255],
-                    "width": 1,
-                    "type": "esriSLS",
-                    "style": "esriSLSSolid"
-                  },
-                  "type": "esriSFS",
-                  "style": "esriSFSSolid"
-                }
-              }, {
-                "value": "Down Wind",
-                "symbol": {
-                  "color": [255, 153, 0, 128],
-                  "outline": {
-                    "color": [255, 153, 0, 255],
-                    "width": 1,
-                    "type": "esriSLS",
-                    "style": "esriSLSSolid"
-                  },
-                  "type": "esriSFS",
-                  "style": "esriSFSSolid"
+                  "style": updatedSettings.IIZoneFillColor.type
                 }
               }, {
                 "value": "Protective Action Area",
                 "symbol": {
-                  "color": [255, 153, 0, 128],
+                  "color": [PAZoneFillColor.r,PAZoneFillColor.g,PAZoneFillColor.b,PAZoneFillTrans],
                   "outline": {
-                    "color": [255, 153, 0, 255],
+                    "color": [PAZoneOutlineColor.r,PAZoneOutlineColor.g,PAZoneOutlineColor.b,PAZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
-                    "style": "esriSLSSolid"
+                    "style": updatedSettings.PAZoneOutlineColor.type
                   },
                   "type": "esriSFS",
-                  "style": "esriSFSSolid"
+                  "style": updatedSettings.PAZoneFillColor.type
+                }
+              }, {
+                "value": "Down Wind",
+                "symbol": {
+                  "color": [downwindZoneFillColor.r,downwindZoneFillColor.g,downwindZoneFillColor.b,downwindZoneFillTrans],
+                  "outline": {
+                    "color": [downwindZoneOutlineColor.r,downwindZoneOutlineColor.g,downwindZoneOutlineColor.b,downwindZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.downwindZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.downwindZoneFillColor.type
+                }
+              }, {
+                "value": "Fire",
+                "symbol": {
+                  "color": [fireZoneFillColor.r,fireZoneFillColor.g,fireZoneFillColor.b,fireZoneFillTrans],
+                  "outline": {
+                    "color": [fireZoneOutlineColor.r,fireZoneOutlineColor.g,fireZoneOutlineColor.b,fireZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.fireZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.fireZoneFillColor.type
+                }
+              }, {
+                "value": "Bleve",                
+                "symbol": {
+                  "color": [bleveZoneFillColor.r,bleveZoneFillColor.g,bleveZoneFillColor.b,bleveZoneFillTrans],
+                  "outline": {
+                    "color": [bleveZoneOutlineColor.r,bleveZoneOutlineColor.g,bleveZoneOutlineColor.b,bleveZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.bleveZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.bleveZoneFillColor.type
                 }
               }]
             }
@@ -710,7 +711,7 @@ define([
             //refresh the layer to apply the settings
             this.ERGArea.refresh();              
           })));
-        this._gridSettingsInstance.startup();
+        this._SettingsInstance.startup();
       },
 
       /**
@@ -740,7 +741,7 @@ define([
           this.dt.deactivate();
           this.map.enableMapNavigation();
         } else {
-          this.dt.removeStartGraphic(this._graphicsLayerERGExtent);
+          this.dt.removeStartGraphic(this._spillLocation);
           this._clearLayers(true); 
           this.ERGCoordTool.manualInput = false;        
           this.dt._setTooltipMessage(0);        
@@ -788,7 +789,7 @@ define([
                 var fs = this.ERGCoordinateFormat.content.formats[r.inputType];
                 this.ERGCoordTool.inputCoordinate.set('formatString', fs.defaultFormat);
                 this.ERGCoordTool.inputCoordinate.set('formatType', r.inputType);
-                this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym, this._graphicsLayerERGExtent);
+                this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym, this._spillLocation);
               }
             }
           ));
@@ -843,8 +844,7 @@ define([
       _CreateERGButtonClicked: function () {
         if(this._selectedMaterial && this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry) {
           var IIAttributeValue, PAAttributeValue, bleveAttributeValue, IIDistance, PADistance;
-          var features = [];
-          
+          var features = [];          
           var spatialReference = new SpatialReference({wkid:102100});
           
           //get the spill location
@@ -862,6 +862,7 @@ define([
             PAAttributeValue = this.transportContainer.getValue() + this.spillTime.getValue() + this.windSpeed.getValue();
           }
           
+          //set the IA and PA distances
           IIDistance = this._selectedMaterial[IIAttributeValue];
           PADistance = this._selectedMaterial[PAAttributeValue];
           
@@ -871,13 +872,10 @@ define([
             radius: IIDistance,
             geodesic: true,
             numberOfPoints: 360
-          });        
-          var IIGraphic = new Graphic(IIZone);
-          IIGraphic.setAttributes({"type": "II Zone"});
-          features.push(IIGraphic);
+          });
           
           // show BLEVE zone
-          if(this.useBleve.getValue() === 'yes' && this._selectedMaterial.BLEVE){            
+          if(this.useBleve.checked && this._selectedMaterial.BLEVE){            
             bleveAttributeValue = this.tankCapacity.getValue();
             var bleveZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial[bleveAttributeValue],'meters');
             var bleveZoneGraphic = new Graphic(bleveZone);
@@ -885,8 +883,8 @@ define([
             features.push(bleveZoneGraphic);
           }
           
-          // show fire evaction zone
-          if(this.fire.getValue() === 'yes'){
+          // show Fire evaction zone
+          if(this.fire.checked){
             var fireZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial['FIRE_ISO'],'meters');
             var fireZoneGraphic = new Graphic(fireZone);
             fireZoneGraphic.setAttributes({"type": "Fire"});
@@ -952,8 +950,13 @@ define([
             var PAZoneGraphic = new Graphic(PAZoneArea);
             PAZoneGraphic.setAttributes({"type": "Protective Action Area"});
             
-            features.push(PAAGraphic,PAZoneGraphic);
-            } 
+            features.push(PAZoneGraphic,PAAGraphic);
+            }
+
+          // draw the II Zone
+          var IIGraphic = new Graphic(IIZone);
+          IIGraphic.setAttributes({"type": "II Zone"});
+          features.push(IIGraphic);            
 
           // draw a small polygon to show spill location
           var spillLocationPoly = GeometryEngine.geodesicBuffer(spillLocation,2.5,'meters');
@@ -1060,7 +1063,7 @@ define([
       **/
       destroy: function() {        
         this.inherited(arguments);        
-        this.map.removeLayer(this._graphicsLayerERGExtent);
+        this.map.removeLayer(this._spillLocation);
         this.map.removeLayer(this.ERGArea);
         console.log('ERG widget distroyed')
       },
