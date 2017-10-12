@@ -1,14 +1,14 @@
 {
   "name": "ERG",
   "platform": "HTML",
-  "version": "2.5",
-  "wabVersion": "2.5",
+  "version": "2.6",
+  "wabVersion": "2.6",
   "author": "Esri",
-  "description": "Grided Reference Graphic Widget",
+  "description": "ERG Widget",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0",
   "properties": {
-  	"keepConfigAfterMapSwithched": true,
+  	"keepConfigAfterMapSwithched": false,
     "supportMultiInstance": false,
     "hasVersionManager": false,
     "hasSettingPage": true,
