@@ -24,7 +24,37 @@ define({
     "fireButtonLabel": 'Configure Fire Isolation Settings', // Shown as tooltip for Fire Isolation Zone Settings dropdown
     
     "bleveSettingsLabel": 'BLEVE Isolation Zone', // Shown as Title for BLEVE Isolation Zone Settings dropdown
-    "bleveButtonLabel": 'Configure BLEVE Settings' // Shown as tooltip for BLEVE Isolation Zone Settings dropdown
+    "bleveButtonLabel": 'Configure BLEVE Settings', // Shown as tooltip for BLEVE Isolation Zone Settings dropdown
+    
+    "transparency": 'Transparency', // Shown as label on transparency sliders
+    "outline": 'Outline', // Shown as label for outline color picker
+    "fill": 'Fill (Color only applies when style set to solid)', // Shown as label for outline color picker
+    
+    "outlineStyle": 'Outline Style', // Shown as Title for Fill Style dropdown
+    
+    "dash": 'Dash',
+    "dashdot": 'Dash Dot',
+    "dashdotdot": 'Dash Dot Dot',
+    "dot": 'Dot',
+    "longdash": 'Long Dash',
+    "longdashdot": 'Long Dash Dot',
+    "null": 'Null',
+    "shortdash": 'Short Dash',
+    "shortdashdot": 'Short Dash Dot',
+    "shortdashdotdot": 'Short Dash Dot Dot',
+    "shortdot": 'Short Dot',
+    "solid": 'Solid',
+    
+    "fillStyle": 'Fill Style', // Shown as Title for Fill Style dropdown
+    
+    "backward": 'Backward',
+    "cross": 'Cross',
+    "diagonal": 'Diagonal',
+    "forward": 'Forward',
+    "horizontal": 'Horizontal',
+    "null": 'Null',
+    "solid": 'Solid',
+    "vertical": 'Vertical'
     
     })
 });

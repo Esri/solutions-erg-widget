@@ -16,7 +16,8 @@
 
 define([
     'dojo/_base/declare',
-    "dojo/_base/lang",
+    'dojo/_base/array',
+    'dojo/_base/lang',
     'dojo/_base/html',
     'dojo/on',
     'dojo/dom-construct',
@@ -28,17 +29,12 @@ define([
     'jimu/dijit/LoadingShelter',
     './symbologySettings'
   ],
-  function(declare, lang, html, on, domConstruct, _WidgetsInTemplateMixin,
+  function(declare, array, lang, html, on, domConstruct, _WidgetsInTemplateMixin,
            utils, BaseWidgetSetting, CheckBox, TabContainer, LoadingShelter, symbologySettings) {
     return declare([BaseWidgetSetting, _WidgetsInTemplateMixin], {
       baseClass: 'jimu-widget-ERG-setting',
       _SettingsInstance: null, //Object to hold Settings instance
-      _spillLocationSym: null, //Object to hold spill Location Symbol
-      _IIZoneSym: null, //Object to hold II Zone Symbol
-      _PAZoneSym: null, //Object to hold PA Zone Symbol
-      _downwindZone: null, //Object to hold Down Wind Zone Symbol
-      _fireZoneSym: null, //Object to hold FIRE Zone Symbol
-      _bleveZoneSym: null, //Object to hold BLEVE Zone Symbol
+      _currentSettings: null, //Object to hold the current settings
       
       postMixInProperties: function() {
         this.nls = lang.mixin(this.nls, window.jimuNls.common);
@@ -88,28 +84,21 @@ define([
         this.initGridTab();
         this.initLabelTab();
         this.initReferenceSystemTab();
-
-        
         this._createSettings();
         this.setConfig(this.config);        
                 
       },
 
       setConfig: function(config) {
-        this.config = config;
-        this._SettingsInstance.spillLocationSymChooser.symbol.setColor(this.config.erg.symbology.spillLocation.color);
-        
+        this.config = config;        
         this.shelter.hide();
       },      
 
       getConfig: function() {
-        this._SettingsInstance.updateSettings();
-        this.config.erg.symbology.spillLocation = this._spillLocationSym;
-        this.config.erg.symbology.IIZone = this._IIZoneSym;
-        this.config.erg.symbology.PAZone = this._PAZoneSym;
-        this.config.erg.symbology.downwind = this._downwindZoneSym;
-        this.config.erg.symbology.fireZone = this._fireZoneSym;
-        this.config.erg.symbology.bleveZone = this._bleveZoneSym;        
+        this._SettingsInstance.onSettingsChanged();
+        for (var key in this._currentSettings) {
+            this.config.erg.symbology[key] = this._currentSettings[key];
+        }        
         return this.config;
       },
       
@@ -131,13 +120,9 @@ define([
         //add a listener for a change in settings
         this.own(this._SettingsInstance.on("settingsChanged",
           lang.hitch(this, function (updatedSettings) {
-            this._spillLocationSym = updatedSettings.spillLocation;
-            this._IIZoneSym = updatedSettings.IIZone;
-            this._PAZoneSym = updatedSettings.PAZone;
-            this._downwindZone = updatedSettings.downwindZone;
-            this._fireZoneSym = updatedSettings.fireZone;
-            this._bleveZoneSym = updatedSettings.bleveZone;
-          })));
+            this._currentSettings = updatedSettings;
+          })
+        ));
         this._SettingsInstance.startup();
       }      
     });

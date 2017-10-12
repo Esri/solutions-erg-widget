@@ -8,8 +8,8 @@
       },
       "spillLocationFillColor": {
         "color": "#000001",
-        "transparency": 0,
-        "type": "esriSFSSolid"
+        "transparency": 0.5,
+        "type": "esriSFSDiagonalCross"
       },
       "IIZoneOutlineColor": {
         "color": "#ffa500",
@@ -62,5 +62,5 @@
         "type": "esriSFSBackwardDiagonal"
       }
     }
-  }  
+  }
 }

@@ -119,8 +119,8 @@ define({
     //common
     "transparency": 'Transparency', // Shown as label on transparency sliders
     "outline": 'Outline', // Shown as label for outline color picker
-    "fill": 'Fill', // Shown as label for outline color picker
-    "createERGBtn": 'Create II and PA Distances', // Shown as label on create button
+    "fill": 'Fill (Color only applies when style set to solid)', // Shown as label for outline color picker
+    "createERGBtn": 'Create Zones', // Shown as label on create button
     "clearERGBtn": 'Clear', // Shown as label on clear button
     "labelFormat": 'Label Format', // Shown as label above label format input box
     "helpIconTooltip": 'Z: Grid Zone Designator (GZD)\nS: 100,000-meter Grid Square Identification (GSID)\nX: Easting (X Coordinate)\nY: Northing (Y Coordinate)\n\nExamples:\nZSXY is 15SWC8081751205\nZS X,Y is 15SWC 80817,51205', // Shown as label above label format input box

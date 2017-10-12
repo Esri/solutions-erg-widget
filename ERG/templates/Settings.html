@@ -1,16 +1,16 @@
 ﻿<div>
     <!-- Spill Location DropDown -->
     <div class="ERGSettingsRow">
-      <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.spillLocationLabel}">${nls.spillLocationLabel}</div>
+      <div class="ERGInputLabelSettings ERGEllipsis SubTitle" title="${nls.spillLocationLabel}">${nls.spillLocationLabel}</div>
       <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.spillLocationButtonLabel}" data-dojo-attach-point="spillLocationSettingsButton"></div>
     </div>
     
     <!-- Spill Location Color Pickers -->
-    <div class="controlGroupHidden" data-dojo-attach-point="spillLocationContainer">
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
-      <div class="colorPicker" data-dojo-attach-point="spillLocationOutlineColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillLocationOutlineType">
+    <div class="container controlGroupHidden" data-dojo-attach-point="spillLocationContainer">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
+      <div class="colorPicker" id="spillLocationOutlineColor" data-dojo-attach-point="spillLocationOutlineColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillLocationOutlineType">
         <option value="esriSLSDash">${nls.dash}</option>
         <option value="esriSLSDashDot">${nls.dashdot}</option>
         <option value="esriSLSDashDotDot">${nls.dashdotdot}</option> 
@@ -24,10 +24,10 @@
         <option value="esriSLSShortDot">${nls.shortdot}</option>
         <option value="esriSLSSolid" selected='selected'>${nls.solid}</option>         
       </select>
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
-      <div class="colorPicker" data-dojo-attach-point="spillLocationFillColorPicker"></div>       
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillLocationFillType">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
+      <div class="colorPicker" id="spillLocationFillColor" data-dojo-attach-point="spillLocationFillColorPicker"></div>       
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillLocationFillType">
         <option value="esriSFSBackwardDiagonal">${nls.backward}</option>
         <option value="esriSFSCross">${nls.cross}</option>
         <option value="esriSFSDiagonalCross">${nls.diagonal}</option> 
@@ -41,16 +41,16 @@
     
     <!-- Initial Isolation Zone DropDown -->
     <div class="ERGSettingsRow">
-      <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.IISettingsLabel}">${nls.IISettingsLabel}</div>
+      <div class="ERGInputLabelSettings ERGEllipsis SubTitle" title="${nls.IISettingsLabel}">${nls.IISettingsLabel}</div>
       <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.IIButtonLabel}" data-dojo-attach-point="IISettingsButton"></div>
     </div>
     
     <!-- Initial Isolation Zone -->
-    <div class="controlGroupHidden" data-dojo-attach-point="IIZoneContainer">
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
-      <div class="colorPicker" data-dojo-attach-point="IIZoneOutlineColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="IIZoneOutlineType">
+    <div class="container controlGroupHidden" data-dojo-attach-point="IIZoneContainer">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
+      <div class="colorPicker" id="IIZoneOutlineColor" data-dojo-attach-point="IIZoneOutlineColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="IIZoneOutlineType">
         <option value="esriSLSDash">${nls.dash}</option>
         <option value="esriSLSDashDot">${nls.dashdot}</option>
         <option value="esriSLSDashDotDot">${nls.dashdotdot}</option> 
@@ -64,10 +64,10 @@
         <option value="esriSLSShortDot">${nls.shortdot}</option>
         <option value="esriSLSSolid" selected='selected'>${nls.solid}</option>         
       </select>
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
-      <div class="colorPicker" data-dojo-attach-point="IIZoneFillColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="IIZoneFillType">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
+      <div class="colorPicker" id="IIZoneFillColor" data-dojo-attach-point="IIZoneFillColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="IIZoneFillType">
         <option value="esriSFSBackwardDiagonal">${nls.backward}</option>
         <option value="esriSFSCross">${nls.cross}</option>
         <option value="esriSFSDiagonalCross">${nls.diagonal}</option> 
@@ -81,16 +81,16 @@
     
     <!-- Protective Action Zone DropDown -->    
     <div class="ERGSettingsRow">
-      <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.PASettingsLabel}">${nls.PASettingsLabel}</div>
+      <div class="ERGInputLabelSettings ERGEllipsis SubTitle" title="${nls.PASettingsLabel}">${nls.PASettingsLabel}</div>
       <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.PAButtonLabel}" data-dojo-attach-point="PASettingsButton"></div>
     </div>
     
     <!-- Protective Action Zone -->
-    <div class="controlGroupHidden" data-dojo-attach-point="PAZoneContainer">
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
-      <div class="colorPicker" data-dojo-attach-point="PAZoneOutlineColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="PAZoneOutlineType">
+    <div class="container controlGroupHidden" data-dojo-attach-point="PAZoneContainer">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
+      <div class="colorPicker" id="PAZoneOutlineColor" data-dojo-attach-point="PAZoneOutlineColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="PAZoneOutlineType">
         <option value="esriSLSDash">${nls.dash}</option>
         <option value="esriSLSDashDot">${nls.dashdot}</option>
         <option value="esriSLSDashDotDot">${nls.dashdotdot}</option> 
@@ -104,10 +104,10 @@
         <option value="esriSLSShortDot">${nls.shortdot}</option>
         <option value="esriSLSSolid" selected='selected'>${nls.solid}</option>         
       </select>
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
-      <div class="colorPicker" data-dojo-attach-point="PAZoneFillColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="PAZoneFillType">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
+      <div class="colorPicker" id="PAZoneFillColor" data-dojo-attach-point="PAZoneFillColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="PAZoneFillType">
         <option value="esriSFSBackwardDiagonal">${nls.backward}</option>
         <option value="esriSFSCross">${nls.cross}</option>
         <option value="esriSFSDiagonalCross">${nls.diagonal}</option> 
@@ -121,16 +121,16 @@
     
     <!-- Downwind Zone DropDown -->    
     <div class="ERGSettingsRow">
-      <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.downwindSettingsLabel}">${nls.downwindSettingsLabel}</div>
+      <div class="ERGInputLabelSettings ERGEllipsis SubTitle" title="${nls.downwindSettingsLabel}">${nls.downwindSettingsLabel}</div>
       <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.downwindButtonLabel}" data-dojo-attach-point="downwindSettingsButton"></div>
     </div>
     
     <!-- Downwind Action Zone -->
-    <div class="controlGroupHidden" data-dojo-attach-point="downwindZoneContainer">
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
-      <div class="colorPicker" data-dojo-attach-point="downwindZoneOutlineColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="downwindZoneOutlineType">
+    <div class="container controlGroupHidden" data-dojo-attach-point="downwindZoneContainer">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
+      <div class="colorPicker" id="downwindZoneOutlineColor" data-dojo-attach-point="downwindZoneOutlineColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="downwindZoneOutlineType">
         <option value="esriSLSDash">${nls.dash}</option>
         <option value="esriSLSDashDot">${nls.dashdot}</option>
         <option value="esriSLSDashDotDot">${nls.dashdotdot}</option> 
@@ -144,10 +144,10 @@
         <option value="esriSLSShortDot">${nls.shortdot}</option>
         <option value="esriSLSSolid" selected='selected'>${nls.solid}</option>         
       </select>
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
-      <div class="colorPicker" data-dojo-attach-point="downwindZoneFillColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="downwindZoneFillType">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
+      <div class="colorPicker" id="downwindZoneFillColor" data-dojo-attach-point="downwindZoneFillColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="downwindZoneFillType">
         <option value="esriSFSBackwardDiagonal">${nls.backward}</option>
         <option value="esriSFSCross">${nls.cross}</option>
         <option value="esriSFSDiagonalCross">${nls.diagonal}</option> 
@@ -161,16 +161,16 @@
     
     <!-- Fire Isolation DropDown -->
     <div class="ERGSettingsRow">
-      <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.fireSettingsLabel}">${nls.fireSettingsLabel}</div>
+      <div class="ERGInputLabelSettings ERGEllipsis SubTitle" title="${nls.fireSettingsLabel}">${nls.fireSettingsLabel}</div>
       <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.fireButtonLabel}" data-dojo-attach-point="fireSettingsButton"></div>
     </div>
     
     <!-- Fire Isolation Zone -->
-    <div class="controlGroupHidden" data-dojo-attach-point="fireZoneContainer">
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
-      <div class="colorPicker" data-dojo-attach-point="fireZoneOutlineColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="fireZoneOutlineType">
+    <div class="container controlGroupHidden" data-dojo-attach-point="fireZoneContainer">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
+      <div class="colorPicker" id="fireZoneOutlineColor" data-dojo-attach-point="fireZoneOutlineColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="fireZoneOutlineType">
         <option value="esriSLSDash">${nls.dash}</option>
         <option value="esriSLSDashDot">${nls.dashdot}</option>
         <option value="esriSLSDashDotDot">${nls.dashdotdot}</option> 
@@ -184,10 +184,10 @@
         <option value="esriSLSShortDot">${nls.shortdot}</option>
         <option value="esriSLSSolid" selected='selected'>${nls.solid}</option>         
       </select>
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
-      <div class="colorPicker" data-dojo-attach-point="fireZoneFillColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="fireZoneFillType">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
+      <div class="colorPicker" id="fireZoneFillColor" data-dojo-attach-point="fireZoneFillColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="fireZoneFillType">
         <option value="esriSFSBackwardDiagonal">${nls.backward}</option>
         <option value="esriSFSCross">${nls.cross}</option>
         <option value="esriSFSDiagonalCross">${nls.diagonal}</option> 
@@ -201,16 +201,16 @@
     
     <!-- BLEVE Isolation DropDown -->
     <div class="ERGSettingsRow">
-      <div class="ERGInputLabel ERGEllipsis SubTitle" title="${nls.bleveSettingsLabel}">${nls.bleveSettingsLabel}</div>
+      <div class="ERGInputLabelSettings ERGEllipsis SubTitle" title="${nls.bleveSettingsLabel}">${nls.bleveSettingsLabel}</div>
       <div class="ERGLabelSettingsDownButton ERGSettingsButtonIcon ERGPointer" title="${nls.bleveButtonLabel}" data-dojo-attach-point="bleveSettingsButton"></div>
     </div>
     
     <!-- BLEVE Isolation Zone -->
-    <div class="controlGroupHidden" data-dojo-attach-point="bleveZoneContainer">
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
-      <div class="colorPicker" data-dojo-attach-point="bleveZoneOutlineColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="bleveZoneOutlineType">
+    <div class="container controlGroupHidden" data-dojo-attach-point="bleveZoneContainer">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.outline}">${nls.outline}</div>
+      <div class="colorPicker" id="bleveZoneOutlineColor" data-dojo-attach-point="bleveZoneOutlineColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.outlineStyle}">${nls.outlineStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="bleveZoneOutlineType">
         <option value="esriSLSDash">${nls.dash}</option>
         <option value="esriSLSDashDot">${nls.dashdot}</option>
         <option value="esriSLSDashDotDot">${nls.dashdotdot}</option> 
@@ -224,10 +224,10 @@
         <option value="esriSLSShortDot">${nls.shortdot}</option>
         <option value="esriSLSSolid" selected='selected'>${nls.solid}</option>         
       </select>
-      <div class="ERGDrafterDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
-      <div class="colorPicker" data-dojo-attach-point="bleveZoneFillColorPicker"></div>
-      <div class="ERGDrafterDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
-      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="bleveZoneFillType">
+      <div class="ERGDropdownLabel GRGDrafterEllipsis" title="${nls.fill}">${nls.fill}</div>
+      <div class="colorPicker" id="bleveZoneFillColor" data-dojo-attach-point="bleveZoneFillColorPicker"></div>
+      <div class="ERGDropdownLabel ERGEllipsis"  title="${nls.fillStyle}">${nls.fillStyle}</div>
+      <select style="width: 100%" class="dropdown" data-dojo-type="dijit/form/Select" data-dojo-attach-point="bleveZoneFillType">
         <option value="esriSFSBackwardDiagonal">${nls.backward}</option>
         <option value="esriSFSCross">${nls.cross}</option>
         <option value="esriSFSDiagonalCross">${nls.diagonal}</option> 

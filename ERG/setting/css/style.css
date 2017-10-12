@@ -16,18 +16,16 @@
     display: inline-block;
 }
 
-.jimu-widget-ERG-setting .ERGHalfWidthLeft {
+.jimu-widget-ERG-setting .ERGSymbologyContainer {
     width: 50%;
-}
-
-.jimu-widget-ERG-setting .ERGHalfWidthRight {
-    padding-left: 10px;
-    width: 50%;
+    padding-top: 10px;
+    padding-left: 15px;
 }
 
 .jimu-widget-ERG-setting .ERGHalfWidthContainer
 {
     display: flex;
+    width: 50%;
 }
 
 .jimu-widget-ERG-setting .ERGInputLabel
@@ -35,6 +33,20 @@
     float: left;
     line-height: 28px;
     padding: 5px 5px 0px 0;
+}
+
+.jimu-widget-ERG-setting .ERGInputLabelSettings
+{
+    float: left;
+    line-height: 28px;
+    padding: 5px 0px 0px 0px;
+}
+
+.jimu-widget-ERG-setting .ERGDropdownLabel
+{
+    line-height: 28px;
+    padding-bottom: 5px;
+    padding-top: 5px;
 }
 
 .jimu-widget-ERG-setting .ERGEllipsis
@@ -55,7 +67,6 @@
 
 .jimu-widget-ERG-setting .ERGSettingsButtonIcon {
     margin-top: 10px;
-    margin-right: 130px;
     height: 20px;
     width: 25px;
     float: right;
@@ -75,10 +86,6 @@
 .jimu-widget-ERG-setting .controlGroupHidden {
     display: none;
 }
-
-
-
-
 
 .jimu-widget-ERG-setting .instruction {
 	margin-bottom: 10px;
@@ -167,9 +174,7 @@
 	overflow-y: auto;
 }
 .jimu-widget-ERG-setting .tabs .jimu-tab>.jimu-viewstack{
-/*	min-height: 100000px;
-	overflow-y: auto;*/
-	padding-bottom: 30px;
+	padding-bottom: 20px;
 }
 
 /*.colorPickerEditor*/

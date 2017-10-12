@@ -109,9 +109,18 @@
     width: 100%;
 }
 
-.jimu-widget-ERG .ERGDrafterDropdownLabel
+.jimu-widget-ERG .ERGInputLabelSettings
+{
+    float: left;
+    line-height: 28px;
+    padding: 5px 0px 0px 0px;
+}
+
+.jimu-widget-ERG .ERGDropdownLabel
 {
     line-height: 28px;
+    padding-bottom: 5px;
+    padding-top: 5px;
 }
 
 .jimu-widget-ERG .ERGNewERGPointButton
@@ -280,11 +289,6 @@
 .jimu-widget-ERG .ERGSettingRowDouble
 {
     padding-bottom: 12px;
-}
-
-.jimu-widget-ERG .ERGDropdownLabel
-{
-    padding-bottom: 5px;
 }
 
 .jimu-widget-ERG .ERGSettingHeader

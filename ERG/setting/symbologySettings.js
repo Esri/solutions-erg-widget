@@ -19,9 +19,10 @@ define([
   'dojo/_base/array',
   'dojo/_base/html',
   'dojo/on',
+  './ColorPickerEditor',
   'jimu/BaseWidget',
   'dijit/_WidgetsInTemplateMixin',
-  'dojo/text!./symbologySettings.html',
+  'dojo/text!../templates/Settings.html',
   'dojo/_base/lang',
   'dojo/Evented',
   'dojo/dom-class',
@@ -35,6 +36,7 @@ define([
     array,
     html,
     on,
+    ColorPickerEditor,
     BaseWidget,
     _WidgetsInTemplateMixin,
     SettingsTemplate,
@@ -47,20 +49,33 @@ define([
     return declare([BaseWidget, _WidgetsInTemplateMixin, Evented], {
       baseClass: 'jimu-widget-ERG-Settings',
       templateString: SettingsTemplate,
-      selectedSettings: {}, //Holds selected Settings
+      selectedSettings: {}, //Holds selected Settings      
+      colorPickerNodes: [], //Holds an array of color pickers populated at start up
+      dropdownNodes: [], //Holds an array of dropdowns populated at start up
       
       constructor: function (options) {
         lang.mixin(this, options);
       },
 
       //Load all the options on startup
-      startup: function () {        
-        if(this.config.erg) {          
-                  
-        }
+      startup: function () {     
+       
+      this.colorPickerNodes = query('.colorPicker',this.domNode);
+      
+      this.dropdownNodes = query('.dropdown',this.domNode);
+      
+      array.forEach(this.colorPickerNodes,lang.hitch(this, function(node, i){
+          node = new ColorPickerEditor({nls: this.nls}, node);
+          node.setValues({
+              "color": this.config.erg.symbology[node.id].color,
+              "transparency": this.config.erg.symbology[node.id].transparency
+            });
+          node.startup();          
+          dijitRegistry.byId(this.dropdownNodes[i].id).set('value',this.config.erg.symbology[node.id].type);
+        }));
         
         //send by default updated parameters
-        this.updateSettings();
+        this.onSettingsChanged();
       },
 
       postCreate: function () {
@@ -102,22 +117,8 @@ define([
       },
       
       _openCloseNodes: function (node,container) {
-        var containers = [
-          this.spillLocationContainer,
-          this.IIZoneContainer,
-          this.PAZoneContainer,
-          this.downwindZoneContainer,
-          this.fireZoneContainer,
-          this.bleveZoneContainer
-        ];
-        var nodes = [
-          this.spillLocationSettingsButton,
-          this.IISettingsButton,
-          this.PASettingsButton,
-          this.downwindSettingsButton,
-          this.fireSettingsButton,
-          this.bleveSettingsButton
-        ];
+        var containers = query('.container',this.domNode);
+        var buttons = query('.ERGSettingsButtonIcon',this.domNode);
         var nodeOpen = false;
         
         if(node){
@@ -127,7 +128,7 @@ define([
         array.forEach(containers,lang.hitch(this, function(otherContainer){
           html.addClass(otherContainer, 'controlGroupHidden');          
         }));
-        array.forEach(nodes,lang.hitch(this, function(otherNode){
+        array.forEach(buttons,lang.hitch(this, function(otherNode){
           html.removeClass(otherNode, 'ERGLabelSettingsUpButton');
           html.addClass(otherNode, 'ERGLabelSettingsDownButton');          
         }));
@@ -139,54 +140,27 @@ define([
           html.addClass(node, 'ERGLabelSettingsUpButton');
         }       
       },
-      
+            
       /**
-      * Return's flag based on settings are changed or not
+      * Update's Settings on close of the widget
       * @memberOf widgets/ERG/Settings
       **/
-      _isSettingsChanged: function () {
-        var isDataChanged = false;        
-        //check if spill Location Symbol Chooser has changed
-        if (this.selectedSettings.spillLocation !==
-          this.spillLocationSymChooser.getValidSymbol()) {
-          isDataChanged = true;
-        } else if (this.selectedSettings.IIZone !==
-          this.IIZoneSymChooser.getValidSymbol()) {
-          //check if II Zone Symbol Chooser has changed
-          isDataChanged = true;
-        } else if (this.selectedSettings.PAZone !==
-          this.PAZoneSymChooser.getValidSymbol()) {
-          //check if PA Zone Symbol Chooser has changed
-          isDataChanged = true;
-        } else if (this.selectedSettings.downwindZone !==
-          this.downwindZoneSymChooser.getValidSymbol()) {
-          //check if Down Wind Zone Symbol Chooser has changed
-          isDataChanged = true;
-        } else if (this.selectedSettings.fireZone !==
-          this.fireZoneSymChooser.getValidSymbol()) {
-          //check if FIRE Zone Symbol Chooser has changed
-          isDataChanged = true;
-        } else if (this.selectedSettings.bleveZone !==
-          this.bleveZoneSymChooser.getValidSymbol()) {
-          //check if BLEVE Zone Symbol Chooser has changed
-          isDataChanged = true;
-        }
-        return isDataChanged;
+      onClose: function () {
+        this.onSettingsChanged();
+        this._openCloseNodes();
       },
 
       /**
       * Set's the selected Settings on any value change
       * @memberOf widgets/ERG/Settings
       **/
-      updateSettings: function () {
-        this.selectedSettings = {
-          "spillLocation": this.spillLocationSymChooser.getValidSymbol(),
-          "IIZone": this.IIZoneSymChooser.getValidSymbol(),
-          "PAZone": this.PAZoneSymChooser.getValidSymbol(),
-          "downwindZone": this.downwindZoneSymChooser.getValidSymbol(),
-          "fireZone": this.fireZoneSymChooser.getValidSymbol(),
-          "bleveZone": this.bleveZoneSymChooser.getValidSymbol()          
-        };        
+      onSettingsChanged: function () {
+        array.forEach(this.colorPickerNodes,lang.hitch(this, function(node, i){
+          var json = {'color': dijitRegistry.byId(node.id).getValues().color,
+                      'transparency': dijitRegistry.byId(node.id).getValues().transparency,
+                      'type': dijitRegistry.byId(this.dropdownNodes[i].id).getValue()};
+          this.selectedSettings[node.id] = json;
+        }));        
         this.emit("settingsChanged", this.selectedSettings);
       }
     });

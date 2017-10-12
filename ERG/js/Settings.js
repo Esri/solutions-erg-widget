@@ -51,6 +51,7 @@ define([
       templateString: SettingsTemplate,
       selectedSettings: {}, //Holds selected Settings      
       colorPickerNodes: [], //Holds an array of color pickers populated at start up
+      dropdownNodes: [], //Holds an array of dropdowns populated at start up
       
       constructor: function (options) {
         lang.mixin(this, options);
@@ -58,30 +59,19 @@ define([
 
       //Load all the options on startup
       startup: function () {     
-        
-        this.colorPickerNodes = [
-          [this.spillLocationOutlineColorPicker,'spillLocationOutlineColor', this.spillLocationOutlineType],
-          [this.IIZoneOutlineColorPicker, 'IIZoneOutlineColor', this.IIZoneOutlineType],
-          [this.PAZoneOutlineColorPicker, 'PAZoneOutlineColor', this.PAZoneOutlineType],
-          [this.downwindZoneOutlineColorPicker, 'downwindZoneOutlineColor', this.downwindZoneOutlineType],
-          [this.fireZoneOutlineColorPicker, 'fireZoneOutlineColor', this.fireZoneOutlineType],
-          [this.bleveZoneOutlineColorPicker, 'bleveZoneOutlineColor', this.bleveZoneOutlineType],
-          [this.spillLocationFillColorPicker, 'spillLocationFillColor', this.spillLocationFillType],
-          [this.IIZoneFillColorPicker, 'IIZoneFillColor', this.IIZoneFillType],
-          [this.PAZoneFillColorPicker, 'PAZoneFillColor', this.PAZoneFillType],
-          [this.downwindZoneFillColorPicker, 'downwindZoneFillColor', this.downwindZoneFillType],
-          [this.fireZoneFillColorPicker, 'fireZoneFillColor', this.fireZoneFillType],
-          [this.bleveZoneFillColorPicker, 'bleveZoneFillColor', this.bleveZoneFillType]          
-        ];
        
-       array.forEach(this.colorPickerNodes,lang.hitch(this, function(node){
-          node[0] = new ColorPickerEditor({nls: this.nls}, node[0]);
-          node[0].setValues({
-              "color": this.config.erg.symbology[node[1]].color,
-              "transparency": this.config.erg.symbology[node[1]].transparency
+      this.colorPickerNodes = query('.colorPicker',this.domNode);
+      
+      this.dropdownNodes = query('.dropdown',this.domNode);
+      
+      array.forEach(this.colorPickerNodes,lang.hitch(this, function(node, i){
+          node = new ColorPickerEditor({nls: this.nls}, node);
+          node.setValues({
+              "color": this.config.erg.symbology[node.id].color,
+              "transparency": this.config.erg.symbology[node.id].transparency
             });
-          node[0].startup();
-          node[2].setValue(this.config.erg.symbology[node[1]].type);
+          node.startup();          
+          dijitRegistry.byId(this.dropdownNodes[i].id).set('value',this.config.erg.symbology[node.id].type);
         }));
         
         //send by default updated parameters
@@ -127,22 +117,8 @@ define([
       },
       
       _openCloseNodes: function (node,container) {
-        var containers = [
-          this.spillLocationContainer,
-          this.IIZoneContainer,
-          this.PAZoneContainer,
-          this.downwindZoneContainer,
-          this.fireZoneContainer,
-          this.bleveZoneContainer
-        ];
-        var nodes = [
-          this.spillLocationSettingsButton,
-          this.IISettingsButton,
-          this.PASettingsButton,
-          this.downwindSettingsButton,
-          this.fireSettingsButton,
-          this.bleveSettingsButton
-        ];
+        var containers = query('.container',this.domNode);
+        var buttons = query('.ERGSettingsButtonIcon',this.domNode);
         var nodeOpen = false;
         
         if(node){
@@ -152,7 +128,7 @@ define([
         array.forEach(containers,lang.hitch(this, function(otherContainer){
           html.addClass(otherContainer, 'controlGroupHidden');          
         }));
-        array.forEach(nodes,lang.hitch(this, function(otherNode){
+        array.forEach(buttons,lang.hitch(this, function(otherNode){
           html.removeClass(otherNode, 'ERGLabelSettingsUpButton');
           html.addClass(otherNode, 'ERGLabelSettingsDownButton');          
         }));
@@ -170,7 +146,8 @@ define([
       * @memberOf widgets/ERG/Settings
       **/
       onClose: function () {
-        this.onSettingsChanged();        
+        this.onSettingsChanged();
+        this._openCloseNodes();
       },
 
       /**
@@ -178,11 +155,11 @@ define([
       * @memberOf widgets/ERG/Settings
       **/
       onSettingsChanged: function () {
-        array.forEach(this.colorPickerNodes,lang.hitch(this, function(node){
-          var json = {'color': node[0].getValues().color,
-                      'transparency': node[0].getValues().transparency,
-                      'type': node[2].getValue()};
-          this.selectedSettings[node[1]] = json;
+        array.forEach(this.colorPickerNodes,lang.hitch(this, function(node, i){
+          var json = {'color': dijitRegistry.byId(node.id).getValues().color,
+                      'transparency': dijitRegistry.byId(node.id).getValues().transparency,
+                      'type': dijitRegistry.byId(this.dropdownNodes[i].id).getValue()};
+          this.selectedSettings[node.id] = json;
         }));        
         this.emit("settingsChanged", this.selectedSettings);
       }
