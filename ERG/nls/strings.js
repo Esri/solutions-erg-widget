@@ -101,8 +101,8 @@ define({
     "vertical": 'Vertical',
     
     
-    //Publish Panel
-    "publishTitle": "Publish ERG to Portal", // Shown as Title for Grid Settings page and label on settings buttons
+    //results Panel
+    "resultsTitle": "Results", // Shown as Title for Grid Settings page and label on settings buttons
     "publishERGBtn": 'Publish', // Shown as label on publish ERG button   
     "ERGLayerName": 'Published ERG Layer Name', // Shown as label for layer name box
     "invalidERGLayerName": 'Layer name must only contain alpha-numeric characters and underscores', //Shown as validation error on published layer name

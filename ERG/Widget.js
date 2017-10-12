@@ -81,6 +81,7 @@ define([
   './js/DrawFeedBack',
   './js/EditOutputCoordinate',
   './js/jquery.easy-autocomplete',
+  './js/portal-utils',
   './js/WeatherInfo',
   
   'dijit/form/NumberTextBox',
@@ -149,7 +150,8 @@ define([
     coordInput,
     drawFeedBackPoint,
     editOutputCoordinate,
-    autoComplete,    
+    autoComplete,
+    portalutils,    
     WeatherInfo
   ) {
     return declare([BaseWidget, dijitWidgetBase, dijitWidgetsInTemplate], {
@@ -168,10 +170,9 @@ define([
       _PAZoneSym: null, //Object to hold PA Zone Symbol
       _downwindZoneSym: null, //Object to hold Down Wind Zone Symbol
       _fireZoneSym: null, //Object to hold FIRE Zone Symbol
-      _bleveZoneSym: null, //Object to hold BLEVE Zone Symbol
-      
-      _ERGAreaFillSymbol: null, //Fill symbol used for ERG cells
-      _cellTextSymbol: null, //Text symbol used for ERG labeling      
+      _bleveZoneSym: null, //Object to hold BLEVE Zone Symbol      
+      _renderer: null, // renderer to be used on the ERG Feature Service
+     
       
       postMixInProperties: function () {
         //mixin default nls with widget nls
@@ -184,6 +185,19 @@ define([
       },
 
       postCreate: function () {
+        //modify String's prototype so we can format a string using .format
+        if (!String.prototype.format) {
+          String.prototype.format = function() {
+            var args = arguments;
+            return this.replace(/{(\d+)}/g, function(match, number) { 
+              return typeof args[number] != 'undefined'
+                ? args[number]
+                : match
+              ;
+            });
+          };
+        }
+        
         this.inherited(arguments);
         
         //set up blank weather info        
@@ -499,7 +513,7 @@ define([
         * Publish panel
         **/
             //Handle click event back button
-            this.own(on(this.publishPanelBackButton, "click", lang.hitch(this, function () {
+            this.own(on(this.resultsPanelBackButton, "click", lang.hitch(this, function () {
               //remove any messages
               this.publishMessage.innerHTML = '';
               //clear layer name
@@ -532,8 +546,8 @@ define([
           case "settingsPage":
             node = this.settingsPageNode;
             break;
-          case "publishPage":
-            node = this.publishPageNode;
+          case "resultsPage":
+            node = this.resultsPageNode;
             break;
         }
         return node;
@@ -705,8 +719,8 @@ define([
             }
             
             // create a renderer for the ERG layer to override default symbology
-            var renderer = new UniqueValueRenderer(uvrJson);
-            this.ERGArea.setRenderer(renderer);
+            this._renderer = new UniqueValueRenderer(uvrJson);
+            this.ERGArea.setRenderer(this._renderer);
            
             //refresh the layer to apply the settings
             this.ERGArea.refresh();              
@@ -966,6 +980,7 @@ define([
           
           this.ERGArea.applyEdits(features, null, null);
           this.map.setExtent(graphicsUtils.graphicsExtent(this.ERGArea.graphics).expand(2),false);
+          this._showPanel("resultsPage");
         }
       },
                   
@@ -1085,15 +1100,15 @@ define([
             var checkServiceNameUrl = this.appConfig.portalUrl + "sharing/rest/portals/" + orgId + "/isServiceNameAvailable";
             var createServiceUrl = this.appConfig.portalUrl + "sharing/content/users/" + userName + "/createService"; 
 
-            drawERG.isNameAvailable(checkServiceNameUrl, token, featureServiceName).then(lang.hitch(this, function(response0) {
+            portalutils.isNameAvailable(checkServiceNameUrl, token, featureServiceName).then(lang.hitch(this, function(response0) {
               if (response0.available) {
                 //set the widget to busy
                 this.busyIndicator.show();
                 //create the service
-                drawERG.createFeatureService(createServiceUrl, token, drawERG.getFeatureServiceParams(featureServiceName, this.map)).then(lang.hitch(this, function(response1) {
+                portalutils.createFeatureService(createServiceUrl, token, portalutils.getFeatureServiceParams(featureServiceName, this.map)).then(lang.hitch(this, function(response1) {
                   if (response1.success) {
                     var addToDefinitionUrl = response1.serviceurl.replace(new RegExp('rest', 'g'), "rest/admin") + "/addToDefinition";
-                    drawERG.addDefinitionToService(addToDefinitionUrl, token, drawERG.getLayerParams(featureServiceName, this.map, this._cellTextSymbol, this._ERGAreaFillSymbol)).then(lang.hitch(this, function(response2) {
+                    portalutils.addDefinitionToService(addToDefinitionUrl, token, portalutils.getLayerParams(featureServiceName, this.map, this._renderer)).then(lang.hitch(this, function(response2) {
                       if (response2.success) {
                         //Push features to new layer
                         var newFeatureLayer = new FeatureLayer(response1.serviceurl + "/0?token=" + token, {
@@ -1105,7 +1120,7 @@ define([
                         
                         var newGraphics = [];
                         array.forEach(this.ERGArea.graphics, function (g) {
-                          newGraphics.push(new Graphic(g.geometry, null, {grid: g.attributes["grid"]}));
+                          newGraphics.push(new Graphic(g.geometry, null, {type: g.attributes["type"]}));
                         }, this);
                         newFeatureLayer.applyEdits(newGraphics, null, null).then(lang.hitch(this, function(){
                           this._reset();                                

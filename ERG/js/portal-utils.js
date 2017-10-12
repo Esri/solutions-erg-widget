@@ -24,8 +24,7 @@ define([
   'esri/geometry/Circle',
   'esri/request',
   'jimu/dijit/Message',  
-  'dojo/json',
-  './geometryUtils'
+  'dojo/json'
 ], function(
   Point,
   Polygon,
@@ -36,13 +35,12 @@ define([
   EsriCircle,
   esriRequest,
   Message,  
-  JSON,
-  geometryUtils
+  JSON
 ) {
   
-  var grg = {};
+  var portalUtil = {};
   
-  grg.getFeatureServiceParams = function (featureServiceName, map) {
+  portalUtil.getFeatureServiceParams = function (featureServiceName, map) {
     return {
      "name" : featureServiceName,
      "serviceDescription" : "",
@@ -75,7 +73,7 @@ define([
     }
   },
 
-  grg.getLayerParams = function (layerName, map, textSymbol, gridSymbol) {          
+  portalUtil.getLayerParams = function (layerName, map, renderer) {          
     return {
       "layers": [
         {
@@ -123,36 +121,10 @@ define([
           "geometryType": "esriGeometryPolygon",
           "minScale" : 0, 
           "maxScale" : 0,
-          "extent": {
-            "xmin": map.extent.xmin,
-            "ymin": map.extent.ymin,
-            "xmax": map.extent.xmax,
-            "ymax": map.extent.ymax,
-            "spatialReference":{
-              "wkid":102100
-            }
-          },
+          "extent": map.extent,
           "drawingInfo": {
-            "renderer": {
-             "type": "simple",
-             "symbol": gridSymbol
-            },
-            "transparency": 0,
-            "labelingInfo": [
-               {
-                "labelExpression": "[grid]",
-                "labelExpressionInfo": {"value": "{grid}"},
-                "format": null,
-                "fieldInfos": null,
-                "useCodedValues": false,
-                "maxScale": 0,
-                "minScale": 0,
-                "where": null,
-                "sizeInfo": null,
-                "labelPlacement": "esriServerPolygonPlacementAlwaysHorizontal",
-                "symbol": textSymbol
-              }
-            ]
+            "renderer": renderer.toJson(),
+            "transparency": 0
           },
           "allowGeometryUpdates": true,
           "hasAttachments": false,
@@ -175,9 +147,9 @@ define([
               "defaultValue": null
             },
             {
-              "name": "grid",
+              "name": "type",
               "type": "esriFieldTypeString",
-              "alias": "grid",
+              "alias": "type",
               "actualType": "nvarchar",
               "nullable": true,
               "editable": true,
@@ -196,7 +168,7 @@ define([
               "drawingTool": "esriFeatureEditToolPolygon",
               "prototype": {
                 "attributes": {
-                  "grid": ""
+                  "type": ""
                 }
               }
             }
@@ -214,7 +186,7 @@ define([
     }        
   },
   
-  grg.isNameAvailable = function (serviceName, token, featureServiceName) {
+  portalUtil.isNameAvailable = function (serviceName, token, featureServiceName) {
     //Check for the layer name
     var def = esriRequest({
       url: serviceName,
@@ -230,7 +202,7 @@ define([
     return def;
   },
 
-  grg.createFeatureService = function (serviceUrl, token, createParams) {
+  portalUtil.createFeatureService = function (serviceUrl, token, createParams) {
     //create the service
     var def = esriRequest({
       url: serviceUrl,
@@ -247,7 +219,7 @@ define([
     return def;
   },
 
-  grg.addDefinitionToService = function (serviceUrl, token, defParams) {
+  portalUtil.addDefinitionToService = function (serviceUrl, token, defParams) {
     var def = esriRequest({
       url: serviceUrl,
       content: {
@@ -261,6 +233,6 @@ define([
     return def;
   }
   
-  return grg;
+  return portalUtil;
 });
 
