@@ -123,7 +123,7 @@ define({
     "createERGBtn": 'Create Zones', // Shown as label on create button
     "clearERGBtn": 'Clear', // Shown as label on clear button
     "labelFormat": 'Label Format', // Shown as label above label format input box
-    "helpIconTooltip": 'Z: Grid Zone Designator (GZD)\nS: 100,000-meter Grid Square Identification (GSID)\nX: Easting (X Coordinate)\nY: Northing (Y Coordinate)\n\nExamples:\nZSXY is 15SWC8081751205\nZS X,Y is 15SWC 80817,51205', // Shown as label above label format input box
+    "helpIconTooltip": 'The threshold between small and large spill sizes are:\nLiquids - 55 gallons (208 liters)\nSolids - 60 pounds (300 kilograms)', // Shown as help info on spill size
     "cellWidth": 'Cell Width (x)', // Shown as label above cell width input
     "cellHeight": 'Cell Height (y)', // Shown as label above cell height input
     "invalidNumberMessage": 'The value entered is not valid', //Shown as validation error on invalid entries

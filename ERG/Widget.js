@@ -164,7 +164,7 @@ define([
       _lastOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _currentOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _useWeather: false, //Flag to hold if weather is to be used
-      _weatherURL: null, //Weather URL
+      _weatherURL: '', //Weather URL
       _SettingsInstance: null, //Object to hold Settings instance
       _spillLocationSym: null, //Object to hold spill Location Symbol
       _IIZoneSym: null, //Object to hold II Zone Symbol
@@ -296,7 +296,6 @@ define([
 
       startup: function () {
         
-        
         this.inherited(arguments);
         this.busyIndicator = busyIndicator.create({target: this.domNode.parentNode.parentNode.parentNode, backgroundOpacity: 0});
         this._setTheme(); 
@@ -329,7 +328,8 @@ define([
                   message: this.nls.table3Message
                 })
                 this.windSpeed.set('disabled', false);
-                this.transportContainer.set('disabled', false);                
+                this.transportContainer.set('disabled', false);
+                dojo.removeClass(this.table3Container, 'ERGHidden');                
                 this._resetTransportContainerOptions();
               } else {
                 this.windSpeed.set('disabled', true);
@@ -341,6 +341,7 @@ define([
                 })
                 this.useBleve.set('disabled', false);
                 this.tankCapacity.set('disabled', false);
+                dojo.removeClass(this.bleveContainer, 'ERGHidden');
               } else {
                 this.useBleve.set('disabled', true);
                 this.tankCapacity.set('disabled', true);
@@ -355,7 +356,9 @@ define([
             }),            
             onShowListEvent: lang.hitch(this, function() {
               this._selectedMaterial = null;
-              this.spillSize.set('disabled', false);
+              this.spillSize.set('disabled', false);              
+              dojo.addClass(this.table3Container, 'ERGHidden');              
+              dojo.addClass(this.bleveContainer, 'ERGHidden');
               dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
             })            
           }          
@@ -454,8 +457,10 @@ define([
               this.materialType.value = '';
               this.windSpeed.set('disabled', true);
               this.transportContainer.set('disabled', true);
+              dojo.addClass(this.table3Container, 'ERGHidden');
               this.useBleve.set('disabled', true);
               this.useBleve.set('checked', false);
+              dojo.addClass(this.bleveContainer, 'ERGHidden');
               this.fire.set('checked', false);
               this.tankCapacity.set('disabled', true);
               this._selectedMaterial = null;
@@ -518,10 +523,12 @@ define([
                   })
                   this.windSpeed.set('disabled', false);
                   this.transportContainer.set('disabled', false);
+                  dojo.removeClass(this.table3Container, 'ERGHidden');
                   this._resetTransportContainerOptions();
                 } else {
                   this.windSpeed.set('disabled', true);
                   this.transportContainer.set('disabled', true);
+                  dojo.addClass(this.table3Container, 'ERGHidden');
                 }
               }
             })));

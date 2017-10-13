@@ -33,10 +33,11 @@
                   <div class="ERGHalfWidthContainer">
                     <div class="ERGHalfWidthLeft ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis"  title="${nls.spillSize}">${nls.spillSize}</div>
-                      <select style="width: 100%" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillSize">
+                      <select style="width: calc(100% - 20px)" data-dojo-type="dijit/form/Select" data-dojo-attach-point="spillSize">
                         <option value="SM">${nls.small}</option>
                         <option value="LG">${nls.large}</option>
                       </select>
+                      <div  title="${nls.helpIconTooltip}" class="jimu-icon helpBtn"></div>
                     </div>
                     <div class="ERGHalfWidthRight ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis" title="${nls.fireLabel}">${nls.fireLabel}</div>
@@ -67,7 +68,7 @@
                     </div>
                   </div>
                   <!-- Wind Speed & Conatiner -->
-                  <div class="ERGHalfWidthContainer">
+                  <div class="ERGHalfWidthContainer ERGHidden" data-dojo-attach-point="table3Container">
                     <div class="ERGHalfWidthLeft ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis"  title="${nls.windSpeed}">${nls.windSpeed}</div>
                       <select style="width: 100%" data-dojo-type="dijit/form/Select" disabled='true' data-dojo-attach-point="windSpeed">
@@ -89,7 +90,7 @@
                     </div>
                   </div>
                   <!-- BLEVE-->
-                  <div class="ERGHalfWidthContainer">
+                  <div class="ERGHalfWidthContainer ERGHidden" data-dojo-attach-point="bleveContainer">
                     <div class="ERGHalfWidthLeft ERGSettingRow">
                       <div class="ERGInputLabel ERGEllipsis" title="${nls.bleveLabel}">${nls.bleveLabel}</div>
                       <input class="switch-toggle" data-dojo-type="dijit/form/CheckBox" data-dojo-attach-point="useBleve" checked="false" disabled='true' />                     

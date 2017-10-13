@@ -391,7 +391,7 @@
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
   border-radius: 10px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .jimu-widget-ERG .switch-toggle.dijitCheckBox:before {
   content: "";
