@@ -50,7 +50,7 @@ define({
     
     "capacity": "Container Capacity (litres)", // Shown as label for Container Capacity dropdown
     
-    "bleveMessage": "For the material you have selected an additional evacuation distance can be shown for BLEVE.\n\nTo enable this, set the Show BLEVE Evac Zone dropdown to yes and select the appropiate container capacity.",
+    "bleveMessage": "For the material you have selected an additional evacuation distance can be shown for BLEVE.\n\nTo enable this, set the Show BLEVE Isolation Zone toggle to on and select the appropiate container capacity.",
     "noPAZoneMessage": "There are no Protective Action distances for this material. Only the Initial Isolation and evacuation zones has been calculated",
     
     //Settings Panel
