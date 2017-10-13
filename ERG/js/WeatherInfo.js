@@ -16,14 +16,14 @@ define([
 
   var weatherInfo = declare('WeatherInfo', null, {
 
-    constructor: function(container, parent) {
+    constructor: function(container, URL, parent) {
 
       
       this.container = container;
 
       this.parent = parent;
       
-      this.weatherURL = "http://coolmaps.esri.com/Weather/info.php?v=1";
+      this.weatherURL = URL;
 
       this.weatherDict = {
         119: ["Cloudy", "cloudy5.png", "cloudy5.png"],
@@ -89,7 +89,7 @@ define([
       }
       var pt = webMercatorUtils.webMercatorToGeographic(loc);
       var coords = pt.y + "," + pt.x;
-      var requestURL = this.weatherURL + "&callbackNode=" + this.parent.name + "&q=" + coords;
+      var requestURL = this.weatherURL + "&q=" + coords;
       var weatherDeferred = esriRequest({
         url: requestURL,
         callbackParamName: "callback"

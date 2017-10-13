@@ -163,7 +163,8 @@ define([
       _windSpeed: 0, //
       _lastOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _currentOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
-      
+      _useWeather: false, //Flag to hold if weather is to be used
+      _weatherURL: null, //Weather URL
       _SettingsInstance: null, //Object to hold Settings instance
       _spillLocationSym: null, //Object to hold spill Location Symbol
       _IIZoneSym: null, //Object to hold II Zone Symbol
@@ -196,6 +197,24 @@ define([
               ;
             });
           };
+        }
+        
+        // determine if weather URL can be reached 
+        if(this._weatherURL){
+          var requestURL = this._weatherURL;
+          var weatherDeferred = esriRequest({
+            url: requestURL,
+            callbackParamName: "callback"
+          }, {
+            useProxy: false
+          });
+          weatherDeferred.then(lang.hitch(this, function(response) {
+            this._useWeather = true;
+            dojo.removeClass(this.weatherContainer, 'ERGHidden');
+          }), lang.hitch(this, function(error) {
+            this._useWeather = false;
+            dojo.addClass(this.weatherContainer, 'ERGHidden');
+          }));
         }
         
         this.inherited(arguments);
@@ -276,6 +295,8 @@ define([
       },
 
       startup: function () {
+        
+        
         this.inherited(arguments);
         this.busyIndicator = busyIndicator.create({target: this.domNode.parentNode.parentNode.parentNode, backgroundOpacity: 0});
         this._setTheme(); 
@@ -340,8 +361,11 @@ define([
           }          
         };
         
+        
         $(this.materialType).easyAutocomplete(options);
-        this._weatherInfo = new WeatherInfo(this.weather, this);
+        if(this._useWeather) {
+          this._weatherInfo = new WeatherInfo(this.weather, this._weatherURL, this);
+        }
       },
 
       /**
@@ -460,7 +484,9 @@ define([
               function (r, ov, nv) {
                 this.ERGCoordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
                 this.dt.addStartGraphic(nv, this._ptSym, this._spillLocation);
-                this._weatherInfo.updateForIncident(nv);                
+                if(this._useWeather) {
+                  this._weatherInfo.updateForIncident(nv);
+                }
               }
             )));
             
@@ -575,7 +601,9 @@ define([
           this.dt.removeStartGraphic(this._spillLocation);                    
           dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
           this.ERGCoordTool.clear();
-          this._resetWeatherInfo();          
+          if(this._useWeather) {
+            this._resetWeatherInfo();
+          }
         }
       },
 
