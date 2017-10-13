@@ -1008,7 +1008,7 @@ define([
           features.push(IIGraphic);            
 
           // draw a small polygon to show spill location
-          var spillLocationPoly = GeometryEngine.geodesicBuffer(spillLocation,2.5,'meters');
+          var spillLocationPoly = GeometryEngine.geodesicBuffer(spillLocation,10,'meters');
           var spillLocationGraphic = new Graphic(spillLocationPoly);
           spillLocationGraphic.setAttributes({"type": "Spill Location"}); 
           features.push(spillLocationGraphic);
