@@ -46,7 +46,7 @@ define({
     "ag": "Agricultural nurse tank",
     "msm": "Multiple small cylinders",
     
-    "bleveLabel": "Show BLEVE Evac Zone", // Shown as label for BLEVE toggle
+    "bleveLabel": "Show BLEVE Isolation Zone", // Shown as label for BLEVE toggle
     
     "capacity": "Container Capacity (litres)", // Shown as label for Container Capacity dropdown
     
