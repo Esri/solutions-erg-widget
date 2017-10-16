@@ -165,7 +165,7 @@ define([
         var div = domConstruct.create("div", {
           innerHTML: info
         }, tpc);
-        domClass.add(div, "IMTcolSmall");
+        domClass.add(div, "ERGcolSmall");
 
         // wind
         var windSpeed = cur.windspeedMiles;
@@ -181,7 +181,7 @@ define([
         var div2 = domConstruct.create("div", {
           innerHTML: info
         }, tpc);
-        domClass.add(div2, "IMTcolSmall");
+        domClass.add(div2, "ERGcolSmall");
         
         switch(windDir){
           case 'N':
@@ -251,8 +251,8 @@ define([
       var divCredit  = domConstruct.create("div", {
         innerHTML: txt
       }, tpc);
-      domClass.add(divCredit, "IMTcolSmall");
-      domClass.add(divCredit, "IMTcolLast");
+      domClass.add(divCredit, "ERGcolSmall");
+      domClass.add(divCredit, "ERGcolLast");
     },    
 
     // error handler

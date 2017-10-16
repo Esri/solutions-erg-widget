@@ -128,48 +128,21 @@
     border: none;
 }
 
-.jimu-widget-ERG .polygonBtn {
-    display: inline-block;
-    background: url(./images/polygon_white.png);
-    background-repeat: no-repeat;
-    background-color: transparent;
-    width: 30px;
-    height: 30px;
-}
-
-.jimu-widget-ERG .polygonBtn:hover {
-    background: url('./images/polygon_white_hover.png');
-    background-repeat: no-repeat;
-}
-
-.jimu-widget-ERG .jimu-polygon-active {
-    background: url('./images/polygon_white_hover.png');
-    background-repeat: no-repeat;
-    border: none;
-}
-
-.jimu-widget-ERG .extentBtn {
-    display: inline-block;
-    background: url(./images/extent_white.png);
-    background-repeat: no-repeat;
-    background-color: transparent;
-    width: 30px;
-    height: 30px;
-}
-
-.jimu-widget-ERG .extentBtn:hover {
-    background: url('./images/extent_white_hover.png');
-    background-repeat: no-repeat;
-}
-
-.jimu-widget-ERG .jimu-extent-active {
-    background: url('./images/extent_white_hover.png');
-    background-repeat: no-repeat;
-    border: none;
-}
-
-
 .claro .dijitSliderImageHandle, .claro .dijitSliderImageHandle:after {
     background: transparent;
     margin-top: 0px;
 }
+
+.easy-autocomplete input {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.easy-autocomplete-container ul {
+  background: none repeat scroll 0 0 #4c4c4c;
+}
+
+.easy-autocomplete-container ul li.selected {
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+}
+

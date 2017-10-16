@@ -1035,14 +1035,14 @@ define([
         var div = domConstruct.create("div", {
           innerHTML: info
         }, tpc);
-        domClass.add(div, "IMTcolSmallUnknown");
+        domClass.add(div, "ERGcolSmallUnknown");
 
         info = '<br/><span>' + this.nls.weatherIntialText + '</span>';
         
         var div2 = domConstruct.create("div", {
           innerHTML: info
         }, tpc);
-        domClass.add(div2, "IMTcolSmall");
+        domClass.add(div2, "ERGcolSmall");
         
         // credits
         var txt = "<a style='color:#6e6e6e;text-decoration:none' href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'><img style='height:36px;margin-top: 10px;' src='" 
@@ -1050,8 +1050,8 @@ define([
         var divCredit  = domConstruct.create("div", {
           innerHTML: txt
         }, tpc);
-        domClass.add(divCredit, "IMTcolSmall");
-        domClass.add(divCredit, "IMTcolLast");
+        domClass.add(divCredit, "ERGcolSmall");
+        domClass.add(divCredit, "ERGcolLast");
       },
       
       /**
