@@ -62,7 +62,5 @@
         "type": "esriSFSBackwardDiagonal"
       }
     }
-  },
-  "facilityLayers": [],
-  "demographicLayer": {}
+  }
 }
