@@ -186,7 +186,7 @@ define([
       },
 
       postCreate: function () {
-        //modify String's prototype so we can format a string using .format
+        //modify String's prototype so we can format a string using .format requried for IE
         if (!String.prototype.format) {
           String.prototype.format = function() {
             var args = arguments;
@@ -198,6 +198,14 @@ define([
             });
           };
         }
+        
+        //modify String's prototype so we can search a string using .includes requried for IE
+         if (!String.prototype.includes) {
+             String.prototype.includes = function() {
+                 'use strict';
+                 return String.prototype.indexOf.apply(this, arguments) !== -1;
+             };
+         }
         
         // determine if weather URL can be reached 
         if(this._weatherURL){
