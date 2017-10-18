@@ -1,1458 +1,1203 @@
 ///////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2017 Esri. All Rights Reserved.
+// Copyright © 2017 Esri. All Rights Reserved.
 //
-// Licensed under the Apache License Version 2.0 (the "License");
+// Licensed under the Apache License Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an 'AS IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 ///////////////////////////////////////////////////////////////////////////
 
 define([
-  "dojo/_base/declare",
-  "dijit/_WidgetsInTemplateMixin",
-  "jimu/BaseWidget",
-  "jimu/dijit/TabContainer",
-  "./List",
-  "jimu/utils",
-  "esri/config",
-  "esri/urlUtils",
-  "esri/tasks/query",
-  "esri/tasks/QueryTask",
-  "esri/tasks/Geoprocessor",
-  "esri/tasks/FeatureSet",
-  "esri/layers/GraphicsLayer",
-  "esri/graphic",
-  "esri/geometry/Point",
-  "esri/symbols/SimpleMarkerSymbol",
-  "esri/symbols/PictureMarkerSymbol",
-  "esri/geometry/Polyline",
-  "esri/symbols/SimpleLineSymbol",
-  "esri/geometry/Polygon",
-  "esri/symbols/SimpleFillSymbol",
-  "esri/toolbars/draw",
-  "esri/InfoTemplate",
-  "esri/request",
-  "esri/graphicsUtils",
-  "esri/geometry/webMercatorUtils",
-  "dojo/_base/Color",
-  "dijit/Dialog",
-  "dijit/ProgressBar",
-  "dijit/form/NumberSpinner",
-  "dojo/_base/lang",
-  "dojo/on",
-  "dojo/dom",
-  "dojo/dom-style",
-  "dijit/form/Select",
-  "dijit/form/TextBox",
-  "esri/geometry/jsonUtils",
-  "dojox/charting/Chart", "dojox/charting/axis2d/Default", "dojox/charting/plot2d/Lines", "dojox/charting/plot2d/Bars", "dojox/charting/plot2d/Pie",
-  "dojox/charting/plot2d/Columns", "dojox/charting/action2d/Tooltip", "dojo/fx/easing", "dojox/charting/action2d/MouseIndicator", "dojox/charting/action2d/Highlight",
-  "dojox/charting/action2d/MoveSlice", "dojox/charting/themes/MiamiNice", "dojox/charting/action2d/Magnify",
-  "dojo/_base/array",
-  "dojo/_base/html",
-  "esri/tasks/RelationParameters",
-  "esri/layers/FeatureLayer",
-  "jimu/dijit/DrawBox",
-  "jimu/dijit/Message",
-  "dojo/query",
-  "dojo/dom-construct",
-  "./FacilitiesPane",
-  "dojox/json/ref"
+  'dojo/dom',
+  'dojo/_base/declare',
+  'jimu/BaseWidget',
+  'dojo/_base/array',
+  'dojo/_base/lang',
+  'dojo/dom-class',
+  'dojo/dom-attr',
+  'dojo/dom-construct',
+  'dojo/dom-style',
+  'dojo/json',
+  'dojo/on',
+  'dojo/keys',
+  'dojo/query',  
+  'dojo/string',
+  'dojo/store/Memory',
+  'dojo/topic',
+  'dojo/_base/html',
+  'dojo/text!./guide/materials.json',
+  
+  'dijit/form/FilteringSelect',
+  'dijit/_WidgetBase',
+  'dijit/_WidgetsInTemplateMixin',
+  'dijit/registry',
+  'dijit/TooltipDialog',
+  'dijit/popup',
+  'dijit/Menu',
+  'dijit/MenuItem',
+  'dijit/MenuSeparator',
+  
+  'jimu/dijit/Message',
+  'jimu/dijit/LoadingIndicator',
+  'jimu/LayerInfos/LayerInfos',
+  'jimu/utils',
+  
+  'esri/IdentityManager',
+  'esri/arcgis/OAuthInfo',
+  'esri/arcgis/Portal',
+  'esri/config',
+  'esri/Color',
+  'esri/dijit/util/busyIndicator',
+  'esri/graphic',
+  'esri/geometry/geometryEngine',
+  'esri/geometry/Extent',
+  'esri/geometry/Point',  
+  'esri/geometry/Polygon',
+  'esri/geometry/Circle',
+  'esri/geometry/webMercatorUtils',
+  'esri/graphicsUtils',
+  'esri/layers/FeatureLayer',
+  'esri/layers/GraphicsLayer',
+  'esri/layers/LabelClass',
+  'esri/SpatialReference',
+  'esri/symbols/Font',
+  'esri/symbols/SimpleMarkerSymbol',
+  'esri/symbols/SimpleFillSymbol',
+  'esri/symbols/TextSymbol',
+  'esri/toolbars/draw',
+  'esri/renderers/UniqueValueRenderer',
+  'esri/tasks/query',
+  'esri/request',
+  
+  './js/Settings',
+  './js/CoordinateInput',
+  './js/DrawFeedBack',
+  './js/EditOutputCoordinate',
+  './js/jquery.easy-autocomplete',
+  './js/portal-utils',
+  './js/WeatherInfo',
+  
+  'dijit/form/NumberTextBox',
+  'dijit/form/RadioButton',
+  'dijit/form/NumberSpinner',
 ],
-  function (declare, _WidgetsInTemplateMixin, BaseWidget, TabContainer, List, utils, esriConfig, urlUtils, Query, QueryTask, Geoprocessor, 
-    FeatureSet, GraphicsLayer, Graphic, Point, SimpleMarkerSymbol, PictureMarkerSymbol, Polyline, SimpleLineSymbol, Polygon, SimpleFillSymbol, 
-    Draw, InfoTemplate, esriRequest, graphicsUtils, webMercatorUtils, Color, Dialog, ProgressBar, NumberSpinner, lang, on, dom, domStyle, 
-    Select, TextBox, jsonUtils, Chart, Default, Lines, Bars, Pie, Columns, Tooltip, easing, MouseIndicator, Highlight, MoveSlice, MiamiNice, 
-    Magnify, array, html, RelationParameters, FeatureLayer, DrawBox, Message, query, domConstruct, FacilitiesPane, ref) {
-    return declare([BaseWidget, _WidgetsInTemplateMixin], {
-      baseClass: 'jimu-widget-erg',
-      name: 'ERG',
-      ERGPChemicalList: [],
-      ERGPlacardList: [],
-      defaultERGName: null,
-      spillGraphicsLayer: null,
-      ergGraphicsLayer: null,
-      facilitiesGraphicsLayer: null,
-      chemicalOrPlacard: "Chemical",
-      selectedSpillSize: "Large",
-      selectedTimeOfSpill: "Day",
-      selectedMaterialType: null,
-      selectedWindDir: 45,
-      defaultChemicalName: null,
-      defaultPlacardName: null,
-      ergGPChemicalService: null,
-      ergGPPlacardService: null,
-      ergGPJobID: null,
-      ergGPActive: null,
-      executionType: null,
-      wsExecutionType: null,
-      findNearestWSService: null,
-      windDirectionQueryTask: null,
-      weatherStationDistanceInfo: null,
-      facilitiesQueryTask: null,
-      chartLayer: null,
-      charts: [],
-      currentChartIndex: -1,
-
-      //widget control events
-      onChangeCalculateBy: function (newValue) {
-        this.chemicalOrPlacard = newValue;
-        this.materialType.removeOption(this.materialType.getOptions());
-        if (newValue === "Chemical") {
-          this.materialType.addOption(this.ERGPChemicalList);
-          this.selectedMaterialType = this.defaultChemicalName;
-        }
-        else if (newValue === "Placard") {
-          this.materialType.addOption(this.ERGPlacardList);
-          this.selectedMaterialType = this.defaultPlacardName;
-        }
+  function (
+    dojoDom,
+    declare,
+    BaseWidget,
+    array,
+    lang,
+    domClass,
+    domAttr,
+    domConstruct,
+    domStyle,
+    JSON,
+    on,
+    keys,
+    query,
+    dojoString,
+    Memory,
+    topic,
+    html,
+    materials,
+    FilteringSelect,
+    dijitWidgetBase,    
+    dijitWidgetsInTemplate,
+    dijitRegistry,
+    dijitTooltipDialog,
+    dijitPopup,
+    Menu, 
+    MenuItem, 
+    MenuSeparator,      
+    Message,
+    LoadingIndicator,
+    jimuLayerInfos,
+    utils,
+    esriId,
+    esriOAuthInfo,
+    esriPortal,
+    esriConfig,
+    Color,
+    busyIndicator,
+    Graphic,
+    GeometryEngine,
+    Extent,
+    Point,
+    Polygon,
+    Circle,
+    WebMercatorUtils,
+    graphicsUtils,
+    FeatureLayer,
+    GraphicsLayer,
+    LabelClass,
+    SpatialReference,
+    Font,
+    SimpleMarkerSymbol,
+    SimpleFillSymbol,
+    TextSymbol,
+    Draw,
+    UniqueValueRenderer,
+    Query,
+    esriRequest,
+    Settings,
+    coordInput,
+    drawFeedBackPoint,
+    editOutputCoordinate,
+    autoComplete,
+    portalutils,    
+    WeatherInfo
+  ) {
+    return declare([BaseWidget, dijitWidgetBase, dijitWidgetsInTemplate], {
+      baseClass: 'jimu-widget-ERG',
+      
+      _selectedMaterial: null, //holds the current value of the selected material
+      _materialsData: null, //a JSON object holding all the information about materials
+      _weatherInfo: null,
+      _windSpeed: 0, //
+      _lastOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
+      _currentOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
+      _useWeather: false, //Flag to hold if weather is to be used
+      _weatherURL: '', //Weather URL
+      _SettingsInstance: null, //Object to hold Settings instance
+      _spillLocationSym: null, //Object to hold spill Location Symbol
+      _IIZoneSym: null, //Object to hold II Zone Symbol
+      _PAZoneSym: null, //Object to hold PA Zone Symbol
+      _downwindZoneSym: null, //Object to hold Down Wind Zone Symbol
+      _fireZoneSym: null, //Object to hold FIRE Zone Symbol
+      _bleveZoneSym: null, //Object to hold BLEVE Zone Symbol      
+      _renderer: null, // renderer to be used on the ERG Feature Service
+     
+      
+      postMixInProperties: function () {
+        //mixin default nls with widget nls
+        this.nls.common = {};
+        lang.mixin(this.nls.common, window.jimuNls.common);
       },
-
-      onChangeSpillSize: function (newValue) {
-        this.selectedSpillSize = newValue;
-      },
-
-      onChangeTimeOfSpill: function (newValue) {
-        this.selectedTimeOfSpill = newValue;
-      },
-
-      onChangeMaterialType: function (newValue) {
-        this.selectedMaterialType = newValue;
-      },
-
-      onWindDirChange: function (newValue) {
-        this.selectedWindDir = newValue;
-      },
-
-      onClearBtnClicked: function () {
-        this.spillGraphicsLayer.clear();
-        this.ergGraphicsLayer.clear();
-        this.facilitiesGraphicsLayer.clear();
-        this.chartLayer.clear();
-        this._clearCharts();
-      },
-
-      //GP Service callbacks
-      ERGRequestSucceeded: function (data) {
-        this.executionType = data.executionType;
-        var materials = data.parameters[1];
-        var choiceList = materials.choiceList;
-        var option = [];
-
-        this.defaultERGName = materials.defaultValue;
-
-        for (var i = 0; i < choiceList.length; i++) {
-          option[i] = {};
-          option[i].label = choiceList[i];
-          option[i].value = choiceList[i];
-          if (choiceList[i] === this.defaultERGName) {
-            option[i].selected = true;
-          }
-        }
-
-        if (materials.name === "placard_id") {
-          this.ERGPlacardList = option;
-          this.defaultPlacardName = this.defaultERGName;
-        }
-
-        else if (materials.name === "material_type") {
-          this.ERGPChemicalList = option;
-          this.defaultChemicalName = this.defaultERGName;
-          this.materialType.addOption(option);
-        }
-      },
-
-      wsRequestSucceeded: function(data) {
-        this.wsExecutionType = data.executionType;
-      },
-
-      queryFacilitiesLayer: function (geom) {
-        var query = new Query();
-        query.spatialRelationship = Query.SPATIAL_REL_INTERSECTS;
-        query.geometry = geom;
-        query.outFields = this.config.facilitiesLayer.fields;
-        query.returnGeometry = true;
-
-        var data = {};
-        data.layerInfo = this.config.chartLayers;
-        data.geometry = geom;
-        this.publishData(data);
-
-        this.facilitiesQueryTask.execute(query);
-
-        this._doQuery(geom);
-        this._doFacilitiesQuery(geom)
-      },
-
-      facilitiesQueryTaskCompleted: function (results) {
-        var features = results.featureSet.features;
-        this.calculateStatistics(features);
-      },
-
-      calculateStatistics: function (features) {
-        for (var i = 0; i < features.length; i++) {
-          var feature = features[i];
-
-          var sms = new SimpleMarkerSymbol({
-            "color": [255, 0, 0, 64],
-            "size": 12,
-            "angle": -30,
-            "xoffset": 0,
-            "yoffset": 0,
-            "type": "esriSMS",
-            "style": "esriSMSSquare",
-            "outline": {
-              "color": [0, 255, 0, 0],
-              "width": 1,
-              "type": "esriSLS",
-              "style": "esriSLSSolid"
-            }
-          });
-          feature.setSymbol(sms);
-          this.facilitiesGraphicsLayer.add(feature);
-        }
-      },
-
-      ERGRequestFailed: function (error) {
-        new Message({message: error.message});
-      },
-
-      //synchronous execution results returned
-      onERGGPExecuteComplete: function (results) {
-        this.ergGraphicsLayer.clear();
-        var sharedPolygon = null;
-        var features = results[0].value.features;
-        for (var i = 0; i < features.length; i++) {
-          var feature = features[i];
-          var ergZone = features[i].attributes["ERGZone"];
-
-          if (ergZone === "Initial Isolation Zone") {
-            var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                new Color([255, 0, 0]), 2), new Color([255, 204, 204, 0.25]));
-            feature.setSymbol(sfs);
-            this.ergGraphicsLayer.add(feature);
-          }
-
-          else if (ergZone === "Protective Action Zone") {
-            var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-              new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                new Color([255, 0, 0]), 2), new Color([240, 128, 128, 0.25]));
-            feature.setSymbol(sfs);
-            this.ergGraphicsLayer.add(feature);
-          }
-
-          else if (ergZone === "Combined Zone") {
-            sharedPolygon = feature.geometry;
-            this.queryFacilitiesLayer(sharedPolygon);
-          }
-        }
-
-        var lineFeatures = results[1].value.features;
-
-        for (var i = 0; i < lineFeatures.length; i++) {
-          var feature = lineFeatures[i];
-          var lineType = lineFeatures[i].attributes["LineType"];
-
-          if (lineType === "Arc") {
-            var sls = new SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 1);
-            feature.setSymbol(sls);
-            this.ergGraphicsLayer.add(feature);
-          }
-
-          else if (lineType === "Radial") {
-            var sls = new SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASH, new dojo.Color([0, 0, 0]), 1);
-            feature.setSymbol(sls);
-            this.ergGraphicsLayer.add(feature);
-          }
-        }
-        this.map.setExtent(graphicsUtils.graphicsExtent(this.ergGraphicsLayer.graphics), true);
-      },
-
-      //asynchronous job completed successfully
-      displayERGServiceResults: function (results) {
-        var sharedPolygon = null;
-        if (results.paramName === "output_areas") {
-          this.ergGraphicsLayer.clear();
-          var features = results.value.features;
-          for (var i = 0; i < features.length; i++) {
-            var feature = features[i];
-            var ergZone = features[i].attributes["ERGZone"];
-
-            if (ergZone === "Initial Isolation Zone") {
-              var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-                new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                  new Color([255, 0, 0]), 2), new Color([255, 204, 204, 0.25]));
-              feature.setSymbol(sfs);
-              this.ergGraphicsLayer.add(feature);
-            }
-
-            else if (ergZone === "Protective Action Zone") {
-              var sfs = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-                new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-                  new Color([255, 0, 0]), 2), new Color([240, 128, 128, 0.25]));
-              feature.setSymbol(sfs);
-              this.ergGraphicsLayer.add(feature);
-            }
-            else if (ergZone === "Combined Zone") {
-              sharedPolygon = feature.geometry;
-              this.queryFacilitiesLayer(sharedPolygon);
-            }
-          }
-
-          this.map.setExtent(graphicsUtils.graphicsExtent(this.ergGraphicsLayer.graphics), true);
-          if (this.ergGPActive === "ergChemicalActive") {
-            this.ergGPChemicalService.getResultData(this.ergGPJobID, "output_lines",
-              lang.hitch(this, this.displayERGServiceResults));
-          }
-          else {
-            this.ergGPPlacardService.getResultData(this.ergGPJobID, "output_lines",
-              lang.hitch(this, this.displayERGServiceResults));
-          }
-        }
-        else {
-          var features = results.value.features;
-
-          for (var i = 0; i < features.length; i++) {
-            var feature = features[i];
-            var lineType = features[i].attributes["LineType"];
-
-            if (lineType === "Arc") {
-              var sls = new SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([0, 0, 0]), 1);
-              feature.setSymbol(sls);
-              this.ergGraphicsLayer.add(feature);
-            }
-
-            else if (lineType === "Radial") {
-              var sls = new SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASH, new dojo.Color([0, 0, 0]), 1);
-              feature.setSymbol(sls);
-              this.ergGraphicsLayer.add(feature);
-            }
-          }
-        }
-      },
-
-      onERGGPComplete: function (jobInfo) {
-        if (jobInfo.jobStatus !== "esriJobFailed") {
-          this.ergGPJobID = jobInfo.jobId;
-          if (this.ergGPActive === "ergChemicalActive") {
-            this.ergGPChemicalService.getResultData(jobInfo.jobId, "output_areas",
-              lang.hitch(this, this.displayERGServiceResults));
-          }
-          else {
-            this.ergGPPlacardService.getResultData(jobInfo.jobId, "output_areas",
-              lang.hitch(this, this.displayERGServiceResults));
-          }
-        } else {
-          this._onQueryError("ERG Geoprocessing job status: " + jobInfo.messages[2].description);
-        }
-      },
-
-
-      onWSGPComplete: function (jobInfo) {
-        if (jobInfo.jobStatus !== "esriJobFailed") {
-          this.findNearestWSService.getResultData(jobInfo.jobId, "SACPoint_shp",
-            lang.hitch(this, this.onFindWSExecuteComplete));
-        } else {
-          this._onQueryError("Wind Service Geoprocessing job status: " + jobInfo.messages[2].description);
-        }
-      },
-
-      onERGGPStatusCallback: function (jobInfo) {
-        var status = jobInfo.jobStatus;
-      },
-
-      onFindWSExecuteComplete: function (results) {
-        this.map.setMapCursor("default");
-        document.body.style.cursor = "default";
-        var features = results instanceof Array ? results[0].value.features : results.value.features;
-
-        for (var i = 0; i < features.length; i++) {
-          var feature = features[i];
-
-          var distance = features[i].attributes["NEAR_DIST"] * 69.09;
-          distance = parseFloat(distance.toFixed(1));
-          this.weatherStationDistanceInfo = "<b>Distance to weather station: </b>" + distance + " miles";
-
-          var fid = features[i].attributes["NEAR_FID"];
-
-          if (this.windDirectionQueryTask != null) {
-            var query = new Query();
-            query.outFields = ["*"];
-            query.returnGeometry = true;
-            query.where = "OBJECTID = " + fid;
-            // this.windDirectionQueryTask.execute(query);
-            this.windDirectionQueryTask.execute(query, lang.hitch(this, this.windDirectionQTCompleted));
-          }
-        }
-      },
-
-      onLookupWindInfo: function () {
-        if (this.spillGraphicsLayer.graphics.length > 0) {
-          this.map.setMapCursor("wait");
-          document.body.style.cursor = "wait";
-          this.btnWindDirection.setAttribute("disabled", true);
-          var geoPt = webMercatorUtils.webMercatorToGeographic(this.spillGraphicsLayer.graphics[0].geometry);
-          var pointSymbol = new SimpleMarkerSymbol();
-          pointSymbol.setSize(14);
-          pointSymbol.setOutline(new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 1));
-          pointSymbol.setColor(new Color([0, 255, 0, 0.25]));
-          var attr = {"OBJECTID ": 0};
-
-          var graphic = new Graphic(geoPt, pointSymbol, attr, null)
-
-          var features = [];
-          features.push(graphic);
-          var featureSet = new FeatureSet();
-          featureSet.features = features;
-          var params = {
-            "Feature_Set": featureSet
-          };
-
-          this.findNearestWSService.outSpatialReference = this.map.spatialReference;
-          if (this.wsExecutionType === "esriExecutionTypeSynchronous") {
-            this.findNearestWSService.execute(params, lang.hitch(this, this.onFindWSExecuteComplete), lang.hitch(function(error) {
-              new Message({message: error.message});
-              this.btnWindDirection.setAttribute("disabled", false);
-              this.map.setMapCursor("default");
-              document.body.style.cursor = "default";
-            }));
-          } else {
-            this.findNearestWSService.submitJob(params, lang.hitch(this, this.onWSGPComplete), 
-              lang.hitch(this, this.onERGGPStatusCallback));            
-          }
-
-        } else {
-          alert("Please add a spill location first");
-        }
-      },
-
-      windDirectionQTCompleted: function (results) {
-        if (!results.featureSet) return;
-
-        this.btnWindDirection.disabled = false;
-
-        var weatherStationName = null;
-        var windTo = -999;
-        var recordedDate = null;
-
-        var features = results.featureSet.features;
-
-        if (features.length > 0) {
-          if (this.config.windDirectionLayer.windDirectionField != null) {
-            var feature = features[0];
-
-            windTo = feature.attributes[this.config.windDirectionLayer.windDirectionField] + 180;
-            if (windTo > 360)
-              windTo = windTo - 360;
-
-            var windDirection = "<b> Wind direction (blowing to:) </b>" + windTo;
-
-            if (this.config.windDirectionLayer.stationNameField != null)
-              weatherStationName = "<b> Station Name: </b>" + feature.attributes[this.config.windDirectionLayer.stationNameField];
-
-            if (this.config.windDirectionLayer.dateTimeField != null) {
-              var date = new Date(feature.attributes[this.config.windDirectionLayer.dateTimeField] * 1000);
-              var hours = date.getHours();
-              var minutes = date.getMinutes();
-
-              // will display time in 10:30:23 format
-              var formattedTime = hours + ':' + minutes;
-              recordedDate = "<b> Recorded on: </b>" + formattedTime;
-            }
-            var windDirectionInfo = weatherStationName + "</br>"
-              + this.weatherStationDistanceInfo + "</br>"
-              + windDirection + "</br>"
-              + recordedDate + "</br></br>"
-              + "Do you want to use wind direction from this weather station?"
-
-            // var windDialog = new Dialog({
-            //   title: "Wind Direction",
-            //   draggable: true,
-            //   content: windDirectionInfo
-            // });
-            // windDialog.show();
-
-            var confirmDialog = new this.confirmationDialog({
-              title: "Wind Direction",
-              message: windDirectionInfo,
-              actionButtons: [
-                {label: 'No', callBack: function () {
-                  //alert('no');
-                }},
-                {label: 'Yes', callBack: lang.hitch(this, function () {
-                  this.selectedWindDir = windTo;
-                  this.winDirSpinner.setValue(windTo);
-                })}
-              ]
-            });
-          }
-        }
-      },
-
-      confirmationDialog: function (configJson) {
-        var dialog = new Dialog({
-          title: configJson.title,
-          content: ["<div style='width:25em'>", configJson.message, "</div>"].join('')
-        });
-
-        dialog.onButtonClickEvent = function (button) {
-          return function () {
-            button.callBack.apply(this, []);
-            dialog.onCancel();
-          }
-        };
-
-        for (actionButton in configJson.actionButtons) {
-          if (configJson.actionButtons.hasOwnProperty(actionButton)) {
-            dojo.place(new dijit.form.Button({label: configJson.actionButtons[actionButton].label,
-              onClick: dialog.onButtonClickEvent.apply(dialog, [configJson.actionButtons[actionButton]])
-            }).domNode, dialog.containerNode, 'after');
-          }
-        }
-        dialog.startup();
-        dialog.show();
-      },
-
-      addGraphic: function (evt) {
-        //deactivate the toolbar and clear existing graphics
-        this.drawToolbar.deactivate();
-        this.map.enableMapNavigation();
-
-        // figure out which symbol to use
-        var symbol;
-        if (evt.geometry.type === "point") {
-          symbol = new SimpleMarkerSymbol();
-        }
-        this.spillGraphicsLayer.add(new Graphic(evt.geometry, symbol));
-      },
-
-      bindDrawToolbar: function (evt) {
-        if (evt.target.id === "drawSpillInfo") {
-          return;
-        }
-        this.map.disableMapNavigation();
-        this.spillGraphicsLayer.clear();
-        this.drawToolbar.activate("point");
-      },
-
-      onSolve: function (evt) {
-        if (this.spillGraphicsLayer.graphics.length === 0) {
-          alert("Please draw a spill location");
-          return;
-        }
-        //Change to results tab
-        this.tabContainer.selectTab(this.nls.tabDemo);
-        html.setStyle(this.progressBar.domNode, 'display', 'block');
-        html.setStyle(this.resultsSection, 'display', 'none');
-        html.setStyle(this.noresultsSection, 'display', 'none');
-
-        //Clear graphic layers
-        this.ergGraphicsLayer.clear();
-        this.facilitiesGraphicsLayer.clear();
-        this.chartLayer.clear();
-
-        var features = [];
-        features.push(this.spillGraphicsLayer.graphics[0]);
-        var featureSet = new FeatureSet();
-        featureSet.features = features;
-
-        var ergType = null;
-        if (this.chemicalOrPlacard === "Chemical") {
-          if (this.selectedMaterialType == null) {
-            this.selectedMaterialType = this.defaultChemicalName;
-          }
-          var params = {
-            "in_features": featureSet,
-            "material_type": this.selectedMaterialType,
-            "time_of_day": this.selectedTimeOfSpill,
-            "spill_size": this.selectedSpillSize,
-            "wind_bearing": this.selectedWindDir
-          };
-
-          this.ergGPActive = "ergChemicalActive";
-
-          if (this.executionType === "esriExecutionTypeSynchronous") {
-            this.ergGPChemicalService.execute(params, lang.hitch(this, this.onERGGPExecuteComplete));
-          } else {
-            this.ergGPChemicalService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
-              lang.hitch(this, this.onERGGPStatusCallback));
-          }
-        }
-        else {
-          if (this.selectedMaterialType == null) {
-            this.selectedMaterialType = this.defaultPlacardName;
-          }
-          var params = {
-            "in_features": featureSet,
-            "placard_id": this.selectedMaterialType,
-            "time_of_day": this.selectedTimeOfSpill,
-            "spill_size": this.selectedSpillSize,
-            "wind_bearing": this.selectedWindDir
-          };
-          this.ergGPActive = "ergPlacardActive";
-          this.ergGPPlacardService.submitJob(params, lang.hitch(this, this.onERGGPComplete),
-            lang.hitch(this, this.onERGGPStatusCallback));
-        }
+      
+      constructor: function (args) {
+        declare.safeMixin(this, args);
       },
 
       postCreate: function () {
+        //modify String's prototype so we can format a string using .format requried for IE
+        if (!String.prototype.format) {
+          String.prototype.format = function() {
+            var args = arguments;
+            return this.replace(/{(\d+)}/g, function(match, number) { 
+              return typeof args[number] != 'undefined'
+                ? args[number]
+                : match
+              ;
+            });
+          };
+        }
+        
+        //modify String's prototype so we can search a string using .includes requried for IE
+         if (!String.prototype.includes) {
+             String.prototype.includes = function() {
+                 'use strict';
+                 return String.prototype.indexOf.apply(this, arguments) !== -1;
+             };
+         }
+        
+        // determine if weather URL can be reached 
+        if(this._weatherURL){
+          var requestURL = this._weatherURL;
+          var weatherDeferred = esriRequest({
+            url: requestURL,
+            callbackParamName: "callback"
+          }, {
+            useProxy: false
+          });
+          weatherDeferred.then(lang.hitch(this, function(response) {
+            this._useWeather = true;
+            dojo.removeClass(this.weatherContainer, 'ERGHidden');
+          }), lang.hitch(this, function(error) {
+            this._useWeather = false;
+            dojo.addClass(this.weatherContainer, 'ERGHidden');
+          }));
+        }
+        
         this.inherited(arguments);
-        this._initChartLayer();
-        this._initResultsTab();
+        
+        //set up blank weather info        
+        this._resetWeatherInfo();        
+        
+        //set up the symbology used for the interactive point draw tools        
+        this.pointSymbol = {
+          'color': [255, 0, 0, 255],
+          'size': 8,
+          'type': 'esriSMS',
+          'style': 'esriSMSCircle',
+          'outline': {
+            'color': [255, 0, 0, 255],
+            'width': 1,
+            'type': 'esriSLS',
+            'style': 'esriSLSSolid'
+          }
+        };        
+        
+        //create graphics layer for spill location and add to map
+        this._spillLocation = new GraphicsLayer({id: "spillLocation"});        
+        
+        //set up symbology for point input
+        this._ptSym = new SimpleMarkerSymbol(this.pointSymbol);
+        
+        //create a feature collection for the drawn ERG to populate 
+        var featureCollection = {
+          "layerDefinition": {
+            "geometryType": "esriGeometryPolygon",
+            "objectIdField": "ObjectID",
+            "fields": [{
+              "name": "ObjectID",
+              "alias": "ObjectID",
+              "type": "esriFieldTypeOID"
+              }, {
+              "name": "type",
+              "alias": "type",
+              "type": "esriFieldTypeString"
+            }],            
+            "extent": this.map.extent,
+          }
+        };
+        
+        //create a the ERG feature layer
+        this.ERGArea = new FeatureLayer(featureCollection,{
+          id: "ERG-Graphic",
+          outFields: ["*"]
+        });   
+        
+        //add the ERG feature layer and the ERG extent graphics layer to the map 
+        this.map.addLayers([this.ERGArea,this._spillLocation]);
+        
+        //set up coordinate input dijit for ERG Spill Location
+        this.ERGCoordTool = new coordInput({nls: this.nls, appConfig: this.appConfig}, this.newERGPointOriginCoords);      
+        this.ERGCoordTool.inputCoordinate.formatType = 'DD';
+        this.ERGCoordinateFormat = new dijitTooltipDialog({
+          content: new editOutputCoordinate({nls: this.nls}),
+          style: 'width: 400px'
+        });
+        
+        //we need an extra class added the the coordinate format node for the Dart theme 
+        if(this.appConfig.theme.name === 'DartTheme')
+        {
+          domClass.add(this.ERGCoordinateFormat.domNode, 'dartThemeClaroDijitTooltipContainerOverride');
+        }
+        
+        // add extended toolbar for drawing ERG Spill Location
+        this.dt = new drawFeedBackPoint(this.map,this.ERGCoordTool.inputCoordinate.util);
+                                     
+        this._initLoading();
+        
+        //set up all the handlers for the different click events
+        this._handleClickEvents();
+        
+        this._createSettings();
       },
 
       startup: function () {
-        this.inherited(arguments);
         
-        //add CORS servers       
-        if (this.config.corsEnabledServers) {
-          array.forEach(this.config.corsEnabledServers, function (corsServer) {
-            if (!this._itemExists(corsServer, esri.config.defaults.io.corsEnabledServers)) {
-              esri.config.defaults.io.corsEnabledServers.push(corsServer);
-            }  
-          }, this);
-        }
-      
-        this.tabContainer = new TabContainer({
-          tabs: [
-            {
-              title: this.nls.tabERG,
-              content: this.tabNode1
-            },
-            {
-              title: this.nls.tabDemo,
-              content: this.tabNode2
-            },
-            {
-              title: this.nls.tabFacilities,
-              content: this.tabNode3
-            }
-          ],
-          selected: this.nls.conditions
-        }, this.tabERG);
-        this.tabContainer.startup();
-        utils.setVerticalCenter(this.tabContainer.domNode);
-
-        this.facilitiesQueryTask = new QueryTask(this.config.facilitiesLayer.url);
-        this.own(on(this.facilitiesQueryTask, "complete", lang.hitch(this, this.facilitiesQueryTaskCompleted)));
-
-        this.windDirectionQueryTask = new QueryTask(this.config.windDirectionLayer.url);
-        this.own(on(this.windDirectionQueryTask, "complete", lang.hitch(this, this.windDirectionQTCompleted)));
-
-        //calculate by option
-        var option = [];
-        option[0] = {};
-        option[0].label = "Chemical";
-        option[0].value = "Chemical";
-
-        option[1] = {};
-        option[1].label = "Placard";
-        option[1].value = "Placard";
-
-        this.calculateBy.addOption(option);
-        //SELECT MENU Change events wiring...
-        this.own(on(this.calculateBy, "change", lang.hitch(this, this.onChangeCalculateBy)));
-
-        //Get Chemical names from the GP Service
-        var ergGPChemicalURL = this.config.chemicalGPService.url;
-        this.ergGPChemicalService = new Geoprocessor(ergGPChemicalURL);
-
-        //erg chemical list
-        var request = esriRequest({
-          url: ergGPChemicalURL + "?f=json",
-          handleAs: "json",
-          callbackParamName: 'callback',
-          load: lang.hitch(this, 'ERGRequestSucceeded'),
-          error: lang.hitch(this, 'ERGRequestFailed')
-        });
-
-        //erg placard list
-        var ergPlacardURL = this.config.placardGPService.url;
-        this.ergGPPlacardService = new Geoprocessor(ergPlacardURL);
-
-        var request2 = esriRequest({
-          url: ergPlacardURL + "?f=json",
-          handleAs: "json",
-          callbackParamName: 'callback',
-          load: lang.hitch(this, 'ERGRequestSucceeded'),
-          error: lang.hitch(this, 'ERGRequestFailed')
-        });
-
-        this.own(on(this.materialType, "change", lang.hitch(this, this.onChangeMaterialType)));
-
-        //find nearest weather station GP service
-        var wsURL = this.config.weatherStationGPService.url;
-        this.findNearestWSService = new Geoprocessor(wsURL);
-        var request3 = esriRequest({
-          url: wsURL + "?f=json",
-          handleAs: "json",
-          callbackParamName: 'callback',
-          load: lang.hitch(this, 'wsRequestSucceeded'),
-          error: lang.hitch(this, 'ERGRequestFailed')
-        });
-
-        //spill size option
-        var spillOption = [];
-        spillOption[0] = {};
-        spillOption[0].label = "Large";
-        spillOption[0].value = "Large";
-
-        spillOption[1] = {};
-        spillOption[1].label = "Small";
-        spillOption[1].value = "Small";
-
-        this.spillSize.addOption(spillOption);
-        this.own(on(this.spillSize, "change", lang.hitch(this, this.onChangeSpillSize)));
-
-        //time of day option
-        var timeOption = [];
-        timeOption[0] = {};
-        timeOption[0].label = "Day";
-        timeOption[0].value = "Day";
-
-        timeOption[1] = {};
-        timeOption[1].label = "Night";
-        timeOption[1].value = "Night";
-        this.timeOfSpill.addOption(timeOption);
-        this.own(on(this.timeOfSpill, "change", lang.hitch(this, this.onChangeTimeOfSpill)));
-
-        //spill location graphics layer
-        this.spillGraphicsLayer = new GraphicsLayer();
-        this.map.addLayer(this.spillGraphicsLayer);
-
-        //ERG coverage layer
-        this.ergGraphicsLayer = new GraphicsLayer();
-        this.map.addLayer(this.ergGraphicsLayer);
-
-        //affected layers
-        this.facilitiesGraphicsLayer = new GraphicsLayer();
-        this.map.addLayer(this.facilitiesGraphicsLayer);
-        this.own(on(this.facilitiesGraphicsLayer, "click", lang.hitch(this, this.facilitiesGraphicsLayerClick)));
-
-        this.drawToolbar = new Draw(this.map);
-        this.own(on(this.drawToolbar, "draw-end", lang.hitch(this, this.addGraphic)));
-        this.own(on(this.drawSpillInfo, "click", lang.hitch(this, this.bindDrawToolbar)));
-      },
-
-      facilitiesGraphicsLayerClick: function (evt) {
-        if (evt.graphic) {
-          var facINFO = "";
-          array.forEach(this.config.facilitiesLayer.fields, function (field) {
-            facINFO += field + ": " + evt.graphic.attributes[field] + "<br>";
-          }, this);
-          this.map.infoWindow.setTitle("ERG");
-          this.map.infoWindow.setContent(facINFO);
-          this.map.infoWindow.show(evt.screenPoint, this.map.getInfoWindowAnchor(evt.screenPoint));
-        }
-      },
-
-      destroy: function () {
         this.inherited(arguments);
-
-        if (this.chartLayer) {
-          this.map.removeLayer(this.chartLayer);
-          this.chartLayer = null;
-        }
-
-        if (this.facilitiesGraphicsLayer) {
-          this.map.removeLayer(this.facilitiesGraphicsLayer);
-          this.facilitiesGraphicsLayer = null;
-        }
-
-        if (this.spillGraphicsLayer) {
-          this.map.removeLayer(this.spillGraphicsLayer);
-          this.spillGraphicsLayer = null;
-        }
-
-        if (this.ergGraphicsLayer) {
-          this.map.removeLayer(this.ergGraphicsLayer);
-          this.ergGraphicsLayer = null;
-        }
-
-        if (this.ergGraphicsLayer) {
-          this.map.removeLayer(this.ergGraphicsLayer);
-          this.ergGraphicsLayer = null;
+        this.busyIndicator = busyIndicator.create({target: this.domNode.parentNode.parentNode.parentNode, backgroundOpacity: 0});
+        this._setTheme(); 
+        
+        //load in the materials json file
+        this._materialsData = JSON.parse(materials);
+        
+        //set up the options for the material input selector
+        var options = {
+          data: this._materialsData,
+          placeholder: this.nls.materialPlaceholder,
+          getValue: function(element) {
+            return element.IDNum === 0?element.Material: element.IDNum + " | " + element.Material;
+          },
+          template: {
+            type: "custom",
+            method: lang.hitch(this, function(value, item) {
+              return "<a href='" + this.folderUrl + "guide/" + item.GuideNum + ".pdf' target='_blank'><img height='18px' src='" + this.folderUrl + "images/pdf.png' /></a>  " + value;
+            })
+          },
+          list: {
+            match: {
+              enabled: true
+            },
+            onChooseEvent: lang.hitch(this, function() {
+              var index = $(this.materialType).getSelectedItemIndex();
+              this._selectedMaterial = $(this.materialType).getSelectedItemData(index);              
+              if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
+                var alertMessage = new Message({
+                  message: this.nls.table3Message
+                })
+                this.windSpeed.set('disabled', false);
+                this.transportContainer.set('disabled', false);
+                dojo.removeClass(this.table3Container, 'ERGHidden');                
+                this._resetTransportContainerOptions();
+              } else {
+                this.windSpeed.set('disabled', true);
+                this.transportContainer.set('disabled', true);
+              }              
+              if (this._selectedMaterial.BLEVE){
+                var alertMessage = new Message({
+                  message: this.nls.bleveMessage
+                })
+                this.useBleve.set('disabled', false);
+                this.tankCapacity.set('disabled', false);
+                dojo.removeClass(this.bleveContainer, 'ERGHidden');
+              } else {
+                this.useBleve.set('disabled', true);
+                this.tankCapacity.set('disabled', true);
+              }              
+              if(this._selectedMaterial.Material.includes('Substances')) {
+                this.spillSize.setValue('SM');
+                this.spillSize.set('disabled', true);
+              }              
+              if(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry) {
+                dojo.removeClass(this.CreateERGButton, 'jimu-state-disabled');
+              }
+            }),            
+            onShowListEvent: lang.hitch(this, function() {
+              this._selectedMaterial = null;
+              this.spillSize.set('disabled', false);              
+              dojo.addClass(this.table3Container, 'ERGHidden');              
+              dojo.addClass(this.bleveContainer, 'ERGHidden');
+              dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
+            })            
+          }          
+        };
+        
+        
+        $(this.materialType).easyAutocomplete(options);
+        if(this._useWeather) {
+          this._weatherInfo = new WeatherInfo(this.weather, this._weatherURL, this);
         }
       },
 
-      _doFacilitiesQuery: function (geometry) {
-        try {
-          html.setStyle(this.facilitiesListSection, 'display', 'none');
-          if (this.config.facilitiesLayer.url) {
-            this._doFacilitiesQueryByUrl(this.config.facilitiesLayer, geometry);
-          } else {
-            this._onQueryError("Infrastructure layer was defined incorrectly.")
-          }
-        } catch (error) {
-          new Message({message: error.message});
+      /**
+      * The transport conatiner dropdown list changes depending on material
+      */
+      _resetTransportContainerOptions: function () {
+        //first of all reomve all options
+        for (var i = this.transportContainer.options.length - 1; i >= 0 ; i--) {
+          this.transportContainer.removeOption(i);
         }
-      },
-
-      _doFacilitiesQueryByUrl: function (layerInfo, geometry) {
-        var queryTask = new QueryTask(layerInfo.url);
-        var q = new Query();
-        q.returnGeometry = true;
-        q.outFields = layerInfo.fields;
-        q.geometry = geometry;
-        queryTask.execute(q);
-        this.own(on(queryTask, 'complete', lang.hitch(this, this._onFacilitiesQueryComplete)));
-        this.own(on(queryTask, 'error', lang.hitch(this, this._onFacilitiesQueryError)));
-      },
-
-      _onFacilitiesQueryComplete: function (response) {
-        var features = response.featureSet.features;
-        if (features.length > 0) {
-          html.empty(this.facilitiesListSection);
-          var parentHeight = domStyle.get(this.domNode.parentNode.parentNode, "height");
-          var listContainer = domConstruct.place("<div></div>", this.facilitiesListSection);
-          var fp = new FacilitiesPane({
-            resultsList: features,
-            frameHeight: parentHeight,
-            gLayer: this.facilitiesGraphicsLayer
-          }, listContainer);
-          html.setStyle(this.facilitiesListSection, 'display', 'block');
-
-          this.facilitiesGraphicsLayer.clear();
-          for (var i = 0; i < features.length; i++) {
-            var f = features[i];
-            this._setFeatureSymbol(f);
-            this.facilitiesGraphicsLayer.add(f);
-          }
+        // rail and semi are common to all materials
+        var dropDownOptions = ["rail", "semi"];
+        // add other container options depending on material id 
+        switch(this._selectedMaterial.IDNum){
+          case 1005:
+            dropDownOptions.push("ag","msm");              
+            break;
+          case 1017:
+          case 1050:
+          case 2186:
+          case 1079:
+            dropDownOptions.push("mton","ston");              
+            break;
+          case 1040:
+          case 1052:
+            dropDownOptions.push("ston");              
+            break;
         }
+                
+        var options = [], singleOption;
+        //Add options for selected dropdown
+        array.forEach(dropDownOptions, lang.hitch(this, function (type) {
+          singleOption = { value: type.toUpperCase(), label: this.nls[type]};   
+          options.push(singleOption);
+        }));
+        this.transportContainer.addOption(options);
+      },
+                
+      /**
+      * Performs activities like resizing widget components, connect map click etc on widget open
+      */
+      onOpen: function () {
+        console.log('widget opened');
       },
 
-      _onFacilitiesQueryError: function (error) {
-        new Message({message: "Facilities list query failed: " + error.message});
+      /**
+      * Performs activities like disconnect map handlers, close popup etc on widget close
+      */
+      onClose: function () {
+        console.log('widget closed');
+      },        
+
+      /**
+      * This function used for loading indicator
+      */
+      _initLoading: function () {
+        this.loading = new LoadingIndicator({hidden: true});
+        this.loading.placeAt(this.domNode);
+        this.loading.startup();
       },
 
-      _initChartLayer: function () {
-        this.chartLayer = new GraphicsLayer();
-        this.map.addLayer(this.chartLayer);
-      },
-
-      _initFacilitiesLayer: function () {
-        this.facilitiesGraphicsLayer = new GraphicsLayer();
-        this.map.addLayer(this.facilitiesGraphicsLayer);
-      },
-
-      _initResultsTab: function () {
-        this.own(on(this.pagingUl, 'click', lang.hitch(this, function (event) {
-          var target = event.target || event.srcElement;
-          var tagName = target.tagName.toLowerCase();
-          if (tagName === 'a') {
-            var as = query('a', this.pagingUl);
-            var index = array.indexOf(as, target);
-            if (index >= 0) {
-              this._showChart(index);
+      /**
+      * Handle click events for different controls
+      **/
+      _handleClickEvents: function () {
+        /**
+        * ERG panel
+        **/        
+            //handle Settings button
+            if(!this.config.erg.lockSettings) {
+              //handle Settings button
+              this.own(on(this.ERGSettingsButton, "click", lang.hitch(this, function () {
+                this._showPanel("settingsPage");
+              })));
+            } else {
+              this.ERGSettingsButton.title = this.nls.lockSettings;
+              //html.addClass(this.ERGSettingsButton, 'controlGroupHidden');
             }
-          }
-        })));
+            
+            //Handle click event of create ERG button        
+            this.own(on(this.CreateERGButton, 'click', lang.hitch(this, 
+              this._CreateERGButtonClicked)));
+              
+            //Handle click event of clear ERG button        
+            this.own(on(this.ClearERGButton, 'click', lang.hitch(this, function () {
+              this.materialType.value = '';
+              this.windSpeed.set('disabled', true);
+              this.transportContainer.set('disabled', true);
+              dojo.addClass(this.table3Container, 'ERGHidden');
+              this.useBleve.set('disabled', true);
+              this.useBleve.set('checked', false);
+              dojo.addClass(this.bleveContainer, 'ERGHidden');
+              this.fire.set('checked', false);
+              this.tankCapacity.set('disabled', true);
+              this._selectedMaterial = null;
+              this._clearLayers(true);
+            })));
+            
+            //Handle click event of Add ERG draw button
+            this.own(on(this.ERGAddPointBtn, 'click', lang.hitch(this, 
+              this._ERGDrawButtonClicked)));
+              
+            //Handle completion of ERG drawing
+            this.own(on(this.dt, 'draw-complete', lang.hitch(this,
+              this._dt_Complete)));
+              
+            //Handle change in coord input      
+            this.own(this.ERGCoordTool.inputCoordinate.watch('outputString', lang.hitch(this,
+              function (r, ov, nv) {
+                if(!this.ERGCoordTool.manualInput){
+                  this.ERGCoordTool.set('value', nv);
+                }
+              }
+            )));
 
-        this.own(on(this.leftArrow, 'click', lang.hitch(this, function () {
-          var index = (this.currentChartIndex - 1 + this.charts.length) % this.charts.length;
-          if (index >= 0) {
-            this._showChart(index);
-          }
-        })));
-
-        this.own(on(this.rightArrow, 'click', lang.hitch(this, function () {
-          var index = (this.currentChartIndex + 1 + this.charts.length) % this.charts.length;
-          if (index >= 0) {
-            this._showChart(index);
-          }
-        })));
+            //Handle change in start point and update coord input
+            this.own(this.dt.watch('startPoint', lang.hitch(this, 
+              function (r, ov, nv) {
+                this.ERGCoordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
+                this.dt.addStartGraphic(nv, this._ptSym, this._spillLocation);
+                if(this._useWeather) {
+                  this._weatherInfo.updateForIncident(nv);
+                }
+              }
+            )));
+            
+            //Handle key up events in coord input
+            this.own(on(this.ERGCoordTool, 'keyup', lang.hitch(this, 
+              this._ERGCoordToolKeyWasPressed)));
+            
+            //Handle click event on coord format button
+            this.own(on(this.ERGFormatButton, 'click', lang.hitch(this, 
+              this._ERGFormatButtonClicked)));
+            
+            //Handle click event on apply button of the coord format popup        
+            this.own(on(this.ERGCoordinateFormat.content.applyButton, 'click', lang.hitch(this,
+              this._ERGFormatPopupApplyButtonClicked)));
+            
+            //Handle click event on cancel button of the coord format popup         
+            this.own(on(this.ERGCoordinateFormat.content.cancelButton, 'click', lang.hitch(this, 
+              function () {
+                dijitPopup.close(this.ERGCoordinateFormat);
+              }
+            )));
+            
+            //Handle spill size dropdown change
+            this.own(on(this.spillSize, 'change', lang.hitch(this, function () { 
+              if(this._selectedMaterial) {
+                if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
+                  var alertMessage = new Message({
+                    message: this.nls.table3Message
+                  })
+                  this.windSpeed.set('disabled', false);
+                  this.transportContainer.set('disabled', false);
+                  dojo.removeClass(this.table3Container, 'ERGHidden');
+                  this._resetTransportContainerOptions();
+                } else {
+                  this.windSpeed.set('disabled', true);
+                  this.transportContainer.set('disabled', true);
+                  dojo.addClass(this.table3Container, 'ERGHidden');
+                }
+              }
+            })));
+            
+        /**
+        * Settings panel
+        **/        
+            //Handle click event of settings back button
+            this.own(on(this.SettingsPanelBackButton, "click", lang.hitch(this, function () {
+              this._SettingsInstance.onClose();          
+              this._showPanel(this._lastOpenPanel);
+            })));        
+        
+        /**
+        * Publish panel
+        **/
+            //Handle click event back button
+            this.own(on(this.resultsPanelBackButton, "click", lang.hitch(this, function () {
+              //remove any messages
+              this.publishMessage.innerHTML = '';
+              //clear layer name
+              this.addERGNameArea.setValue('');
+              this._spillLocation.show();
+              this._showPanel(this._lastOpenPanel);              
+            })));
+            
+            //Handle click event of publish ERG to portal button
+            this.own(on(this.ERGAreaBySizePublishERGButton, 'click', lang.hitch(this, function () {
+              if(this.addERGNameArea.isValid()) {
+                this.publishMessage.innerHTML = '';
+                this._initSaveToPortal(this.addERGNameArea.value)
+              } else {
+                // Invalid entry
+                this.publishMessage.innerHTML = this.nls.missingLayerNameMessage;
+              }
+            })));            
+      },
+      
+      /**
+      * Get panel node from panel name
+      **/
+      _getNodeByName: function (panelName) {
+        var node;
+        switch (panelName) {
+          case "ergMainPage":
+            node = this.ergMainPageNode;
+            break;          
+          case "settingsPage":
+            node = this.settingsPageNode;
+            break;
+          case "resultsPage":
+            node = this.resultsPageNode;
+            break;
+        }
+        return node;
+      },
+      
+      _reset: function () {
+        this._clearLayers(true);
+        
+        //ensure all toolbars are deactivated
+        this.dt.deactivate();
+        
+        //enable map navigation if disabled due to a tool being in use
+        this.map.enableMapNavigation();
+        
+        //remove any active classes from the tool icons
+        dojo.removeClass(this.ERGAddPointBtn, 'jimu-edit-active');
       },
 
-      _doQuery: function (geometry) {
-        try {
-          //Change to results tab
-          this.tabContainer.selectTab(this.nls.tabDemo);
-          html.setStyle(this.progressBar.domNode, 'display', 'block');
-          html.setStyle(this.resultsSection, 'display', 'none');
-          html.setStyle(this.noresultsSection, 'display', 'none');
-
-          if (this.config.demographicLayer.url) {
-            this._doQueryByUrl(this.config.demographicLayer, geometry);
-          } else {
-            this._onQueryError("Demographic layer was defined incorrectly");
+      _clearLayers: function (includeExtentLayer) {
+        this.ERGArea.clear();
+        //refresh ERG layer to make sure any labels are removed
+        this.ERGArea.refresh();        
+        //sometimes we only want to clear the ERG overlay and not the spill location 
+        if(includeExtentLayer) {
+          this.dt.removeStartGraphic(this._spillLocation);                    
+          dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
+          this.ERGCoordTool.clear();
+          if(this._useWeather) {
+            this._resetWeatherInfo();
           }
-        } catch (error) {
-          new Message({message: error.message});
         }
       },
 
-      _doQueryByUrl: function (layerInfo, geometry) {
-        var queryTask = new QueryTask(layerInfo.url);
-        var q = new Query();
-        q.returnGeometry = true;
-        q.outFields = layerInfo.fields;
-        q.geometry = geometry;
-        queryTask.execute(q);
-        this.own(on(queryTask, 'complete', lang.hitch(this, this._onQueryComplete)));
-        this.own(on(queryTask, 'error', lang.hitch(this, this._onQueryError)));
+      /**
+      * Creates settings
+      **/
+      _createSettings: function () {
+        //Create Settings Instance
+        this._SettingsInstance = new Settings({
+          nls: this.nls,
+          config: this.config,
+          appConfig: this.appConfig
+        }, domConstruct.create("div", {}, this.SettingsNode));        
+        
+        //add a listener for a change in settings
+        this.own(this._SettingsInstance.on("settingsChanged",
+          lang.hitch(this, function (updatedSettings) {
+            
+            var spillLocationFillColor = new Color(updatedSettings.spillLocationFillColor.color);            
+            var spillLocationFillTrans = (1 - updatedSettings.spillLocationFillColor.transparency) * 255;
+            var spillLocationOutlineColor = new Color(updatedSettings.spillLocationOutlineColor.color);            
+            var spillLocationOutlineTrans = (1 - updatedSettings.spillLocationOutlineColor.transparency) * 255;
+            
+            var IIZoneFillColor = new Color(updatedSettings.IIZoneFillColor.color);            
+            var IIZoneFillTrans = (1 - updatedSettings.IIZoneFillColor.transparency) * 255;
+            var IIZoneOutlineColor = new Color(updatedSettings.IIZoneOutlineColor.color);            
+            var IIZoneOutlineTrans = (1 - updatedSettings.IIZoneOutlineColor.transparency) * 255;
+            
+            var PAZoneFillColor = new Color(updatedSettings.PAZoneFillColor.color);            
+            var PAZoneFillTrans = (1 - updatedSettings.PAZoneFillColor.transparency) * 255;
+            var PAZoneOutlineColor = new Color(updatedSettings.PAZoneOutlineColor.color);            
+            var PAZoneOutlineTrans = (1 - updatedSettings.PAZoneOutlineColor.transparency) * 255;
+            
+            var downwindZoneFillColor = new Color(updatedSettings.downwindZoneFillColor.color);            
+            var downwindZoneFillTrans = (1 - updatedSettings.downwindZoneFillColor.transparency) * 255;
+            var downwindZoneOutlineColor = new Color(updatedSettings.downwindZoneOutlineColor.color);            
+            var downwindZoneOutlineTrans = (1 - updatedSettings.downwindZoneOutlineColor.transparency) * 255;
+            
+            var fireZoneFillColor = new Color(updatedSettings.fireZoneFillColor.color);            
+            var fireZoneFillTrans = (1 - updatedSettings.fireZoneFillColor.transparency) * 255;
+            var fireZoneOutlineColor = new Color(updatedSettings.fireZoneOutlineColor.color);            
+            var fireZoneOutlineTrans = (1 - updatedSettings.fireZoneOutlineColor.transparency) * 255;
+            
+            var bleveZoneFillColor = new Color(updatedSettings.bleveZoneFillColor.color);            
+            var bleveZoneFillTrans = (1 - updatedSettings.bleveZoneFillColor.transparency) * 255;
+            var bleveZoneOutlineColor = new Color(updatedSettings.bleveZoneOutlineColor.color);            
+            var bleveZoneOutlineTrans = (1 - updatedSettings.bleveZoneOutlineColor.transparency) * 255;
+            
+            var uvrJson = {"type": "uniqueValue",
+              "field1": "Type",
+              "defaultSymbol": {
+                "color": [255, 153, 0, 128],
+                "outline": {
+                  "color": [255, 153, 0, 255],
+                  "width": 1,
+                  "type": "esriSLS",
+                  "style": "esriSLSSolid"
+                },
+                "type": "esriSFS",
+                "style": "esriSFSSolid"
+              },
+              "uniqueValueInfos": [{
+                "value": "Spill Location",
+                "symbol": {
+                  "color": [spillLocationFillColor.r,spillLocationFillColor.g,spillLocationFillColor.b,spillLocationFillTrans],
+                  "outline": {
+                    "color": [spillLocationOutlineColor.r,spillLocationOutlineColor.g,spillLocationOutlineColor.b,spillLocationOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.spillLocationOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.spillLocationFillColor.type
+                }
+              }, {
+                "value": "II Zone",
+                "symbol": {
+                  "color": [IIZoneFillColor.r,IIZoneFillColor.g,IIZoneFillColor.b,IIZoneFillTrans],
+                  "outline": {
+                    "color": [IIZoneOutlineColor.r,IIZoneOutlineColor.g,IIZoneOutlineColor.b,IIZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.IIZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.IIZoneFillColor.type
+                }
+              }, {
+                "value": "Protective Action Area",
+                "symbol": {
+                  "color": [PAZoneFillColor.r,PAZoneFillColor.g,PAZoneFillColor.b,PAZoneFillTrans],
+                  "outline": {
+                    "color": [PAZoneOutlineColor.r,PAZoneOutlineColor.g,PAZoneOutlineColor.b,PAZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.PAZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.PAZoneFillColor.type
+                }
+              }, {
+                "value": "Down Wind",
+                "symbol": {
+                  "color": [downwindZoneFillColor.r,downwindZoneFillColor.g,downwindZoneFillColor.b,downwindZoneFillTrans],
+                  "outline": {
+                    "color": [downwindZoneOutlineColor.r,downwindZoneOutlineColor.g,downwindZoneOutlineColor.b,downwindZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.downwindZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.downwindZoneFillColor.type
+                }
+              }, {
+                "value": "Fire",
+                "symbol": {
+                  "color": [fireZoneFillColor.r,fireZoneFillColor.g,fireZoneFillColor.b,fireZoneFillTrans],
+                  "outline": {
+                    "color": [fireZoneOutlineColor.r,fireZoneOutlineColor.g,fireZoneOutlineColor.b,fireZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.fireZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.fireZoneFillColor.type
+                }
+              }, {
+                "value": "Bleve",                
+                "symbol": {
+                  "color": [bleveZoneFillColor.r,bleveZoneFillColor.g,bleveZoneFillColor.b,bleveZoneFillTrans],
+                  "outline": {
+                    "color": [bleveZoneOutlineColor.r,bleveZoneOutlineColor.g,bleveZoneOutlineColor.b,bleveZoneOutlineTrans],
+                    "width": 1,
+                    "type": "esriSLS",
+                    "style": updatedSettings.bleveZoneOutlineColor.type
+                  },
+                  "type": "esriSFS",
+                  "style": updatedSettings.bleveZoneFillColor.type
+                }
+              }]
+            }
+            
+            // create a renderer for the ERG layer to override default symbology
+            this._renderer = new UniqueValueRenderer(uvrJson);
+            this.ERGArea.setRenderer(this._renderer);
+           
+            //refresh the layer to apply the settings
+            this.ERGArea.refresh();              
+          })));
+        this._SettingsInstance.startup();
       },
 
-      _onQueryComplete: function (response) {
-        var featureSet = response.featureSet;
-        var features = featureSet.features;
-        this._displayResult(features);
+      /**
+      * Displays selected panel
+      **/
+      _showPanel: function (currentPanel) {
+        var prevNode, currentNode;
+        //check if previous panel exist and hide it
+        if (this._currentOpenPanel) {
+          prevNode = this._getNodeByName(this._currentOpenPanel);
+          domClass.add(prevNode, "ERGHidden");
+        }
+        //get current panel to be displayed and show it
+        currentNode = this._getNodeByName(currentPanel);
+        domClass.remove(currentNode, "ERGHidden");
+        //set the current panel and previous panel
+        this._lastOpenPanel = this._currentOpenPanel;
+        this._currentOpenPanel = currentPanel;
       },
-
-      _onQueryError: function (error) {
-        html.setStyle(this.progressBar.domNode, 'display', 'none');
-        this._clear();
-        html.setStyle(this.resultsSection, 'display', 'none');
-        html.setStyle(this.noresultsSection, 'display', 'block');
-        alert(error);
-      },
-
-      _displayResult: function (features) {
-        this.progressBar.domNode.style.display = 'none';
-        //html.setStyle(this.progressBar.domNode,'display','none');
-        this._clear();
-        var length = features.length;
-        if (length > 0) {
-          html.setStyle(this.resultsSection, 'display', 'block');
-          html.setStyle(this.noresultsSection, 'display', 'none');
-          for (var i = 0; i < length; i++) {
-            var f = features[i];
-            this._setFeatureSymbol(f);
-            this.chartLayer.add(f);
-          }
-          this._createCharts(features);
+      
+      /**
+      * Handle the draw point icon being clicked on the ERG Panel
+      **/
+      _ERGDrawButtonClicked: function () {
+        if(domClass.contains(this.ERGAddPointBtn,'jimu-edit-active')) {
+          //already selected so deactivate draw tool
+          this.dt.deactivate();
+          this.map.enableMapNavigation();
         } else {
-          html.setStyle(this.resultsSection, 'display', 'none');
-          html.setStyle(this.noresultsSection, 'display', 'block');
+          this.dt.removeStartGraphic(this._spillLocation);
+          this._clearLayers(true); 
+          this.ERGCoordTool.manualInput = false;        
+          this.dt._setTooltipMessage(0);        
+          this.map.disableMapNavigation();          
+          this.dt.activate('point');
+          var tooltip = this.dt._tooltip;
+          if (tooltip) {
+            tooltip.innerHTML = this.nls.drawPointToolTip;
+          }          
+        }
+        domClass.toggle(this.ERGAddPointBtn, 'jimu-edit-active');
+      },
+      
+      /**
+      * Handle the completion of the draw spill location
+      **/      
+      _dt_Complete: function () {          
+        domClass.remove(this.ERGAddPointBtn, 'jimu-edit-active');
+        this.dt.deactivate();
+        this.map.enableMapNavigation();
+        if(this._selectedMaterial) {
+          dojo.removeClass(this.CreateERGButton, 'jimu-state-disabled');
         }
       },
-
-      _setFeatureSymbol: function (f) {
-        switch (f.geometry.type) {
-          case 'extent':
-          case 'polygon':
-            f.setSymbol(this._getFillSymbol());
-            break;
-          case 'polyline':
-            f.setSymbol(this._getLineSymbol());
-            break;
-          default:
-            f.setSymbol(this._getMarkerSymbol());
-            break;
-        }
-      },
-
-      _getHighLightColor: function () {
-        var color = new Color('#f5f50e');
-        if (this.config && this.config.highLightColor) {
-          color = new Color(this.config.highLightColor);
-        }
-        return color;
-      },
-
-      _getMarkerSymbol: function () {
-        var style = SimpleMarkerSymbol.STYLE_CIRCLE;
-        var size = 15;
-        var color = new Color("#FF0000");
-        color.a = 1;
-
-        var outlineSymbol = new SimpleLineSymbol();
-        var outlineColor = new Color("#000000");
-        var outlineWidth = 0;
-        outlineSymbol.setStyle(SimpleLineSymbol.STYLE_SOLID);
-        outlineSymbol.setColor(outlineColor);
-        outlineSymbol.setWidth(outlineWidth);
-
-        var symbol = new SimpleMarkerSymbol(style, size, outlineSymbol, color);
-        return symbol;
-      },
-
-      _getHightLightMarkerSymbol: function () {
-        var style = SimpleMarkerSymbol.STYLE_CIRCLE;
-        var size = 15;
-        var color = new Color("#3fafdc");
-        color.a = 1;
-
-        var outlineSymbol = new SimpleLineSymbol();
-        var outlineColor = this._getHighLightColor();
-        var outlineWidth = 3;
-        outlineSymbol.setStyle(SimpleLineSymbol.STYLE_SOLID);
-        outlineSymbol.setColor(outlineColor);
-        outlineSymbol.setWidth(outlineWidth);
-
-        var symbol = new SimpleMarkerSymbol(style, size, outlineSymbol, color);
-        return symbol;
-      },
-
-      _getLineSymbol: function () {
-        var symbol = new SimpleLineSymbol();
-        var style = SimpleLineSymbol.STYLE_SOLID;
-        var color = new Color("#3fafdc");
-        color.a = 1;
-        var width = 5;
-        symbol.setStyle(style);
-        symbol.setColor(color);
-        symbol.setWidth(width);
-        return symbol;
-      },
-
-      _getHightLightLineSymbol: function () {
-        var symbol = new SimpleLineSymbol();
-        var style = SimpleLineSymbol.STYLE_SOLID;
-        var color = this._getHighLightColor();
-        color.a = 1;
-        var width = 7;
-        symbol.setStyle(style);
-        symbol.setColor(color);
-        symbol.setWidth(width);
-        return symbol;
-      },
-
-      _getFillSymbol: function () {
-        var style = SimpleFillSymbol.STYLE_SOLID;
-        var color = new Color('#3fafdc');
-        color.a = 0.5;
-        var outlineSymbol = new SimpleLineSymbol();
-        var outlineColor = new Color('#000000');
-        var outlineWidth = 1;
-        outlineSymbol.setStyle(SimpleLineSymbol.STYLE_SOLID);
-        outlineSymbol.setColor(outlineColor);
-        outlineSymbol.setWidth(outlineWidth);
-        var symbol = new SimpleFillSymbol(style, outlineSymbol, color);
-        return symbol;
-      },
-
-      _getHightLightFillSymbol: function () {
-        var style = SimpleFillSymbol.STYLE_SOLID;
-        var color = new Color('#3fafdc');
-        color.a = 0.5;
-        var outlineSymbol = new SimpleLineSymbol();
-        var outlineColor = this._getHighLightColor();
-        var outlineWidth = 3;
-        outlineSymbol.setStyle(SimpleLineSymbol.STYLE_SOLID);
-        outlineSymbol.setColor(outlineColor);
-        outlineSymbol.setWidth(outlineWidth);
-        var symbol = new SimpleFillSymbol(style, outlineSymbol, color);
-        return symbol;
-      },
-
-      _clear: function () {
-        this._clearCharts();
-      },
-
-      _clearCharts: function () {
-        try {
-          this.chartTitle.innerHTML = "";
-          this.currentChartIndex = -1;
-          var chartDivs = query('.chart-div', this.chartContainer);
-          chartDivs.style({display: 'none'});
-          var lis = query("li", this.pagingUl);
-          if (lis.className != '')
-            lis.className = ''; //lis.removeClass('selected');
-
-          if (this.charts.length > 0) {
-            for (var i = 0; i < this.charts.length; i++) {
-              var chart = this.charts[i];
-              if (chart) {
-                chart.destroy();
+      
+      /**
+      * catch key press in spill location input
+      **/
+      _ERGCoordToolKeyWasPressed: function (evt) {
+        this.ERGCoordTool.manualInput = true;
+        if (evt.keyCode === keys.ENTER) {
+          this.ERGCoordTool.inputCoordinate.getInputType().then(lang.hitch(this, 
+            function (r) {
+              if(r.inputType === "UNKNOWN"){
+                var alertMessage = new Message({
+                  message: this.nls.parseCoordinatesError
+                });
+              } else {
+                this._reset();
+                topic.publish(
+                  'ERG-center-point-input',
+                  this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry
+                );
+                this._ERGSetCoordLabel(r.inputType);
+                var fs = this.ERGCoordinateFormat.content.formats[r.inputType];
+                this.ERGCoordTool.inputCoordinate.set('formatString', fs.defaultFormat);
+                this.ERGCoordTool.inputCoordinate.set('formatType', r.inputType);
+                this.dt.addStartGraphic(r.coordinateEsriGeometry, this._ptSym, this._spillLocation);
               }
             }
+          ));
+        }
+      },
+      
+      /**
+      * Reformat coordinate label depend on what reference system is chosen
+      **/
+      _ERGSetCoordLabel: function (toType) {
+        this.ERGCoordInputLabel.innerHTML = dojoString.substitute(
+          this.nls.coordInputLabel + ' (${crdType})', {
+              crdType: toType
+          });
+      },
+      
+      /**
+      * Handle the format coordinate input popup opening
+      * Point by Size Panel
+      **/
+      _ERGFormatButtonClicked: function () {
+        this.ERGCoordinateFormat.content.set('ct', this.ERGCoordTool.inputCoordinate.formatType);
+        dijitPopup.open({
+            popup: this.ERGCoordinateFormat,
+            around: this.ERGFormatButton
+        });
+      },
+      
+      /**
+      * Handle the format coordinate input being applied
+      **/
+      _ERGFormatPopupApplyButtonClicked: function () {
+        var fs = this.ERGCoordinateFormat.content.formats[this.ERGCoordinateFormat.content.ct];
+        var cfs = fs.defaultFormat;
+        var fv = this.ERGCoordinateFormat.content.frmtSelect.get('value');
+        if (fs.useCustom) {
+            cfs = fs.customFormat;
+        }
+        this.ERGCoordTool.inputCoordinate.set(
+          'formatPrefix',
+          this.ERGCoordinateFormat.content.addSignChkBox.checked
+        );
+        this.ERGCoordTool.inputCoordinate.set('formatString', cfs);
+        this.ERGCoordTool.inputCoordinate.set('formatType', fv);
+        this._ERGSetCoordLabel(fv);
+        dijitPopup.close(this.ERGCoordinateFormat);        
+      },
+      
+      /**
+      * Handle the create ERG button being clicked
+      **/
+      _CreateERGButtonClicked: function () {
+        if(this._selectedMaterial && this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry) {
+          var IIAttributeValue, PAAttributeValue, bleveAttributeValue, IIDistance, PADistance;
+          var features = [];          
+          var spatialReference = new SpatialReference({wkid:102100});
+          
+          //get the spill location
+          var spillLocation = WebMercatorUtils.geographicToWebMercator(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
+          
+          // clear any existing ERG overlays
+          this._clearLayers(true);
+          
+          //check if you need to refer to table 3
+          if(!this._selectedMaterial.TABLE3) {
+            IIAttributeValue = this.spillSize.getValue() + "_ISO";
+            PAAttributeValue = this.spillSize.getValue() + "_" + this.spillTime.getValue();
+          } else {
+            IIAttributeValue = this.transportContainer.getValue() + "_ISO";
+            PAAttributeValue = this.transportContainer.getValue() + this.spillTime.getValue() + this.windSpeed.getValue();
           }
-          this.charts = [];
-          html.empty(this.pagingUl);
-          html.empty(this.chartContainer);
-          html.setStyle(this.resultsSection, 'display', 'none');
-          html.setStyle(this.noresultsSection, 'display', 'block');
-        } catch (error) {
-          new Message({message: error.message});
-        }
-      },
-
-      _setHightLightSymbol: function (g) {
-        switch (g.geometry.type) {
-          case 'extent':
-          case 'polygon':
-            g.setSymbol(this._getHightLightFillSymbol());
-            break;
-          case 'polyline':
-            g.setSymbol(this._getHightLightLineSymbol());
-            break;
-          default:
-            g.setSymbol(this._getHightLightMarkerSymbol());
-            break;
-        }
-      },
-
-      _showChart: function (index) {
-        this.chartTitle.innerHTML = "";
-        this.currentChartIndex = -1;
-        var chartDivs = query('.chart-div', this.chartContainer);
-        chartDivs.style({display: 'none'});
-        var lis = query("li", this.pagingUl);
-        lis.removeClass('selected');
-        if (index < 0) {
-          return;
-        }
-
-        var chartDiv = chartDivs[index];
-        if (chartDiv) {
-          this.currentChartIndex = index;
-          html.setStyle(chartDiv, {display: 'block'});
-        }
-        var chart = this.charts[index];
-        if (chart && chart.media) {
-          this.chartTitle.innerHTML = chart.media.title;
-          this.description.innerHTML = chart.media.description || "";
-          this.totalSum.innerHTML = chart.totalSum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        var li = lis[index];
-        if (li) {
-          html.addClass(li, 'selected');
-        }
-      },
-
-      _createCharts: function (features) {
-        try {
-          this._clearCharts();
-          html.setStyle(this.resultsSection, 'display', 'block');
-          html.setStyle(this.noresultsSection, 'display', 'none');
-          //this.tabContainer.selectTab(this.nls.tabDemo);
-          var layerInfo = this.config.demographicLayer;
-          var medias = layerInfo.medias;
-          var labelField = layerInfo.labelField;
-          var box = html.getMarginBox(this.chartContainer);
-          var w = box.w + "px";
-          var h = box.h + "px";
-
-          var i, chart;
-          for (i = 0; i < medias.length; i++) {
-            chart = null;
-            var media = medias[i];
-            var type = media.type.toLowerCase();
-            var chartDiv = html.create('div', {'class': 'chart-div', style: {width: w, height: h}}, this.chartContainer);
-            if (type === 'barschart') {
-              chart = this._createBarsChart(chartDiv, media, features, labelField);
+          
+          //set the IA and PA distances
+          IIDistance = this._selectedMaterial[IIAttributeValue];
+          PADistance = this._selectedMaterial[PAAttributeValue];
+          
+          // determine the initial isolation zone
+          var IIZone = new Circle({
+            center: spillLocation,
+            radius: IIDistance,
+            geodesic: true,
+            numberOfPoints: 360
+          });
+          
+          // show BLEVE zone
+          if(this.useBleve.checked && this._selectedMaterial.BLEVE){            
+            bleveAttributeValue = this.tankCapacity.getValue();
+            var bleveZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial[bleveAttributeValue],'meters');
+            var bleveZoneGraphic = new Graphic(bleveZone);
+            bleveZoneGraphic.setAttributes({"type": "Bleve"});
+            features.push(bleveZoneGraphic);
+          }
+          
+          // show Fire evaction zone
+          if(this.fire.checked){
+            var fireZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial['FIRE_ISO'],'meters');
+            var fireZoneGraphic = new Graphic(fireZone);
+            fireZoneGraphic.setAttributes({"type": "Fire"});
+            features.push(fireZoneGraphic);
+          }
+          
+          if(this._selectedMaterial.Material.includes('Substances') || this._selectedMaterial.BLEVE) {
+            // Materials with the word Substances in their title or BLEVE values do not have any PA distances
+            // warn the user to this then zoom to the II Zone
+            var alertMessage = new Message({
+              message: this.nls.noPAZoneMessage
+            }); 
+          } else {          
+            // create a circle from the spill location that we can use to calculate
+            // the center point that will be used for the Protective Action (PA) Zone
+            var PACircle = new Circle({
+                center: spillLocation,
+                radius: PADistance/2,
+                geodesic: true,
+                numberOfPoints: 360
+            });
+            
+            // Get the center point for the PA Zone (first point of the circle due north)
+            var PACenter = PACircle.getPoint(0,0);
+            
+            // Create another circle from this center point, the extent of which will be the PA Zone
+            var PAZone = new Circle({
+                center: PACenter,
+                radius: PADistance/2,
+                geodesic: true,
+            });
+            
+            // get the two bottom corners of the PA Zone - these will be swapped out below
+            var PAZoneExtent = PAZone.getExtent();
+            var PAPoint1 = new Point(PAZoneExtent.xmin,PAZoneExtent.ymin,spatialReference);
+            var PAPoint2 = new Point(PAZoneExtent.xmax,PAZoneExtent.ymin,spatialReference);
+            
+            // Compute the "protective action arc" - the arc at the limit of the protective action zone
+            var paBuffer = GeometryEngine.geodesicBuffer(spillLocation,PADistance,'meters');
+            var protectiveActionArc = GeometryEngine.intersect(paBuffer,Polygon.fromExtent(PAZoneExtent));
+                      
+            // get the 2 coordinates where the initial isolation zone intersects with the protective action distance
+            var iiPoint1 = IIZone.getPoint(0,270);
+            var iiPoint2 = IIZone.getPoint(0,90);
+            
+            // Swap out the two bottom corners to create the fan
+            array.forEach(protectiveActionArc.rings[0],lang.hitch(this, function(point, i){
+              if(point[0] === PAPoint1.x && point[1] === PAPoint1.y) {
+                protectiveActionArc.setPoint(0, i, iiPoint1);
+              } else if(point[0] === PAPoint2.x && point[1] === PAPoint2.y) {
+                protectiveActionArc.setPoint(0, i, iiPoint2);
+              }
+            }));
+            
+            var protectiveActionArea = GeometryEngine.difference(protectiveActionArc,IIZone);
+            
+            // all geometry so far is orientated north so rotate what we need to the wind direction
+            protectiveActionArea = GeometryEngine.rotate(protectiveActionArea,this.windDirection.getValue() * -1,spillLocation);         
+            PAZoneArea = GeometryEngine.rotate(Polygon.fromExtent(PAZoneExtent),this.windDirection.getValue() * -1,spillLocation);
+                      
+            var PAAGraphic = new Graphic(protectiveActionArea);
+            PAAGraphic.setAttributes({"type": "Down Wind"});
+            var PAZoneGraphic = new Graphic(PAZoneArea);
+            PAZoneGraphic.setAttributes({"type": "Protective Action Area"});
+            
+            features.push(PAZoneGraphic,PAAGraphic);
             }
-            else if (type === 'columnschart') {
-              chart = this._createColumnsChart(chartDiv, media, features, labelField);
-            }
-            else if (type === 'linechart') {
-              chart = this._createLineChart(chartDiv, media, features, labelField);
-            }
-            else if (type === 'piechart') {
-              chart = this._createPieChart(chartDiv, media, features, labelField);
-            }
 
-            if (chart) {
-              chart.media = media;
-              this.charts.push(chart);
-              html.setStyle(chartDiv, 'display', 'none');
-            }
-            else {
-              html.destroy(chartDiv);
-            }
+          // draw the II Zone
+          var IIGraphic = new Graphic(IIZone);
+          IIGraphic.setAttributes({"type": "II Zone"});
+          features.push(IIGraphic);            
+
+          // draw a small polygon to show spill location
+          var spillLocationPoly = GeometryEngine.geodesicBuffer(spillLocation,10,'meters');
+          var spillLocationGraphic = new Graphic(spillLocationPoly);
+          spillLocationGraphic.setAttributes({"type": "Spill Location"}); 
+          features.push(spillLocationGraphic);
+          
+          this.ERGArea.applyEdits(features, null, null);
+          this.map.setExtent(graphicsUtils.graphicsExtent(this.ERGArea.graphics).expand(2),false);
+          this._showPanel("resultsPage");
+        }
+      },
+                  
+      /**
+      * reset the weather info
+      **/
+      _resetWeatherInfo: function () {
+        this.weather.innerHTML = "";
+        var tpc = domConstruct.create("div", {
+          id: "tpc",
+          style: "width: 100%;"
+        }, this.weather);
+        domClass.add(tpc, "IMT_tabPanelContent");
+        
+        // current        
+        info = "<img style='height:76px' src='" + this.folderUrl + "images/w/dunno.png' />";
+        var div = domConstruct.create("div", {
+          innerHTML: info
+        }, tpc);
+        domClass.add(div, "ERGcolSmallUnknown");
+
+        info = '<br/><span>' + this.nls.weatherIntialText + '</span>';
+        
+        var div2 = domConstruct.create("div", {
+          innerHTML: info
+        }, tpc);
+        domClass.add(div2, "ERGcolSmall");
+        
+        // credits
+        var txt = "<a style='color:#6e6e6e;text-decoration:none' href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'><img style='height:36px;margin-top: 10px;' src='" 
+          + this.folderUrl + "images/darksky.png' />" + '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 'Dark Sky</a></span>';
+        var divCredit  = domConstruct.create("div", {
+          innerHTML: txt
+        }, tpc);
+        domClass.add(divCredit, "ERGcolSmall");
+        domClass.add(divCredit, "ERGcolLast");
+      },
+      
+      /**
+      * Handle different theme styles
+      **/
+      //source:
+      //https://stackoverflow.com/questions/9979415/dynamically-load-and-unload-stylesheets
+      _removeStyleFile: function (filename, filetype) {
+        //determine element type to create nodelist from
+        var targetelement = null;
+        if (filetype === "js") {
+          targetelement = "script";
+        } else if (filetype === "css") {
+          targetelement = "link";
+        } else {
+          targetelement = "none";
+        }
+        //determine corresponding attribute to test for
+        var targetattr = null;
+        if (filetype === "js") {
+          targetattr = "src";
+        } else if (filetype === "css") {
+          targetattr = "href";
+        } else {
+          targetattr = "none";
+        }
+        var allsuspects = document.getElementsByTagName(targetelement);
+        //search backwards within nodelist for matching elements to remove
+        for (var i = allsuspects.length; i >= 0; i--) {
+          if (allsuspects[i] &&
+            allsuspects[i].getAttribute(targetattr) !== null &&
+            allsuspects[i].getAttribute(targetattr).indexOf(filename) !== -1) {
+            //remove element by calling parentNode.removeChild()
+            allsuspects[i].parentNode.removeChild(allsuspects[i]);
           }
-
-          var chartCount = this.charts.length;
-          for (i = 0; i < chartCount; i++) {
-            var strLi = "<li><a></a></li>";
-            var domLi = html.toDom(strLi);
-            html.place(domLi, this.pagingUl);
-          }
-
-          this._showChart(0);
-        } catch (error) {
-          new Message({message: error.message});
         }
       },
 
-      _createBarsChart: function (chartNode, media, features, labelField) {
-        var series = [];
-
-        //init series
-        var totalSum = 0;
-        for (var i = 0; i < features.length; i++) {
-          var attributes = features[i].attributes;
-          var name = attributes[labelField] || "Total";
-          var num = attributes[media.chartField];
-          var ele = {
-            y: num,
-            tooltip: "<div style='color:green;margin-right:10px;'><span style='white-space:nowrap;'>" + name + "</span><br/><span>" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</span></div>"
-          };
-          series.push(ele);
-          totalSum += num;
+      _setTheme: function () {
+        //Check if DartTheme
+        if (this.appConfig.theme.name === "DartTheme") {
+          //Load appropriate CSS for dart theme
+          utils.loadStyleLink('darkOverrideCSS', this.folderUrl + "css/dartTheme.css", null);
+        } else {
+          this._removeStyleFile(this.folderUrl + "css/dartTheme.css", 'css');
         }
-
-        //construct chart
-        var barsChart = new Chart(chartNode);
-
-        barsChart.addPlot('default', {
-          type: Bars,
-          animate: {
-            duration: 2000,
-            easing: easing.bounceInOut
-          },
-          enableCache: true,
-          markers: true,
-          minBarSize: 3,
-          maxBarSize: 20
-        });
-
-        barsChart.addAxis('x', {
-          vertical: true
-        });
-
-        barsChart.addAxis('y', {
-          type: Default,
-          fixLower: "minor",
-          fixUpper: "minor"
-        });
-
-        barsChart.addSeries(media.title, series, {
-          stroke: {
-            color: "#FFFFFF"
-          },
-          fill: "#1f77b4"
-        });
-
-        new MoveSlice(barsChart, "default");
-        new Highlight(barsChart, "default");
-        new Tooltip(barsChart, "default");
-
-        barsChart.connectToPlot('default', lang.hitch(this, function (evt) {
-          var g = this.chartLayer.graphics[evt.index];
-          if (evt.type === 'onmouseover') {
-            this._setHightLightSymbol(g);
-          }
-          else if (evt.type === 'onmouseout') {
-            this._setFeatureSymbol(g);
-          }
-        }));
-        barsChart.render();
-        barsChart.totalSum = totalSum;
-
-        return barsChart;
-      },
-
-      _createColumnsChart: function (chartNode, media, features, labelField) {
-        var series = [];
-
-        //collect series
-        var totalSum = 0;
-        for (var i = 0; i < features.length; i++) {
-          var attributes = features[i].attributes;
-          var name = attributes[labelField] || "Total";
-          var num = attributes[media.chartField];
-          var ele = {
-            y: num,
-            tooltip: "<div style='color:green;margin-right:10px;'><span style='white-space:nowrap;'>" + name + "</span><br/><span>" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</span></div>"
-          };
-          series.push(ele);
-          totalSum += num;
+        //Check if DashBoardTheme
+        if (this.appConfig.theme.name === "DashboardTheme" && this.appConfig.theme.styles[0] === "default"){
+          //Load appropriate CSS for dashboard theme
+          utils.loadStyleLink('darkDashboardOverrideCSS', this.folderUrl + "css/dashboardTheme.css", null);
+        } else {
+          this._removeStyleFile(this.folderUrl + "css/dashboardTheme.css", 'css');
         }
-
-        //construct chart
-        var columnsChart = new Chart(chartNode);
-
-        columnsChart.addPlot('default', {
-          type: Columns,
-          animate: {
-            duration: 2000,
-            easing: easing.bounceInOut
-          },
-          enableCache: true,
-          markers: true
-        });
-
-        columnsChart.addAxis('x', {
-          type: Default
-        });
-
-        columnsChart.addAxis('y', {
-          vertical: true,
-          fixLower: "minor",
-          fixUpper: "major",
-          min: 0
-        });
-
-        columnsChart.addSeries(media.title, series, {
-          stroke: {
-            color: "#FFFFFF"
-          },
-          fill: "#1f77b4"
-        });
-
-        new MoveSlice(columnsChart, "default");
-        new Highlight(columnsChart, "default");
-        new Tooltip(columnsChart, "default");
-
-        columnsChart.connectToPlot('default', lang.hitch(this, function (evt) {
-          var g = this.chartLayer.graphics[evt.index];
-          if (evt.type === 'onmouseover') {
-            this._setHightLightSymbol(g);
-          }
-          else if (evt.type === 'onmouseout') {
-            this._setFeatureSymbol(g);
-          }
-        }));
-
-        columnsChart.render();
-        columnsChart.totalSum = totalSum;
-
-        return columnsChart;
       },
-
-      _createLineChart: function (chartNode, media, features, labelField) {
-        var series = [];
-
-        //init series
-        var totalSum = 0;
-        for (var i = 0; i < features.length; i++) {
-          var attributes = features[i].attributes;
-          var name = attributes[labelField] || "Total";
-          var num = attributes[media.chartField];
-          var ele = {
-            y: num,
-            tooltip: "<div style='color:green;margin-right:10px;'><span style='white-space:nowrap;'>" + name + "</span><br/><span>" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</span></div>"
-          };
-          series.push(ele);
-          totalSum += num;
-        }
-
-        //construct chart
-        var lineChart = new Chart(chartNode);
-
-        lineChart.addPlot('default', {
-          type: Lines,
-          animate: {
-            duration: 2000,
-            easing: easing.cubicIn
-          },
-          markers: true,
-          tension: "S"
-        });
-
-        lineChart.addAxis('x', {
-          type: Default
-        });
-
-        lineChart.addAxis('y', {
-          vertical: true,
-          fixUpper: "minor",
-          fixLower: "minor"
-        });
-
-        lineChart.addSeries(media.title, series, {
-          stroke: {
-            color: "#FF7F0E"
-          },
-          fill: "#FF7F0E"
-        });
-
-        new Magnify(lineChart, "default");
-        new Highlight(lineChart, "default");
-        new Tooltip(lineChart, "default");
-
-        lineChart.connectToPlot('default', lang.hitch(this, function (evt) {
-          var g = this.chartLayer.graphics[evt.index];
-          if (evt.type === 'onmouseover') {
-            this._setHightLightSymbol(g);
-          }
-          else if (evt.type === 'onmouseout') {
-            this._setFeatureSymbol(g);
-          }
-        }));
-
-        lineChart.render();
-        lineChart.totalSum = totalSum;
-
-        return lineChart;
+      
+      /**
+      * Handle widget being destroyed
+      * Primarly needed when in WAB configuration mode
+      **/
+      destroy: function() {        
+        this.inherited(arguments);        
+        this.map.removeLayer(this._spillLocation);
+        this.map.removeLayer(this.ERGArea);
+        console.log('ERG widget distroyed')
       },
+      
+      /**
+      * Handle publish ERG to portal
+      **/
+      _initSaveToPortal: function(layerName) {        
+        esriId.registerOAuthInfos();        
+        var featureServiceName = layerName;
+        esriId.getCredential(this.appConfig.portalUrl + "/sharing", { oAuthPopupConfirmation: false }).then(lang.hitch(this, function() {
+          //sign in
+          new esriPortal.Portal(this.appConfig.portalUrl).signIn().then(lang.hitch(this, function(portalUser) {
+           //Get the token
+            var token = portalUser.credential.token;
+            var orgId = portalUser.orgId;
+            var userName = portalUser.username;
+            
+            var checkServiceNameUrl = this.appConfig.portalUrl + "sharing/rest/portals/" + orgId + "/isServiceNameAvailable";
+            var createServiceUrl = this.appConfig.portalUrl + "sharing/content/users/" + userName + "/createService"; 
 
-      _parseUrl: function (url) {
-        var location = document.createElement("a");
-        location.href = url;
-        return location;
-      },
-
-      _isValidUrl: function (url) {
-        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-        return regexp.test(url);
-      },
-
-      _itemExists: function (searchItem, list) {
-        for (var i = 0; i < list.length; i++) {
-          if (list[i] === searchItem) {
-            return true;
-          }
-        }
-        return false;
-      },
-
-      _createPieChart: function (chartNode, media, features, labelField) {
-        var series = [];
-        var i;
-
-        //init series
-        var sum = 0.0;
-        for (i = 0; i < features.length; i++) {
-          sum += features[i].attributes[media.chartField];
-        }
-
-        for (i = 0; i < features.length; i++) {
-          var attributes = features[i].attributes;
-          var name = attributes[labelField] || "Total";
-          var num = attributes[media.chartField];
-          var percent = (num / sum * 100).toFixed(1) + "%";
-          var ele = {
-            y: num,
-            text: "",
-            tooltip: "<div style='color:green;margin-right:10px;'><span style='white-space:nowrap;'>" + name + ":" + percent + "</span><br/><span>(" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ")</span></div>"
-          };
-          series.push(ele);
-        }
-
-        //construct chart
-        var pieChart = new Chart(chartNode);
-
-        pieChart.setTheme(MiamiNice);
-
-        pieChart.addPlot('default', {
-          type: Pie,
-          animate: {
-            duration: 2000,
-            easing: easing.bounceInOut
-          },
-          radius: 100,
-          markers: true
-        });
-
-        pieChart.addSeries(media.title, series);
-        new MoveSlice(pieChart, "default");
-        new Highlight(pieChart, "default");
-        new Tooltip(pieChart, "default");
-
-        pieChart.connectToPlot('default', lang.hitch(this, function (evt) {
-          var g = this.chartLayer.graphics[evt.index];
-          if (evt.type === 'onmouseover') {
-            this._setHightLightSymbol(g);
-          }
-          else if (evt.type === 'onmouseout') {
-            this._setFeatureSymbol(g);
-          }
-        }));
-
-        pieChart.render();
-        pieChart.totalSum = sum;
-
-        return pieChart;
-      }
+            portalutils.isNameAvailable(checkServiceNameUrl, token, featureServiceName).then(lang.hitch(this, function(response0) {
+              if (response0.available) {
+                //set the widget to busy
+                this.busyIndicator.show();
+                //create the service
+                portalutils.createFeatureService(createServiceUrl, token, portalutils.getFeatureServiceParams(featureServiceName, this.map)).then(lang.hitch(this, function(response1) {
+                  if (response1.success) {
+                    var addToDefinitionUrl = response1.serviceurl.replace(new RegExp('rest', 'g'), "rest/admin") + "/addToDefinition";
+                    portalutils.addDefinitionToService(addToDefinitionUrl, token, portalutils.getLayerParams(featureServiceName, this.map, this._renderer)).then(lang.hitch(this, function(response2) {
+                      if (response2.success) {
+                        //Push features to new layer
+                        var newFeatureLayer = new FeatureLayer(response1.serviceurl + "/0?token=" + token, {
+                          id: featureServiceName,
+                          outFields: ["*"],
+                              
+                         });                        
+                        this.map.addLayers([newFeatureLayer]);
+                        
+                        var newGraphics = [];
+                        array.forEach(this.ERGArea.graphics, function (g) {
+                          newGraphics.push(new Graphic(g.geometry, null, {type: g.attributes["type"]}));
+                        }, this);
+                        newFeatureLayer.applyEdits(newGraphics, null, null).then(lang.hitch(this, function(){
+                          this._reset();                                
+                        })).otherwise(lang.hitch(this,function(){
+                          this._reset();
+                        })); 
+                        this.busyIndicator.hide();
+                        var newURL = '<br /><a href="' +this.appConfig.portalUrl + "home/item.html?id=" + response1.itemId + '" target="_blank">';
+                        this.publishMessage.innerHTML = this.nls.successfullyPublished.format(newURL) + '</a>';
+                        
+                      }                      
+                    }), function(err2) {
+                      this.busyIndicator.hide();
+                      this.publishMessage.innerHTML = this.nls.addToDefinition.format(err2.message);                                                    
+                    });                    
+                  } else {
+                    this.busyIndicator.hide();
+                    this.publishMessage.innerHTML = this.nls.unableToCreate.format(featureServiceName);                    
+                  }
+                }), function(err1) {
+                  this.busyIndicator.hide();
+                  this.publishMessage.innerHTML = this.nls.createService.format(err1.message);                  
+                });
+              } else {
+                  this.busyIndicator.hide();
+                  this.publishMessage.innerHTML = this.nls.publishingFailedLayerExists.format(featureServiceName); 
+                  
+              }
+            }), function(err0) {
+              this.busyIndicator.hide();
+              this.publishMessage.innerHTML = this.nls.checkService.format(err0.message);
+            });
+          }))
+        }));        
+      }     
     });
   });
