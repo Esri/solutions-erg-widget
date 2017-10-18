@@ -186,7 +186,7 @@ define([
       },
 
       postCreate: function () {
-        //modify String's prototype so we can format a string using .format requried for IE
+        //modify String's prototype so we can format a string using .format required for IE
         if (!String.prototype.format) {
           String.prototype.format = function() {
             var args = arguments;
@@ -199,7 +199,7 @@ define([
           };
         }
         
-        //modify String's prototype so we can search a string using .includes requried for IE
+        //modify String's prototype so we can search a string using .includes required for IE
          if (!String.prototype.includes) {
              String.prototype.includes = function() {
                  'use strict';
