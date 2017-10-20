@@ -186,7 +186,7 @@ define([
       },
 
       postCreate: function () {
-        //modify String's prototype so we can format a string using .format required for IE
+        //modify String's prototype so we can format a string using .format requried for IE
         if (!String.prototype.format) {
           String.prototype.format = function() {
             var args = arguments;
@@ -199,7 +199,7 @@ define([
           };
         }
         
-        //modify String's prototype so we can search a string using .includes required for IE
+        //modify String's prototype so we can search a string using .includes requried for IE
          if (!String.prototype.includes) {
              String.prototype.includes = function() {
                  'use strict';
@@ -272,10 +272,14 @@ define([
         this.ERGArea = new FeatureLayer(featureCollection,{
           id: "ERG-Graphic",
           outFields: ["*"]
-        });   
+        });
         
         //add the ERG feature layer and the ERG extent graphics layer to the map 
         this.map.addLayers([this.ERGArea,this._spillLocation]);
+        
+        // show or hide labels
+        featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById("ERG-Graphic");
+        featureLayerInfo.enablePopup();
         
         //set up coordinate input dijit for ERG Spill Location
         this.ERGCoordTool = new coordInput({nls: this.nls, appConfig: this.appConfig}, this.newERGPointOriginCoords);      
@@ -1160,6 +1164,17 @@ define([
                               
                          });                        
                         this.map.addLayers([newFeatureLayer]);
+                        
+                        //must ensure the layer is loaded before we can access it to turn on the labels if required
+                        if(newFeatureLayer.loaded){
+                          featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
+                          featureLayerInfo.enablePopup();                         
+                        } else {
+                          newFeatureLayer.on("load", lang.hitch(this, function () {
+                            featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
+                            featureLayerInfo.enablePopup();                            
+                          }));
+                        }
                         
                         var newGraphics = [];
                         array.forEach(this.ERGArea.graphics, function (g) {
