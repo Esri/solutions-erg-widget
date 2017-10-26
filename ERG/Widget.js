@@ -841,7 +841,6 @@ define([
                   message: this.nls.parseCoordinatesError
                 });
               } else {
-                this._reset();
                 topic.publish(
                   'ERG-center-point-input',
                   this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry
