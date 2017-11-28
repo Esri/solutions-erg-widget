@@ -46,7 +46,7 @@ In order to develop and test widgets you need to deploy the GRG directory to the
 
 ## Issues
 
-Find a bug or want to request a new feature?  Please let us know by submitting an [issue](https://github.com/ArcGIS/solutions-erg-widget/issues/new).
+Find a bug or want to request a new feature?  Please let us know by submitting an [issue](https://github.com/Esri/solutions-erg-widget/issues/new).
 
 ## Contributing
 
