@@ -16,12 +16,10 @@
 
 define([
   'dojo/_base/declare',
-  'dojo/topic',
   'dijit/form/ValidationTextBox',
   './Coordinate'
 ], function (
   dojoDeclare,
-  dojoTopic,
   dijitValidationTextBox,
   Coord
 ) {
@@ -58,7 +56,7 @@ define([
     /**
      *
      **/
-    validator: function (value, contstraints) {
+    validator: function (value) {
 
       if (!this.validateOnInput) {return true;}
       //if (this.get('value').length < 4) return false;

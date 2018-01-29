@@ -29,7 +29,7 @@ define([
   'dojo/query',
   'dijit/registry',
   'dijit/form/Select',
-  'jimu/dijit/SymbolChooser',  
+  'jimu/dijit/SymbolChooser'  
 ],
   function (
     declare,
@@ -71,7 +71,8 @@ define([
               "transparency": this.config.erg.symbology[node.id].transparency
             });
           node.startup();          
-          dijitRegistry.byId(this.dropdownNodes[i].id).set('value',this.config.erg.symbology[node.id].type);
+          dijitRegistry.byId(this.dropdownNodes[i].id).set('value',
+            this.config.erg.symbology[node.id].type);
         }));
         
         //send by default updated parameters

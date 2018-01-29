@@ -19,7 +19,6 @@ define([
   'dojo/_base/array',
   'dojo/_base/lang',
   'dojo/Stateful',
-  'dojo/topic',
   'dojo/Deferred',
   'esri/geometry/Point',
   'esri/SpatialReference',
@@ -33,7 +32,6 @@ define([
   dojoArray,
   dojoLang,
   dojoStateful,
-  dojoTopic,
   DojoDeferred,
   EsriPoint,
   EsriSpatialReference,
@@ -76,7 +74,7 @@ define([
     
     _coordinateEsriGeometrySetter: function (value) {
         var pt;
-        if (value == null) return;
+        if (value === null) {return;}
       if (value.spatialReference.wkid !== 4326) {
         pt = EsriWMUtils.webMercatorToGeographic(value);
       } else {
@@ -102,10 +100,11 @@ define([
       var sanitizedInput = this.util.getCleanInput(this.inputString);
       this.util.getCoordinateType(sanitizedInput).then(dojoLang.hitch(this, function(itm){
         if (itm) {
-          if (itm.length == 1) {
+          if (itm.length === 1) {
             var sortedInput = this.processCoordTextInput(sanitizedInput, itm[0],false);
-            this.util.getXYNotation(sortedInput, itm[0].conversionType).then(dojoLang.hitch(this,function(r){
-              if (r.length <= 0 || (!r[0][0] && r[0][0] != 0)){
+            this.util.getXYNotation(sortedInput, itm[0].conversionType).then(
+              dojoLang.hitch(this,function(r){
+              if (r.length <= 0 || (!r[0][0] && r[0][0] !== 0)){
                 this.hasError = true;
                 this.valid = false;
                 this.message = 'Invalid Coordinate';
@@ -115,11 +114,12 @@ define([
                 this.valid = true;
                 this.formatType = itm[0].conversionType;                
                 this.inputType = itm[0].conversionType;
-                this.coordinateEsriGeometry = new EsriPoint(r[0][0],r[0][1],new EsriSpatialReference({wkid: 4326}));
+                this.coordinateEsriGeometry = 
+                  new EsriPoint(r[0][0],r[0][1],new EsriSpatialReference({wkid: 4326}));
                 this.message = 'Invalid Coordinate';
                 this.inputTypeDef.resolve(this);
               }              
-              })), dojoLang.hitch(this, function (r) {
+              })), dojoLang.hitch(this, function () {
                 this.hasError = true;
                 this.valid = false;
                 this.inputType = 'UNKNOWN';
@@ -137,11 +137,12 @@ define([
             
             dialog.show().then(dojoLang.hitch(this, function() {                    
               var singleMatch = dojoArray.filter(itm, function (singleItm) {
-                return singleItm.name == dialog.content.comboOptions.get('value');
+                return singleItm.name === dialog.content.comboOptions.get('value');
               });
               var withStr = this.processCoordTextInput(sanitizedInput, singleMatch[0],false);
-              this.util.getXYNotation(withStr, singleMatch[0].conversionType).then(dojoLang.hitch(this,function(r) {
-                  if (r.length <= 0 || (!r[0][0] && r[0][0] != 0)){
+              this.util.getXYNotation(withStr, singleMatch[0].conversionType).then(
+                dojoLang.hitch(this,function(r) {
+                  if (r.length <= 0 || (!r[0][0] && r[0][0] !== 0)){
                   this.hasError = true;
                   this.valid = false;
                   this.message = 'Invalid Coordinate';
@@ -151,11 +152,12 @@ define([
                   this.valid = true;
                   this.inputType = itm[0].conversionType;
                   this.formatType = itm[0].conversionType;
-                  this.coordinateEsriGeometry = new EsriPoint(r[0][0],r[0][1],new EsriSpatialReference({wkid: 4326}));
+                  this.coordinateEsriGeometry = 
+                    new EsriPoint(r[0][0],r[0][1],new EsriSpatialReference({wkid: 4326}));
                   this.message = '';
                   this.inputTypeDef.resolve(this);
                 }              
-                })), dojoLang.hitch(this, function (r) {
+                })), dojoLang.hitch(this, function () {
                   this.hasError = true;
                   this.valid = false;
                   this.inputType = 'UNKNOWN';
@@ -163,7 +165,7 @@ define([
                   this.inputTypeDef.resolve(this);
                 });
             }, function() {
-               deferred.reject();
+              this.inputTypeDef.reject();
             }));
           }
         } else {            
@@ -184,7 +186,8 @@ define([
         
         var match = asType.pattern.exec(withStr);            
         
-        var northSouthPrefix, northSouthSuffix, eastWestPrefix, eastWestSuffix, latDeg, longDeg, latMin, longMin, latSec, longSec;
+        var northSouthPrefix, northSouthSuffix, eastWestPrefix, eastWestSuffix;
+        var latDeg, longDeg, latMin, longMin, latSec, longSec;
         
         var prefixSuffixError = false;
         
@@ -262,7 +265,7 @@ define([
         //check for north/south prefix/suffix
         if(northSouthPrefix && northSouthSuffix) {
               prefixSuffixError = true;                    
-              new RegExp(/[Ss-]/).test(northSouthPrefix)?northSouthPrefix = '-':northSouthPrefix = '+';
+              northSouthPrefix = new RegExp(/[Ss-]/).test(northSouthPrefix)?'-':'+';
             } else {
               if(northSouthPrefix && new RegExp(/[Ss-]/).test(northSouthPrefix)){
                 northSouthPrefix = '-';
@@ -278,7 +281,7 @@ define([
         //check for east/west prefix/suffix
         if(eastWestPrefix && eastWestSuffix) {
           prefixSuffixError = true;                    
-          new RegExp(/[Ww-]/).test(eastWestPrefix)?eastWestPrefix = '-':eastWestPrefix = '+';
+          eastWestPrefix = new RegExp(/[Ww-]/).test(eastWestPrefix)?'-':'+';
         } else {
           if(eastWestPrefix && new RegExp(/[Ww-]/).test(eastWestPrefix)){
             eastWestPrefix = '-';
@@ -303,10 +306,12 @@ define([
             withStr = northSouthPrefix + latDeg + "," + eastWestPrefix + longDeg;
             break;              
           case 'DDM':
-            withStr = northSouthPrefix + latDeg + " " + latMin + "," + eastWestPrefix + longDeg + " " + longMin;
+            withStr = northSouthPrefix + latDeg + " " + latMin + "," + 
+              eastWestPrefix + longDeg + " " + longMin;
             break;
           case 'DMS':
-            withStr = northSouthPrefix + latDeg + " " + latMin + " " + latSec + "," + eastWestPrefix + longDeg + " " + longMin + " " + longSec;
+            withStr = northSouthPrefix + latDeg + " " + latMin + " " + 
+              latSec + "," + eastWestPrefix + longDeg + " " + longMin + " " + longSec;
             break;
           default:
             withStr = withStr;              

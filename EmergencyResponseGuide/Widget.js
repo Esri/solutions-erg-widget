@@ -15,34 +15,24 @@
 ///////////////////////////////////////////////////////////////////////////
 
 define([
-  'dojo/dom',
+  'dojo',
   'dojo/_base/declare',
   'jimu/BaseWidget',
   'dojo/_base/array',
   'dojo/_base/lang',
   'dojo/dom-class',
-  'dojo/dom-attr',
   'dojo/dom-construct',
-  'dojo/dom-style',
   'dojo/json',
   'dojo/on',
-  'dojo/keys',
-  'dojo/query',  
+  'dojo/keys',  
   'dojo/string',
-  'dojo/store/Memory',
   'dojo/topic',
-  'dojo/_base/html',
   'dojo/text!./guide/materials.json',
   
-  'dijit/form/FilteringSelect',
   'dijit/_WidgetBase',
   'dijit/_WidgetsInTemplateMixin',
-  'dijit/registry',
   'dijit/TooltipDialog',
   'dijit/popup',
-  'dijit/Menu',
-  'dijit/MenuItem',
-  'dijit/MenuSeparator',
   
   'jimu/dijit/Message',
   'jimu/dijit/LoadingIndicator',
@@ -50,14 +40,11 @@ define([
   'jimu/utils',
   
   'esri/IdentityManager',
-  'esri/arcgis/OAuthInfo',
   'esri/arcgis/Portal',
-  'esri/config',
   'esri/Color',
   'esri/dijit/util/busyIndicator',
   'esri/graphic',
   'esri/geometry/geometryEngine',
-  'esri/geometry/Extent',
   'esri/geometry/Point',  
   'esri/geometry/Polygon',
   'esri/geometry/Circle',
@@ -65,70 +52,51 @@ define([
   'esri/graphicsUtils',
   'esri/layers/FeatureLayer',
   'esri/layers/GraphicsLayer',
-  'esri/layers/LabelClass',
   'esri/SpatialReference',
-  'esri/symbols/Font',
   'esri/symbols/SimpleMarkerSymbol',
-  'esri/symbols/SimpleFillSymbol',
-  'esri/symbols/TextSymbol',
-  'esri/toolbars/draw',
   'esri/renderers/UniqueValueRenderer',
-  'esri/tasks/query',
   'esri/request',
   
   './js/Settings',
   './js/CoordinateInput',
   './js/DrawFeedBack',
-  './js/EditOutputCoordinate',
-  './js/jquery.easy-autocomplete',
+  './js/EditOutputCoordinate',  
   './js/portal-utils',
   './js/WeatherInfo',
+  './js/jquery.easy-autocomplete',
   
   'dijit/form/NumberTextBox',
   'dijit/form/RadioButton',
-  'dijit/form/NumberSpinner',
+  'dijit/form/NumberSpinner'
 ],
   function (
-    dojoDom,
+    dojo,
     declare,
     BaseWidget,
     array,
     lang,
     domClass,
-    domAttr,
     domConstruct,
-    domStyle,
     JSON,
     on,
     keys,
-    query,
     dojoString,
-    Memory,
     topic,
-    html,
     materials,
-    FilteringSelect,
     dijitWidgetBase,    
     dijitWidgetsInTemplate,
-    dijitRegistry,
     dijitTooltipDialog,
-    dijitPopup,
-    Menu, 
-    MenuItem, 
-    MenuSeparator,      
+    dijitPopup,      
     Message,
     LoadingIndicator,
     jimuLayerInfos,
     utils,
     esriId,
-    esriOAuthInfo,
     esriPortal,
-    esriConfig,
     Color,
     busyIndicator,
     Graphic,
     GeometryEngine,
-    Extent,
     Point,
     Polygon,
     Circle,
@@ -136,21 +104,14 @@ define([
     graphicsUtils,
     FeatureLayer,
     GraphicsLayer,
-    LabelClass,
     SpatialReference,
-    Font,
     SimpleMarkerSymbol,
-    SimpleFillSymbol,
-    TextSymbol,
-    Draw,
     UniqueValueRenderer,
-    Query,
     esriRequest,
     Settings,
     coordInput,
     drawFeedBackPoint,
     editOutputCoordinate,
-    autoComplete,
     portalutils,    
     WeatherInfo
   ) {
@@ -191,9 +152,7 @@ define([
           String.prototype.format = function() {
             var args = arguments;
             return this.replace(/{(\d+)}/g, function(match, number) { 
-              return typeof args[number] != 'undefined'
-                ? args[number]
-                : match
+              return typeof args[number] !== 'undefined'? args[number]: match
               ;
             });
           };
@@ -216,10 +175,10 @@ define([
           }, {
             useProxy: false
           });
-          weatherDeferred.then(lang.hitch(this, function(response) {
+          weatherDeferred.then(lang.hitch(this, function() {
             this._useWeather = true;
             dojo.removeClass(this.weatherContainer, 'ERGHidden');
-          }), lang.hitch(this, function(error) {
+          }), lang.hitch(this, function() {
             this._useWeather = false;
             dojo.addClass(this.weatherContainer, 'ERGHidden');
           }));
@@ -264,7 +223,7 @@ define([
               "alias": "type",
               "type": "esriFieldTypeString"
             }],            
-            "extent": this.map.extent,
+            "extent": this.map.extent
           }
         };
         
@@ -277,12 +236,27 @@ define([
         //add the ERG feature layer and the ERG extent graphics layer to the map 
         this.map.addLayers([this.ERGArea,this._spillLocation]);
         
-        // show or hide labels
-        featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById("ERG-Graphic");
-        featureLayerInfo.enablePopup();
+        var featureLayerInfo;
+        //must ensure the layer is loaded before we can access it to turn on the labels if required
+        if(this.ERGArea.loaded){
+          // show or hide labels
+          featureLayerInfo = 
+            jimuLayerInfos.getInstanceSync().getLayerInfoById("ERG-Graphic");
+          featureLayerInfo.enablePopup();          
+        } else {
+          this.ERGArea.on("load", lang.hitch(this, function () {
+            // show or hide labels
+            featureLayerInfo = 
+              jimuLayerInfos.getInstanceSync().getLayerInfoById("ERG-Graphic");
+            featureLayerInfo.enablePopup();
+          }));
+        }
         
         //set up coordinate input dijit for ERG Spill Location
-        this.ERGCoordTool = new coordInput({nls: this.nls, appConfig: this.appConfig}, this.newERGPointOriginCoords);      
+        this.ERGCoordTool = new coordInput({
+          nls: this.nls, 
+          appConfig: this.appConfig
+        }, this.newERGPointOriginCoords);      
         this.ERGCoordTool.inputCoordinate.formatType = 'DD';
         this.ERGCoordinateFormat = new dijitTooltipDialog({
           content: new editOutputCoordinate({nls: this.nls}),
@@ -292,7 +266,10 @@ define([
         //we need an extra class added the the coordinate format node for the Dart theme 
         if(this.appConfig.theme.name === 'DartTheme')
         {
-          domClass.add(this.ERGCoordinateFormat.domNode, 'dartThemeClaroDijitTooltipContainerOverride');
+          domClass.add(
+            this.ERGCoordinateFormat.domNode,
+            'dartThemeClaroDijitTooltipContainerOverride'
+          );
         }
         
         // add extended toolbar for drawing ERG Spill Location
@@ -309,7 +286,10 @@ define([
       startup: function () {
         
         this.inherited(arguments);
-        this.busyIndicator = busyIndicator.create({target: this.domNode.parentNode.parentNode.parentNode, backgroundOpacity: 0});
+        this.busyIndicator = busyIndicator.create({
+          target: this.domNode.parentNode.parentNode.parentNode, 
+          backgroundOpacity: 0
+        });
         this._setTheme(); 
         
         //load in the materials json file
@@ -325,7 +305,9 @@ define([
           template: {
             type: "custom",
             method: lang.hitch(this, function(value, item) {
-              return "<a href='" + this.folderUrl + "guide/" + item.GuideNum + ".pdf' target='_blank'><img height='18px' src='" + this.folderUrl + "images/pdf.png' /></a>  " + value;
+              return "<a href='" + this.folderUrl + "guide/" + item.GuideNum + 
+                ".pdf' target='_blank'><img height='18px' src='" + 
+                this.folderUrl + "images/pdf.png' /></a>  " + value;
             })
           },
           list: {
@@ -334,11 +316,12 @@ define([
             },
             onChooseEvent: lang.hitch(this, function() {
               var index = $(this.materialType).getSelectedItemIndex();
-              this._selectedMaterial = $(this.materialType).getSelectedItemData(index);              
+              this._selectedMaterial = 
+                $(this.materialType).getSelectedItemData(index);              
               if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
-                var alertMessage = new Message({
+                new Message({
                   message: this.nls.table3Message
-                })
+                });
                 this.windSpeed.set('disabled', false);
                 this.transportContainer.set('disabled', false);
                 dojo.removeClass(this.table3Container, 'ERGHidden');                
@@ -348,9 +331,9 @@ define([
                 this.transportContainer.set('disabled', true);
               }              
               if (this._selectedMaterial.BLEVE){
-                var alertMessage = new Message({
+                new Message({
                   message: this.nls.bleveMessage
-                })
+                });
                 this.useBleve.set('disabled', false);
                 this.tankCapacity.set('disabled', false);
                 dojo.removeClass(this.bleveContainer, 'ERGHidden');
@@ -490,6 +473,7 @@ define([
             //Handle change in coord input      
             this.own(this.ERGCoordTool.inputCoordinate.watch('outputString', lang.hitch(this,
               function (r, ov, nv) {
+                r = ov = null;
                 if(!this.ERGCoordTool.manualInput){
                   this.ERGCoordTool.set('value', nv);
                 }
@@ -499,6 +483,7 @@ define([
             //Handle change in start point and update coord input
             this.own(this.dt.watch('startPoint', lang.hitch(this, 
               function (r, ov, nv) {
+                r = ov = null;
                 this.ERGCoordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
                 this.dt.addStartGraphic(nv, this._ptSym, this._spillLocation);
                 if(this._useWeather) {
@@ -530,9 +515,9 @@ define([
             this.own(on(this.spillSize, 'change', lang.hitch(this, function () { 
               if(this._selectedMaterial) {
                 if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
-                  var alertMessage = new Message({
+                  new Message({
                     message: this.nls.table3Message
-                  })
+                  });
                   this.windSpeed.set('disabled', false);
                   this.transportContainer.set('disabled', false);
                   dojo.removeClass(this.table3Container, 'ERGHidden');
@@ -571,7 +556,7 @@ define([
             this.own(on(this.ERGAreaBySizePublishERGButton, 'click', lang.hitch(this, function () {
               if(this.addERGNameArea.isValid()) {
                 this.publishMessage.innerHTML = '';
-                this._initSaveToPortal(this.addERGNameArea.value)
+                this._initSaveToPortal(this.addERGNameArea.value);
               } else {
                 // Invalid entry
                 this.publishMessage.innerHTML = this.nls.missingLayerNameMessage;
@@ -641,35 +626,59 @@ define([
         this.own(this._SettingsInstance.on("settingsChanged",
           lang.hitch(this, function (updatedSettings) {
             
-            var spillLocationFillColor = new Color(updatedSettings.spillLocationFillColor.color);            
-            var spillLocationFillTrans = (1 - updatedSettings.spillLocationFillColor.transparency) * 255;
-            var spillLocationOutlineColor = new Color(updatedSettings.spillLocationOutlineColor.color);            
-            var spillLocationOutlineTrans = (1 - updatedSettings.spillLocationOutlineColor.transparency) * 255;
+            var spillLocationFillColor = 
+              new Color(updatedSettings.spillLocationFillColor.color); 
+            var spillLocationFillTrans = 
+              (1 - updatedSettings.spillLocationFillColor.transparency) * 255;
+            var spillLocationOutlineColor = 
+              new Color(updatedSettings.spillLocationOutlineColor.color);            
+            var spillLocationOutlineTrans = 
+              (1 - updatedSettings.spillLocationOutlineColor.transparency) * 255;
             
-            var IIZoneFillColor = new Color(updatedSettings.IIZoneFillColor.color);            
-            var IIZoneFillTrans = (1 - updatedSettings.IIZoneFillColor.transparency) * 255;
-            var IIZoneOutlineColor = new Color(updatedSettings.IIZoneOutlineColor.color);            
-            var IIZoneOutlineTrans = (1 - updatedSettings.IIZoneOutlineColor.transparency) * 255;
+            var IIZoneFillColor = 
+              new Color(updatedSettings.IIZoneFillColor.color);            
+            var IIZoneFillTrans = 
+              (1 - updatedSettings.IIZoneFillColor.transparency) * 255;
+            var IIZoneOutlineColor = 
+              new Color(updatedSettings.IIZoneOutlineColor.color);            
+            var IIZoneOutlineTrans = 
+              (1 - updatedSettings.IIZoneOutlineColor.transparency) * 255;
             
-            var PAZoneFillColor = new Color(updatedSettings.PAZoneFillColor.color);            
-            var PAZoneFillTrans = (1 - updatedSettings.PAZoneFillColor.transparency) * 255;
-            var PAZoneOutlineColor = new Color(updatedSettings.PAZoneOutlineColor.color);            
-            var PAZoneOutlineTrans = (1 - updatedSettings.PAZoneOutlineColor.transparency) * 255;
+            var PAZoneFillColor = 
+              new Color(updatedSettings.PAZoneFillColor.color);            
+            var PAZoneFillTrans = 
+              (1 - updatedSettings.PAZoneFillColor.transparency) * 255;
+            var PAZoneOutlineColor = 
+              new Color(updatedSettings.PAZoneOutlineColor.color);            
+            var PAZoneOutlineTrans = 
+              (1 - updatedSettings.PAZoneOutlineColor.transparency) * 255;
             
-            var downwindZoneFillColor = new Color(updatedSettings.downwindZoneFillColor.color);            
-            var downwindZoneFillTrans = (1 - updatedSettings.downwindZoneFillColor.transparency) * 255;
-            var downwindZoneOutlineColor = new Color(updatedSettings.downwindZoneOutlineColor.color);            
-            var downwindZoneOutlineTrans = (1 - updatedSettings.downwindZoneOutlineColor.transparency) * 255;
+            var downwindZoneFillColor = 
+              new Color(updatedSettings.downwindZoneFillColor.color);            
+            var downwindZoneFillTrans = 
+              (1 - updatedSettings.downwindZoneFillColor.transparency) * 255;
+            var downwindZoneOutlineColor = 
+              new Color(updatedSettings.downwindZoneOutlineColor.color);            
+            var downwindZoneOutlineTrans = 
+              (1 - updatedSettings.downwindZoneOutlineColor.transparency) * 255;
             
-            var fireZoneFillColor = new Color(updatedSettings.fireZoneFillColor.color);            
-            var fireZoneFillTrans = (1 - updatedSettings.fireZoneFillColor.transparency) * 255;
-            var fireZoneOutlineColor = new Color(updatedSettings.fireZoneOutlineColor.color);            
-            var fireZoneOutlineTrans = (1 - updatedSettings.fireZoneOutlineColor.transparency) * 255;
+            var fireZoneFillColor = 
+              new Color(updatedSettings.fireZoneFillColor.color);            
+            var fireZoneFillTrans = 
+              (1 - updatedSettings.fireZoneFillColor.transparency) * 255;
+            var fireZoneOutlineColor = 
+              new Color(updatedSettings.fireZoneOutlineColor.color);            
+            var fireZoneOutlineTrans = 
+              (1 - updatedSettings.fireZoneOutlineColor.transparency) * 255;
             
-            var bleveZoneFillColor = new Color(updatedSettings.bleveZoneFillColor.color);            
-            var bleveZoneFillTrans = (1 - updatedSettings.bleveZoneFillColor.transparency) * 255;
-            var bleveZoneOutlineColor = new Color(updatedSettings.bleveZoneOutlineColor.color);            
-            var bleveZoneOutlineTrans = (1 - updatedSettings.bleveZoneOutlineColor.transparency) * 255;
+            var bleveZoneFillColor = 
+              new Color(updatedSettings.bleveZoneFillColor.color);            
+            var bleveZoneFillTrans = 
+              (1 - updatedSettings.bleveZoneFillColor.transparency) * 255;
+            var bleveZoneOutlineColor = 
+              new Color(updatedSettings.bleveZoneOutlineColor.color);            
+            var bleveZoneOutlineTrans = 
+              (1 - updatedSettings.bleveZoneOutlineColor.transparency) * 255;
             
             var uvrJson = {"type": "uniqueValue",
               "field1": "Type",
@@ -687,9 +696,15 @@ define([
               "uniqueValueInfos": [{
                 "value": "Spill Location",
                 "symbol": {
-                  "color": [spillLocationFillColor.r,spillLocationFillColor.g,spillLocationFillColor.b,spillLocationFillTrans],
+                  "color": [spillLocationFillColor.r,
+                    spillLocationFillColor.g,
+                    spillLocationFillColor.b,
+                    spillLocationFillTrans],
                   "outline": {
-                    "color": [spillLocationOutlineColor.r,spillLocationOutlineColor.g,spillLocationOutlineColor.b,spillLocationOutlineTrans],
+                    "color": [spillLocationOutlineColor.r,
+                      spillLocationOutlineColor.g,
+                      spillLocationOutlineColor.b,
+                      spillLocationOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
                     "style": updatedSettings.spillLocationOutlineColor.type
@@ -702,7 +717,10 @@ define([
                 "symbol": {
                   "color": [IIZoneFillColor.r,IIZoneFillColor.g,IIZoneFillColor.b,IIZoneFillTrans],
                   "outline": {
-                    "color": [IIZoneOutlineColor.r,IIZoneOutlineColor.g,IIZoneOutlineColor.b,IIZoneOutlineTrans],
+                    "color": [IIZoneOutlineColor.r,
+                      IIZoneOutlineColor.g,
+                      IIZoneOutlineColor.b,
+                      IIZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
                     "style": updatedSettings.IIZoneOutlineColor.type
@@ -715,7 +733,10 @@ define([
                 "symbol": {
                   "color": [PAZoneFillColor.r,PAZoneFillColor.g,PAZoneFillColor.b,PAZoneFillTrans],
                   "outline": {
-                    "color": [PAZoneOutlineColor.r,PAZoneOutlineColor.g,PAZoneOutlineColor.b,PAZoneOutlineTrans],
+                    "color": [PAZoneOutlineColor.r,
+                      PAZoneOutlineColor.g,
+                      PAZoneOutlineColor.b,
+                      PAZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
                     "style": updatedSettings.PAZoneOutlineColor.type
@@ -726,9 +747,15 @@ define([
               }, {
                 "value": "Down Wind",
                 "symbol": {
-                  "color": [downwindZoneFillColor.r,downwindZoneFillColor.g,downwindZoneFillColor.b,downwindZoneFillTrans],
+                  "color": [downwindZoneFillColor.r,
+                    downwindZoneFillColor.g,
+                    downwindZoneFillColor.b,
+                    downwindZoneFillTrans],
                   "outline": {
-                    "color": [downwindZoneOutlineColor.r,downwindZoneOutlineColor.g,downwindZoneOutlineColor.b,downwindZoneOutlineTrans],
+                    "color": [downwindZoneOutlineColor.r,
+                      downwindZoneOutlineColor.g,
+                      downwindZoneOutlineColor.b,
+                      downwindZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
                     "style": updatedSettings.downwindZoneOutlineColor.type
@@ -739,9 +766,15 @@ define([
               }, {
                 "value": "Fire",
                 "symbol": {
-                  "color": [fireZoneFillColor.r,fireZoneFillColor.g,fireZoneFillColor.b,fireZoneFillTrans],
+                  "color": [fireZoneFillColor.r,
+                    fireZoneFillColor.g,
+                    fireZoneFillColor.b,
+                    fireZoneFillTrans],
                   "outline": {
-                    "color": [fireZoneOutlineColor.r,fireZoneOutlineColor.g,fireZoneOutlineColor.b,fireZoneOutlineTrans],
+                    "color": [fireZoneOutlineColor.r,
+                      fireZoneOutlineColor.g,
+                      fireZoneOutlineColor.b,
+                      fireZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
                     "style": updatedSettings.fireZoneOutlineColor.type
@@ -752,9 +785,15 @@ define([
               }, {
                 "value": "Bleve",                
                 "symbol": {
-                  "color": [bleveZoneFillColor.r,bleveZoneFillColor.g,bleveZoneFillColor.b,bleveZoneFillTrans],
+                  "color": [bleveZoneFillColor.r,
+                    bleveZoneFillColor.g,
+                    bleveZoneFillColor.b,
+                    bleveZoneFillTrans],
                   "outline": {
-                    "color": [bleveZoneOutlineColor.r,bleveZoneOutlineColor.g,bleveZoneOutlineColor.b,bleveZoneOutlineTrans],
+                    "color": [bleveZoneOutlineColor.r,
+                      bleveZoneOutlineColor.g,
+                      bleveZoneOutlineColor.b,
+                      bleveZoneOutlineTrans],
                     "width": 1,
                     "type": "esriSLS",
                     "style": updatedSettings.bleveZoneOutlineColor.type
@@ -763,7 +802,7 @@ define([
                   "style": updatedSettings.bleveZoneFillColor.type
                 }
               }]
-            }
+            };
             
             // create a renderer for the ERG layer to override default symbology
             this._renderer = new UniqueValueRenderer(uvrJson);
@@ -837,7 +876,7 @@ define([
           this.ERGCoordTool.inputCoordinate.getInputType().then(lang.hitch(this, 
             function (r) {
               if(r.inputType === "UNKNOWN"){
-                var alertMessage = new Message({
+                new Message({
                   message: this.nls.parseCoordinatesError
                 });
               } else {
@@ -908,7 +947,8 @@ define([
           var spatialReference = new SpatialReference({wkid:102100});
           
           //get the spill location
-          var spillLocation = WebMercatorUtils.geographicToWebMercator(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
+          var spillLocation = WebMercatorUtils.geographicToWebMercator(
+            this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
           
           // clear any existing ERG overlays
           this._clearLayers(true);
@@ -919,7 +959,8 @@ define([
             PAAttributeValue = this.spillSize.getValue() + "_" + this.spillTime.getValue();
           } else {
             IIAttributeValue = this.transportContainer.getValue() + "_ISO";
-            PAAttributeValue = this.transportContainer.getValue() + this.spillTime.getValue() + this.windSpeed.getValue();
+            PAAttributeValue = this.transportContainer.getValue() + 
+              this.spillTime.getValue() + this.windSpeed.getValue();
           }
           
           //set the IA and PA distances
@@ -937,7 +978,8 @@ define([
           // show BLEVE zone
           if(this.useBleve.checked && this._selectedMaterial.BLEVE){            
             bleveAttributeValue = this.tankCapacity.getValue();
-            var bleveZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial[bleveAttributeValue],'meters');
+            var bleveZone = GeometryEngine.geodesicBuffer(spillLocation,
+              this._selectedMaterial[bleveAttributeValue],'meters');
             var bleveZoneGraphic = new Graphic(bleveZone);
             bleveZoneGraphic.setAttributes({"type": "Bleve"});
             features.push(bleveZoneGraphic);
@@ -945,16 +987,19 @@ define([
           
           // show Fire evaction zone
           if(this.fire.checked){
-            var fireZone = GeometryEngine.geodesicBuffer(spillLocation,this._selectedMaterial['FIRE_ISO'],'meters');
+            var fireZone = GeometryEngine.geodesicBuffer(spillLocation,
+              this._selectedMaterial.FIRE_ISO,'meters');
             var fireZoneGraphic = new Graphic(fireZone);
             fireZoneGraphic.setAttributes({"type": "Fire"});
             features.push(fireZoneGraphic);
           }
           
-          if(this._selectedMaterial.Material.includes('Substances') || this._selectedMaterial.BLEVE) {
-            // Materials with the word Substances in their title or BLEVE values do not have any PA distances
+          if(this._selectedMaterial.Material.includes('Substances') || 
+            this._selectedMaterial.BLEVE) {
+            // Materials with the word Substances in their title or BLEVE 
+            // values do not have any PA distances
             // warn the user to this then zoom to the II Zone
-            var alertMessage = new Message({
+            new Message({
               message: this.nls.noPAZoneMessage
             }); 
           } else {          
@@ -974,7 +1019,7 @@ define([
             var PAZone = new Circle({
                 center: PACenter,
                 radius: PADistance/2,
-                geodesic: true,
+                geodesic: true
             });
             
             // get the two bottom corners of the PA Zone - these will be swapped out below
@@ -982,11 +1027,14 @@ define([
             var PAPoint1 = new Point(PAZoneExtent.xmin,PAZoneExtent.ymin,spatialReference);
             var PAPoint2 = new Point(PAZoneExtent.xmax,PAZoneExtent.ymin,spatialReference);
             
-            // Compute the "protective action arc" - the arc at the limit of the protective action zone
+            // Compute the "protective action arc" - 
+            // the arc at the limit of the protective action zone
             var paBuffer = GeometryEngine.geodesicBuffer(spillLocation,PADistance,'meters');
-            var protectiveActionArc = GeometryEngine.intersect(paBuffer,Polygon.fromExtent(PAZoneExtent));
+            var protectiveActionArc = GeometryEngine.intersect(
+              paBuffer,Polygon.fromExtent(PAZoneExtent));
                       
-            // get the 2 coordinates where the initial isolation zone intersects with the protective action distance
+            // get the 2 coordinates where the initial isolation zone intersects with
+            // the protective action distance
             var iiPoint1 = IIZone.getPoint(0,270);
             var iiPoint2 = IIZone.getPoint(0,90);
             
@@ -1000,10 +1048,11 @@ define([
             }));
             
             var protectiveActionArea = GeometryEngine.difference(protectiveActionArc,IIZone);
-            
             // all geometry so far is orientated north so rotate what we need to the wind direction
-            protectiveActionArea = GeometryEngine.rotate(protectiveActionArea,this.windDirection.getValue() * -1,spillLocation);         
-            PAZoneArea = GeometryEngine.rotate(Polygon.fromExtent(PAZoneExtent),this.windDirection.getValue() * -1,spillLocation);
+            protectiveActionArea = GeometryEngine.rotate(protectiveActionArea,
+              this.windDirection.getValue() * -1,spillLocation);         
+            var PAZoneArea = GeometryEngine.rotate(Polygon.fromExtent(PAZoneExtent),
+              this.windDirection.getValue() * -1,spillLocation);
                       
             var PAAGraphic = new Graphic(protectiveActionArea);
             PAAGraphic.setAttributes({"type": "Down Wind"});
@@ -1034,6 +1083,7 @@ define([
       * reset the weather info
       **/
       _resetWeatherInfo: function () {
+        var info;
         this.weather.innerHTML = "";
         var tpc = domConstruct.create("div", {
           id: "tpc",
@@ -1056,8 +1106,12 @@ define([
         domClass.add(div2, "ERGcolSmall");
         
         // credits
-        var txt = "<a style='color:#6e6e6e;text-decoration:none' href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'><img style='height:36px;margin-top: 10px;' src='" 
-          + this.folderUrl + "images/darksky.png' />" + '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 'Dark Sky</a></span>';
+        var txt = "<a style='color:#6e6e6e;text-decoration:none'" +
+         "href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'>" +
+         "<img style='height:36px;margin-top: 10px;' src='" + 
+          this.folderUrl + "images/darksky.png' />" + 
+          '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 
+          'Dark Sky</a></span>';
         var divCredit  = domConstruct.create("div", {
           innerHTML: txt
         }, tpc);
@@ -1110,9 +1164,11 @@ define([
           this._removeStyleFile(this.folderUrl + "css/dartTheme.css", 'css');
         }
         //Check if DashBoardTheme
-        if (this.appConfig.theme.name === "DashboardTheme" && this.appConfig.theme.styles[0] === "default"){
+        if (this.appConfig.theme.name === "DashboardTheme" && 
+          this.appConfig.theme.styles[0] === "default"){
           //Load appropriate CSS for dashboard theme
-          utils.loadStyleLink('darkDashboardOverrideCSS', this.folderUrl + "css/dashboardTheme.css", null);
+          utils.loadStyleLink('darkDashboardOverrideCSS', 
+            this.folderUrl + "css/dashboardTheme.css", null);
         } else {
           this._removeStyleFile(this.folderUrl + "css/dashboardTheme.css", 'css');
         }
@@ -1126,7 +1182,6 @@ define([
         this.inherited(arguments);        
         this.map.removeLayer(this._spillLocation);
         this.map.removeLayer(this.ERGArea);
-        console.log('ERG widget distroyed')
       },
       
       /**
@@ -1135,82 +1190,107 @@ define([
       _initSaveToPortal: function(layerName) {        
         esriId.registerOAuthInfos();        
         var featureServiceName = layerName;
-        esriId.getCredential(this.appConfig.portalUrl + "/sharing", { oAuthPopupConfirmation: false }).then(lang.hitch(this, function() {
+        esriId.getCredential(this.appConfig.portalUrl + "/sharing", { 
+          oAuthPopupConfirmation: false }).then(lang.hitch(this, function() {
           //sign in
-          new esriPortal.Portal(this.appConfig.portalUrl).signIn().then(lang.hitch(this, function(portalUser) {
+          new esriPortal.Portal(this.appConfig.portalUrl).signIn().then(
+            lang.hitch(this, function(portalUser) {
            //Get the token
             var token = portalUser.credential.token;
             var orgId = portalUser.orgId;
             var userName = portalUser.username;
             
-            var checkServiceNameUrl = this.appConfig.portalUrl + "sharing/rest/portals/" + orgId + "/isServiceNameAvailable";
-            var createServiceUrl = this.appConfig.portalUrl + "sharing/content/users/" + userName + "/createService"; 
+            var checkServiceNameUrl = 
+              this.appConfig.portalUrl + "sharing/rest/portals/" + 
+              orgId + "/isServiceNameAvailable";
+            var createServiceUrl = 
+              this.appConfig.portalUrl + 
+              "sharing/content/users/" + userName + "/createService"; 
 
-            portalutils.isNameAvailable(checkServiceNameUrl, token, featureServiceName).then(lang.hitch(this, function(response0) {
+            portalutils.isNameAvailable(checkServiceNameUrl, token, featureServiceName).then(
+              lang.hitch(this, function(response0) {
               if (response0.available) {
                 //set the widget to busy
                 this.busyIndicator.show();
                 //create the service
-                portalutils.createFeatureService(createServiceUrl, token, portalutils.getFeatureServiceParams(featureServiceName, this.map)).then(lang.hitch(this, function(response1) {
+                portalutils.createFeatureService(createServiceUrl, token, 
+                  portalutils.getFeatureServiceParams(featureServiceName, this.map)).then(
+                    lang.hitch(this, function(response1) {
                   if (response1.success) {
-                    var addToDefinitionUrl = response1.serviceurl.replace(new RegExp('rest', 'g'), "rest/admin") + "/addToDefinition";
-                    portalutils.addDefinitionToService(addToDefinitionUrl, token, portalutils.getLayerParams(featureServiceName, this.map, this._renderer)).then(lang.hitch(this, function(response2) {
+                    var addToDefinitionUrl = 
+                      response1.serviceurl.replace(new RegExp('rest', 'g'), "rest/admin") + 
+                        "/addToDefinition";
+                    portalutils.addDefinitionToService(addToDefinitionUrl, 
+                      token, portalutils.getLayerParams(featureServiceName, 
+                        this.map, this._renderer)).then(lang.hitch(this, function(response2) {
                       if (response2.success) {
                         //Push features to new layer
-                        var newFeatureLayer = new FeatureLayer(response1.serviceurl + "/0?token=" + token, {
-                          id: featureServiceName,
-                          outFields: ["*"],
-                              
-                         });                        
+                        var newFeatureLayer = 
+                          new FeatureLayer(response1.serviceurl + "/0?token=" + token, {
+                            id: featureServiceName,
+                            outFields: ["*"]                           
+                          });                        
                         this.map.addLayers([newFeatureLayer]);
                         
-                        //must ensure the layer is loaded before we can access it to turn on the labels if required
+                        var featureLayerInfo;
+                        // must ensure the layer is loaded before we can access 
+                        // it to turn on the labels if required
                         if(newFeatureLayer.loaded){
-                          featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
+                          featureLayerInfo = 
+                            jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
                           featureLayerInfo.enablePopup();                         
                         } else {
                           newFeatureLayer.on("load", lang.hitch(this, function () {
-                            featureLayerInfo = jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
+                            featureLayerInfo = 
+                              jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
                             featureLayerInfo.enablePopup();                            
                           }));
                         }
                         
                         var newGraphics = [];
                         array.forEach(this.ERGArea.graphics, function (g) {
-                          newGraphics.push(new Graphic(g.geometry, null, {type: g.attributes["type"]}));
+                          newGraphics.push(new Graphic(g.geometry, null, 
+                            {type: g.attributes.type}));
                         }, this);
-                        newFeatureLayer.applyEdits(newGraphics, null, null).then(lang.hitch(this, function(){
+                        newFeatureLayer.applyEdits(newGraphics, null, null).then(
+                          lang.hitch(this, function(){
                           this._reset();                                
                         })).otherwise(lang.hitch(this,function(){
                           this._reset();
                         })); 
                         this.busyIndicator.hide();
-                        var newURL = '<br /><a href="' +this.appConfig.portalUrl + "home/item.html?id=" + response1.itemId + '" target="_blank">';
-                        this.publishMessage.innerHTML = this.nls.successfullyPublished.format(newURL) + '</a>';
+                        var newURL = '<br /><a href="' + this.appConfig.portalUrl + 
+                          "home/item.html?id=" + response1.itemId + '" target="_blank">';
+                        this.publishMessage.innerHTML = 
+                          this.nls.successfullyPublished.format(newURL) + '</a>';
                         
                       }                      
                     }), function(err2) {
                       this.busyIndicator.hide();
-                      this.publishMessage.innerHTML = this.nls.addToDefinition.format(err2.message);                                                    
+                      this.publishMessage.innerHTML = 
+                        this.nls.addToDefinition.format(err2.message); 
                     });                    
                   } else {
                     this.busyIndicator.hide();
-                    this.publishMessage.innerHTML = this.nls.unableToCreate.format(featureServiceName);                    
+                    this.publishMessage.innerHTML = 
+                      this.nls.unableToCreate.format(featureServiceName);                    
                   }
                 }), function(err1) {
                   this.busyIndicator.hide();
-                  this.publishMessage.innerHTML = this.nls.createService.format(err1.message);                  
+                  this.publishMessage.innerHTML = 
+                    this.nls.createService.format(err1.message);                  
                 });
               } else {
                   this.busyIndicator.hide();
-                  this.publishMessage.innerHTML = this.nls.publishingFailedLayerExists.format(featureServiceName); 
+                  this.publishMessage.innerHTML = 
+                    this.nls.publishingFailedLayerExists.format(featureServiceName); 
                   
               }
             }), function(err0) {
               this.busyIndicator.hide();
               this.publishMessage.innerHTML = this.nls.checkService.format(err0.message);
             });
-          }))
+          }));
         }));        
       }     
     });
