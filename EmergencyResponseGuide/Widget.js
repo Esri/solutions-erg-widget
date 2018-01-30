@@ -62,7 +62,7 @@ define([
   './js/DrawFeedBack',
   './js/EditOutputCoordinate',  
   './js/portal-utils',
-  './js/WeatherInfoYahoo',
+  './js/WeatherInfo',
   './js/jquery.easy-autocomplete',
   
   'dijit/form/NumberTextBox',
@@ -125,7 +125,9 @@ define([
       _lastOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _currentOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _useWeather: false, //Flag to hold if weather is to be used
-      _weatherURL: 'https://query.yahooapis.com/v1/public/yql?', //Weather URL
+      _weatherURL: 'https://query.yahooapis.com/v1/public/yql?', //Weather URL for Yahoo
+      //_weatherURL: 'http://coolmaps.esri.com/Weather/info.php?v=1', //Weather URL for DarkSky
+      _weatherSource: 'Yahoo', //options Yahoo or DarkSky
       _SettingsInstance: null, //Object to hold Settings instance
       _spillLocationSym: null, //Object to hold spill Location Symbol
       _IIZoneSym: null, //Object to hold II Zone Symbol
@@ -168,7 +170,11 @@ define([
         
         // determine if weather URL can be reached 
         if(this._weatherURL){
-          var requestURL = this._weatherURL + "q=select wind,item.condition from weather.forecast where woeid = 56570399&format=json";
+          if(this._weatherSource === 'Yahoo') {
+            var requestURL = this._weatherURL + "q=select wind,item.condition from weather.forecast where woeid = 56570399&format=json";
+          } else {
+            var requestURL = this._weatherURL + "&q=45,45&callbackNode=LocalPerspective";
+          }
           var weatherDeferred = esriRequest({
             url: requestURL,
             callbackParamName: "callback"
@@ -178,17 +184,16 @@ define([
           weatherDeferred.then(lang.hitch(this, function() {
             this._useWeather = true;
             dojo.removeClass(this.weatherContainer, 'ERGHidden');
-            this._weatherInfo = new WeatherInfo(this.weather, this._weatherURL, this);   
+            this._weatherInfo = new WeatherInfo(this.weather, this._weatherURL, this);
+            //set up blank weather info        
+            this._weatherInfo._resetWeatherInfo(this._weatherSource,this.nls.weatherIntialText); 
           }), lang.hitch(this, function() {
             this._useWeather = false;
             dojo.addClass(this.weatherContainer, 'ERGHidden');
           }));
         }
         
-        this.inherited(arguments);
-        
-        //set up blank weather info        
-        this._resetWeatherInfo();        
+        this.inherited(arguments); 
         
         //set up the symbology used for the interactive point draw tools        
         this.pointSymbol = {
@@ -284,8 +289,7 @@ define([
         this._createSettings();
       },
 
-      startup: function () {
-        
+      startup: function () {        
         this.inherited(arguments);
         this.busyIndicator = busyIndicator.create({
           target: this.domNode.parentNode.parentNode.parentNode, 
@@ -602,7 +606,7 @@ define([
           dojo.addClass(this.CreateERGButton, 'jimu-state-disabled');
           this.ERGCoordTool.clear();
           if(this._useWeather) {
-            this._resetWeatherInfo();
+            this._weatherInfo._resetWeatherInfo(this._weatherSource,this.nls.weatherIntialText);
           }
         }
       },
@@ -1073,46 +1077,6 @@ define([
           this.map.setExtent(graphicsUtils.graphicsExtent(this.ERGArea.graphics).expand(2),false);
           this._showPanel("resultsPage");
         }
-      },
-                  
-      /**
-      * reset the weather info
-      **/
-      _resetWeatherInfo: function () {
-        var info;
-        this.weather.innerHTML = "";
-        var tpc = domConstruct.create("div", {
-          id: "tpc",
-          style: "width: 100%;"
-        }, this.weather);
-        domClass.add(tpc, "IMT_tabPanelContent");
-        
-        // current        
-        info = "<img style='height:76px' src='" + this.folderUrl + "images/w/dunno.png' />";
-        var div = domConstruct.create("div", {
-          innerHTML: info
-        }, tpc);
-        domClass.add(div, "ERGcolSmallUnknown");
-
-        info = '<br/><span>' + this.nls.weatherIntialText + '</span>';
-        
-        var div2 = domConstruct.create("div", {
-          innerHTML: info
-        }, tpc);
-        domClass.add(div2, "ERGcolSmall");
-        
-        // credits
-        var txt = "<a style='color:#6e6e6e;text-decoration:none'" +
-         "href='https://www.yahoo.com/news/weather/' title='Yahoo Weather' target='_blank'>"+
-         "<img style='height:36px;margin-top: 10px;' src='" + 
-          this.folderUrl + "images/yahoo.png' />" + 
-          '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 
-          'Yahoo</a></span>';
-        var divCredit  = domConstruct.create("div", {
-          innerHTML: txt
-        }, tpc);
-        domClass.add(divCredit, "ERGcolSmall");
-        domClass.add(divCredit, "ERGcolLast");
       },
       
       /**
