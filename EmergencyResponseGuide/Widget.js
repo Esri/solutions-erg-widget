@@ -170,10 +170,13 @@ define([
         
         // determine if weather URL can be reached 
         if(this._weatherURL){
+          var requestURL;
           if(this._weatherSource === 'Yahoo') {
-            var requestURL = this._weatherURL + "q=select wind,item.condition from weather.forecast where woeid = 56570399&format=json";
+            requestURL = this._weatherURL + 
+              "q=select wind,item.condition from weather.forecast" + 
+              " where woeid = 56570399&format=json";
           } else {
-            var requestURL = this._weatherURL + "&q=45,45&callbackNode=LocalPerspective";
+            requestURL = this._weatherURL + "&q=45,45&callbackNode=LocalPerspective";
           }
           var weatherDeferred = esriRequest({
             url: requestURL,
@@ -487,7 +490,8 @@ define([
                 this.ERGCoordTool.inputCoordinate.set('coordinateEsriGeometry', nv);
                 this.dt.addStartGraphic(nv, this._ptSym, this._spillLocation);
                 if(this._useWeather) {
-                  this._weatherInfo.updateForIncident(this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
+                  this._weatherInfo.updateForIncident(
+                    this.ERGCoordTool.inputCoordinate.coordinateEsriGeometry);
                 }
               }
             )));
