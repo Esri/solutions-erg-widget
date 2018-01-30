@@ -372,7 +372,7 @@ define([
       }, tpc);
       domClass.add(div, "ERGcolSmallUnknown");
 
-      info = '<br/><span>' + message + '</span>';
+      info = '<span>' + message + '</span>';
       
       var div2 = domConstruct.create("div", {
         innerHTML: info
