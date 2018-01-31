@@ -1,6 +1,6 @@
 define({
   root: ({
-    _widgetLabel: "ERG", // Label of widget
+    _widgetLabel: "Emergency Response Guide", // Label of widget
     
     //ERG Main Page Panel    
     "ergMainPageTitle": "Based on the Emergency Response Guidebook 2016", // Shown as title for new ERG from point panel

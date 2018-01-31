@@ -43,8 +43,9 @@ define([
         postCreate: function () {
           this.label1.innerHTML = this.numberOfInputs + " " + this.nls.notationsMatch;
           for (var i = 0; i < this.selectOptions.length; i++) {
-              this.comboOptions.addOption({ value: this.selectOptions[i].name , label: this.selectOptions[i].notationType});
+              this.comboOptions.addOption({ value: this.selectOptions[i].name , 
+                label: this.selectOptions[i].notationType});
           }
-       },
+       }
     });
 });

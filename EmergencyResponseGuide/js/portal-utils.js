@@ -15,26 +15,10 @@
 ///////////////////////////////////////////////////////////////////////////
 
 define([
-  'esri/geometry/Point',
-  'esri/geometry/Polygon',  
-  'esri/geometry/geometryEngine',
-  'esri/graphic',
-  'esri/geometry/webMercatorUtils',
-  'esri/SpatialReference',
-  'esri/geometry/Circle',
   'esri/request',
-  'jimu/dijit/Message',  
   'dojo/json'
 ], function(
-  Point,
-  Polygon,
-  geometryEngine,
-  Graphic,
-  webMercatorUtils,
-  SpatialReference,
-  EsriCircle,
   esriRequest,
-  Message,  
   JSON
 ) {
   
@@ -70,7 +54,7 @@ define([
         "xssPreventionRule" : "InputOnly",
         "xssInputRule" : "rejectInvalid"
       }
-    }
+    };
   },
 
   portalUtil.getLayerParams = function (layerName, map, renderer) {          
@@ -87,7 +71,7 @@ define([
           "name": layerName,
           "type": "Feature Layer",
           "displayField": "",
-          "description": "A GRG (Gridded Reference Graphic) is a grid overlay used for a common reference point in many situations - from cordon and search operations to security for presidential inaugurations.",
+          "description": "",
           "tags" : "GRG",
           "copyrightText": "",
           "defaultVisibility": true,
@@ -183,7 +167,7 @@ define([
           "capabilities": "Query,Editing,Create,Update,Delete"
         }
       ]
-    }        
+    };        
   },
   
   portalUtil.isNameAvailable = function (serviceName, token, featureServiceName) {
@@ -231,7 +215,7 @@ define([
       callbackParamName: "callback"                          
     },{usePost: true});
     return def;
-  }
+  };
   
   return portalUtil;
 });

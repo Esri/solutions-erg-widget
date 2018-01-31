@@ -17,7 +17,6 @@
 define([
     'dojo/_base/declare',
     'dojo/_base/lang',
-    'dojo/_base/Color',
     'dojo/on',
     'dojo/query',
     'dojo/Stateful',
@@ -29,7 +28,7 @@ define([
     'dijit/form/HorizontalSlider',
     "dijit/form/NumberSpinner"
   ],
-  function(declare, lang, Color, on, query, dojoStateful, html,
+  function(declare, lang, on, query, dojoStateful, html,
            _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template,
            HorizontalSlider) {
     return declare([dojoStateful, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {

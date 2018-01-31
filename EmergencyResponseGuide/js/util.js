@@ -172,76 +172,103 @@ define([
       return deferred.promise;
     },
     
-    getNotations: function () {    
+    getNotations: function () {
       var strs = [
-        {
-          name: 'DD',
-          pattern: /^(([NS\+\-\s])*([0-8]?\d([,.]\d*)?|90([,.]0*)?)([°˚º^~*]*)([NS\+\-\s])*)([,:;\s|\/\\]+)(([EW\+\-\s])*([0]?\d?\d([,.]\d*)?|1[0-7]\d([,.]\d*)?|180([,.]0*)?)([°˚º^~*]*)([EW\+\-\s])*)$/,
-          notationType: "DD - Latitude/Longitude",
-          conversionType: "DD"
-        }, {
-          name: 'DDrev',
-          pattern: /^(([EW\+\-\s])*([0]?\d?\d([,.]\d*)?|1[0-7]\d([,.]\d*)?|180([,.]0*)?)([°˚º^~*]*)([EW\+\-\s])*)([,:;\s|\/\\]+)(([NS\+\-\s])*([0-8]?\d([,.]\d*)?|90([,.]0*)?)([°˚º^~*]*)([NS\+\-\s])*)$/,
-          notationType: "DD - Longitude/Latitude",
-          conversionType: "DD"
-        }, {
-          name: 'DDM',
-          pattern: /^(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)['′\s_]*([NS\+\-\s])*)([,:;\s|\/\\]+)(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+(([0-5]\d|\d)([,.]\d*)?)['′\s_]*([EW\+\-\s])*)[\s]*$/,
-          notationType: "DDM - Latitude/Longitude",
-          conversionType: "DDM"                    
-        }, {
-          name: 'DDMrev',
-          pattern: /^(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+(([0-5]\d|\d)([,.]\d*)?)['′\s_]*([EW\+\-\s])*)([,:;\s|\/\\]+)(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)['′\s_]*([NS\+\-\s])*)[\s]*$/,
-          notationType: "DDM - Longitude/Latitude",
-          conversionType: "DDM"                    
-        }, {
-          name: 'DMS',
-          pattern: /^(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+([0-5]?\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([NS\+\-\s])*)([,:;\s|\/\\]+)(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+([0-5]\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([EW\+\-\s])*)[\s]*$/,
-          notationType: "DMS - Latitude/Longitude",
-          conversionType: "DMS" 
-        }, {
-          name: 'DMSrev',
-          pattern: /^(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+([0-5]\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([EW\+\-\s])*)([,:;\s|\/\\]+)(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+([0-5]?\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([NS\+\-\s])*)[\s]*$/,
-          notationType: "DMS - Longitude/Latitude",
-          conversionType: "DMS" 
-        }, {
-          name: 'GARS',
-          pattern: /^\d{3}[a-zA-Z]{2}[1-4]?[1-9]?$/,
-          notationType: "GARS",
-          conversionType: "GARS"
-        }, {
-          name: 'GEOREF',
-          pattern: /^[a-zA-Z]{4}\d{1,8}$/,
-          notationType: "GEOREF",
-          conversionType: "GEOREF"
-        }, {
-          name: 'MGRS',
-          pattern: /^\d{1,2}[-,;:\s]*[C-HJ-NP-X][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d[-,;:\s]+\d|\d{2}[-,;:\s]+\d{2}|\d{3}[-,;:\s]+\d{3}|\d{4}[-,;:\s]+\d{4}|\d{5}[-,;:\s]+\d{5})$|^(\d{1,2}[-,;:\s]*[C-HJ-NP-X][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*)(\d{2}|\d{4}|\d{6}|\d{8}|\d{10})?$|^[ABYZ][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d[-,;:\s]+\d|\d{2}[-,;:\s]+\d{2}|\d{3}[-,;:\s]+\d{3}|\d{4}[-,;:\s]+\d{4}|\d{5}[-,;:\s]+\d{5})$|^[ABYZ][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d{2}|\d{4}|\d{6}|\d{8}|\d{10})?$/,
-          notationType: "MGRS",
-          conversionType: "MGRS"
-        },
-        //not sure if USNG is needed as its exactly the same as MGRS
-        /*{
-          name: 'USNG',
-          pattern: /^\d{1,2}[-,;:\s]*[C-HJ-NP-X][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d[-,;:\s]+\d|\d{2}[-,;:\s]+\d{2}|\d{3}[-,;:\s]+\d{3}|\d{4}[-,;:\s]+\d{4}|\d{5}[-,;:\s]+\d{5})$|^(\d{1,2}[-,;:\s]*[C-HJ-NP-X][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*)(\d{2}|\d{4}|\d{6}|\d{8}|\d{10})?$|^[ABYZ][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d[-,;:\s]+\d|\d{2}[-,;:\s]+\d{2}|\d{3}[-,;:\s]+\d{3}|\d{4}[-,;:\s]+\d{4}|\d{5}[-,;:\s]+\d{5})$|^[ABYZ][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d{2}|\d{4}|\d{6}|\d{8}|\d{10})?$/,
-          notationType: "USNG",
-          conversionType: "USNG"
-        },*/ 
-        {
-          name: 'UTM',
-          pattern: /^\d{1,2}[-,;:\s]*[c-hj-np-xC-HJ-NP-X][-,;:\s]*\d{1,6}\.?\d*[mM]?[-,;:\s]?\d{1,7}\.?\d*[mM]?$/,
-          notationType: "UTM - Band Letter",
-          conversionType: "UTM"
-        }, {
-          name: 'UTM (H)',
-          pattern: /^\d{1,2}[-,;:\s]*[NnSs][-,;:\s]*\d{1,6}\.?\d*[mM]?[-,;:\s]+\d{1,7}\.?\d*[mM]?$/,
-          notationType: "UTM - Hemisphere (N/S)",
-          conversionType: "UTM (H)"
-        }
+      {
+      name: "DD",
+      pattern: new RegExp([
+      /^(([NS\+\-\s])*([0-8]?\d([,.]\d*)?|90([,.]0*)?)([°˚º^~*]*)([NS\+\-\s])*)([,:;\s|\/\\]+)/,
+      /(([EW\+\-\s])*([0]?\d?\d([,.]\d*)?|1[0-7]\d([,.]\d*)?|180([,.]0*)?)([°˚º^~*]*)([EW\+\-\s])*)$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "DD - Latitude/Longitude",
+      conversionType: "DD"
+      }, {
+      name: "DDrev",
+      pattern: new RegExp([
+      /^(([EW\+\-\s])*([0]?\d?\d([,.]\d*)?|1[0-7]\d([,.]\d*)?|180([,.]0*)?)([°˚º^~*]*)([EW\+\-\s])*)/,
+      /([,:;\s|\/\\]+)(([NS\+\-\s])*([0-8]?\d([,.]\d*)?|90([,.]0*)?)([°˚º^~*]*)([NS\+\-\s])*)$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "DD - Longitude/Latitude",
+      conversionType: "DD"
+      }, {
+      name: "DDM",
+      pattern: new RegExp([
+      /^(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)['′\s_]*([NS\+\-\s])*)/,
+      /([,:;\s|\/\\]+)/,
+      /(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+(([0-5]\d|\d)([,.]\d*)?)['′\s_]*([EW\+\-\s])*)/,
+      /[\s]*$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "DDM - Latitude/Longitude",
+      conversionType: "DDM"
+      }, {
+      name: "DDMrev",
+      pattern: new RegExp([
+      /^(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+(([0-5]\d|\d)([,.]\d*)?)['′\s_]*([EW\+\-\s])*)/,
+      /([,:;\s|\/\\]+)/,
+      /(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)['′\s_]*([NS\+\-\s])*)[\s]*$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "DDM - Longitude/Latitude",
+      conversionType: "DDM"
+      }, {
+      name: "DMS",
+      pattern: new RegExp([
+      /^(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+([0-5]?\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([NS\+\-\s])*)/,
+      /([,:;\s|\/\\]+)/,
+      /(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+([0-5]\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([EW\+\-\s])*)[\s]*$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "DMS - Latitude/Longitude",
+      conversionType: "DMS"
+      }, {
+      name: "DMSrev",
+      pattern: new RegExp([
+      /^(([EW\+\-\s])*([0]?\d?\d|1[0-7]\d|180)[°˚º^~*\s\-_]+([0-5]\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([EW\+\-\s])*)/,
+      /([,:;\s|\/\\]+)/,
+      /(([NS\+\-\s])*([0-8]?\d|90)[°˚º^~*\s\-_]+([0-5]?\d|\d)['′\s\-_]+(([0-5]?\d|\d)([,.]\d*)?)["¨˝\s_]*([NS\+\-\s])*)[\s]*$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "DMS - Longitude/Latitude",
+      conversionType: "DMS"
+      }, {
+      name: "GARS",
+      pattern: /^\d{3}[a-zA-Z]{2}[1-4]?[1-9]?$/,
+      notationType: "GARS",
+      conversionType: "GARS"
+      }, {
+      name: "GEOREF",
+      pattern: /^[a-zA-Z]{4}\d{1,8}$/,
+      notationType: "GEOREF",
+      conversionType: "GEOREF"
+      }, {
+      name: "MGRS",
+      pattern: new RegExp([
+      /^\d{1,2}[-,;:\s]*[C-HJ-NP-X][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*/,
+      /(\d[-,;:\s]+\d|\d{2}[-,;:\s]+\d{2}|\d{3}[-,;:\s]+\d{3}|\d{4}[-,;:\s]+\d{4}|\d{5}[-,;:\s]+\d{5})/,
+      /$|^(\d{1,2}[-,;:\s]*[C-HJ-NP-X][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*)/,
+      /(\d{2}|\d{4}|\d{6}|\d{8}|\d{10})?$|^[ABYZ][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*/,
+      /(\d[-,;:\s]+\d|\d{2}[-,;:\s]+\d{2}|\d{3}[-,;:\s]+\d{3}|\d{4}[-,;:\s]+\d{4}|\d{5}[-,;:\s]+\d{5})/,
+      /$|^[ABYZ][-,;:\s]*[A-HJ-NP-Z]{2}[-,;:\s]*(\d{2}|\d{4}|\d{6}|\d{8}|\d{10})?$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "MGRS",
+      conversionType: "MGRS"
+      },
+      {
+      name: "UTM",
+      pattern: new RegExp([
+        /^\d{1,2}[-,;:\s]*[c-hj-np-xC-HJ-NP-X][-,;:\s]*\d{1,6}\.?\d*[mM]?[-,;:\s]?\d{1,7}\.?\d*[mM]?$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "UTM - Band Letter",
+      conversionType: "UTM"
+      }, {
+      name: "UTM (H)",
+      pattern: new RegExp([
+        /^\d{1,2}[-,;:\s]*[NnSs][-,;:\s]*\d{1,6}\.?\d*[mM]?[-,;:\s]+\d{1,7}\.?\d*[mM]?$/
+      ].map(function(r) {return r.source;}).join("")),
+      notationType: "UTM - Hemisphere (N/S)",
+      conversionType: "UTM (H)"
+      }
       ];
-      
+    
       return strs;
-    },
+      },
 
     getCoordinateType: function (fromInput) {
       var clnInput = this.getCleanInput(fromInput);
@@ -251,7 +278,7 @@ define([
       var strs = this.getNotations();
 
       var matchedtype = dojoArray.filter(strs, function (itm) {
-        return itm.pattern.test(this.v)               
+        return itm.pattern.test(this.v);               
       }, {
         v:clnInput
       });
@@ -278,8 +305,8 @@ define([
       r.londeg = parts[1].replace(/[eEwW]/, '');
       
       if (addSignPrefix) {
-        parts[0].slice(-1) === 'N'?r.latdeg = '+' + r.latdeg:r.latdeg = '-' + r.latdeg;         
-        parts[1].slice(-1) === "W"?r.londeg = '-' + r.londeg:r.londeg = '+' + r.londeg;
+        r.latdeg =parts[0].slice(-1) === 'N'?'+' + r.latdeg:'-' + r.latdeg;         
+        r.londeg = parts[1].slice(-1) === "W"?'-' + r.londeg:'+' + r.londeg;
       }
 
       var s = withFormatStr.replace(/X/, r.londeg);
@@ -307,8 +334,8 @@ define([
       r.lonmin = r.parts[3].replace(/[eEwW]/, '');
                   
       if (addSignPrefix) {
-        r.parts[1].slice(-1) === 'N'?r.latdeg = '+' + r.latdeg:r.latdeg = '-' + r.latdeg;
-        r.parts[3].slice(-1) === 'W'?r.londeg = '-' + r.londeg:r.londeg = '+' + r.londeg;
+        r.latdeg = r.parts[1].slice(-1) === 'N'?'+' + r.latdeg:'-' + r.latdeg;
+        r.londeg = r.parts[3].slice(-1) === 'W'?'-' + r.londeg:'+' + r.londeg;
       }
 
       //A° B'N X° Y'E
@@ -343,8 +370,8 @@ define([
       r.lonsec = r.parts[5].replace(/[EWew]/, ''); 
       
       if (addSignPrefix) {
-        r.parts[2].slice(-1) === 'N'?r.latdeg = '+' + r.latdeg:r.latdeg = '-' + r.latdeg;
-        r.parts[5].slice(-1) ==='W'?r.londeg = '-' + r.londeg:r.londeg = '+' + r.londeg;            
+        r.latdeg = r.parts[2].slice(-1) === 'N'?'+' + r.latdeg:'-' + r.latdeg;
+        r.londeg = r.parts[5].slice(-1) ==='W'?'-' + r.londeg:'+' + r.londeg;            
       }
      
       //A° B' C''N X° Y' Z''E
@@ -364,7 +391,7 @@ define([
     /**
      *
      **/
-    getFormattedUSNGStr: function (fromValue, withFormatStr, addSignPrefix) {
+    getFormattedUSNGStr: function (fromValue, withFormatStr) {
       var r = {};
       r.sourceValue = fromValue;
       r.sourceFormatString = withFormatStr;
@@ -391,7 +418,7 @@ define([
     /**
      *
      **/
-    getFormattedMGRSStr: function (fromValue, withFormatStr, addSignPrefix) {
+    getFormattedMGRSStr: function (fromValue, withFormatStr) {
       var r = {};
       r.sourceValue = fromValue;
       r.sourceFormatString = withFormatStr;
@@ -418,7 +445,7 @@ define([
     /**
      *
      **/
-    getFormattedGARSStr: function (fromValue, withFormatStr, addSignPrefix) {
+    getFormattedGARSStr: function (fromValue, withFormatStr) {
       var r = {};
       r.sourceValue = fromValue;
       r.sourceFormatString = withFormatStr;
@@ -443,7 +470,7 @@ define([
     /**
      *
      **/
-    getFormattedGEOREFStr: function (fromValue, withFormatStr, addSignPrefix) {
+    getFormattedGEOREFStr: function (fromValue, withFormatStr) {
       var r = {};
       r.sourceValue = fromValue;
       r.sourceFormatString = withFormatStr;
@@ -473,7 +500,7 @@ define([
     /**
      *
      **/
-    getFormattedUTMStr: function (fromValue, withFormatStr, addSignPrefix, addDirSuffix) {
+    getFormattedUTMStr: function (fromValue, withFormatStr) {
       var r = {};
       r.sourceValue = fromValue;
       r.sourceFormatString = withFormatStr;
@@ -497,7 +524,7 @@ define([
     /**
      *
      **/
-    getFormattedUTMHStr: function (fromValue, withFormatStr, addSignPrefix, addDirSuffix) {
+    getFormattedUTMHStr: function (fromValue, withFormatStr) {
       var r = {};
       r.sourceValue = fromValue;
       r.sourceFormatString = withFormatStr;

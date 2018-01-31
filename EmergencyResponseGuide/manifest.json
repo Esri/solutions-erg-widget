@@ -1,5 +1,6 @@
 {
-  "name": "ERG",
+  "name": "EmergencyResponseGuide",
+  "label": "Emergency Response Guide",
   "platform": "HTML",
   "version": "2.6",
   "wabVersion": "2.6",

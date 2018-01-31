@@ -115,8 +115,7 @@ define([
       weatherDeferred.then(lang.hitch(this, function(response) {
         var info = this._resultsHandler(response);
         return info;
-      }), lang.hitch(this, function(error) {
-        var info = this._errorHandler(error);
+      }), lang.hitch(this, function() {        
       }));
     },
 
@@ -124,10 +123,7 @@ define([
     _resultsHandler: function(response) {
       var data = response.data;
       var current = data.current_condition;
-      var weather = data.weather;
-
-      
-
+        
       this.container.innerHTML = "";
       domClass.remove(this.container, "loading");
 
@@ -262,8 +258,12 @@ define([
       }
 
       // credits
-      var txt = "<a style='color:#6e6e6e;text-decoration:none' href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'><img style='height:36px;margin-top: 10px;' src='" 
-          + this.parent.folderUrl + "images/darksky.png' />" + '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 'Dark Sky</a></span>';
+      var txt = "<a style='color:#6e6e6e;text-decoration:none'" + 
+          "href='https://darksky.net/poweredby/' title='Dark Sky' target='_blank'>"+
+          "<img style='height:36px;margin-top: 10px;' src='" + 
+          this.parent.folderUrl + "images/darksky.png' />" + 
+          '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 
+          'Dark Sky</a></span>';
       var divCredit  = domConstruct.create("div", {
         innerHTML: txt
       }, tpc);
@@ -272,12 +272,8 @@ define([
     },    
 
     // error handler
-    _errorHandler: function(error) {
+    _errorHandler: function() {
       domClass.remove(this.container, "loading");
-      var info = this.parent.nls.weatherErrorMessage;
-      var div = domConstruct.create("div", {
-        innerHTML: info
-      }, this.container);
     }
   });
 
