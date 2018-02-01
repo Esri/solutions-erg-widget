@@ -236,7 +236,7 @@
   height: 16px;
   width: 28px;
   border: 0 none;
-  background: #e04f1d;
+  background: #adadad;
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -254,7 +254,7 @@
   height: 12px;
   width: 12px;
   left: auto;
-  right: 2px;
+  right: 14px;
   top: 2px;
   z-index: 1;
   -webkit-transition: right 0.3s;
@@ -279,7 +279,7 @@
 }
 
 .jimu-widget-ERG .switch-toggle.dijitCheckBox.dijitCheckBoxChecked:before {
-  right: 14px;
+  right: 2px;
 }
 
 .jimu-widget-ERG .dijitTextBox .dijitPlaceHolder{
