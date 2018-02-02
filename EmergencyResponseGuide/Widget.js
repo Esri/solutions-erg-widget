@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 ///////////////////////////////////////////////////////////////////////////
-
+/*globals $:false */
 define([
   'dojo',
   'dojo/_base/declare',
@@ -195,7 +195,7 @@ define([
           }));
         }
         
-        this.inherited(arguments)
+        this.inherited(arguments);
         
         //set up the symbology used for the interactive point draw tools        
         this.pointSymbol = {
@@ -291,7 +291,7 @@ define([
         this._createSettings();
       },
 
-      startup: function ()         
+      startup: function () {        
         this.inherited(arguments);
         this.busyIndicator = busyIndicator.create({
           target: this.domNode.parentNode.parentNode.parentNode, 
