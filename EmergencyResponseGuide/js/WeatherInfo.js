@@ -104,7 +104,7 @@ define([
       } else {
         requestURL = this.weatherURL + "&q=" + coords + "&callbackNode=LocalPerspective";
       }
-      
+
       var weatherDeferred = esriRequest({
         url: requestURL,
         callbackParamName: "callback"
@@ -400,14 +400,14 @@ define([
           this.parent.folderUrl  + "images/darksky.png' />" + 
           '<br /><span style="font-size:11px;color:#6e6e6e">Powered by<br/>' + 
           'Dark Sky</a></span>';
-      }
+      }     
       var divCredit  = domConstruct.create("div", {
         innerHTML: txt
       }, tpc);
       domClass.add(divCredit, "ERGcolSmall");
-      domClass.add(divCredit, "ERGcolLast");      
+      domClass.add(divCredit, "ERGcolLast");
     },
-
+      
     // error handler
     _errorHandler: function() {
       domClass.remove(this.container, "loading");

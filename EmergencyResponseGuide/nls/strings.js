@@ -21,6 +21,7 @@ define({
     
     "weatherLabel": "Current Weather at Spill Location", // Shown as title for weather container
     "weatherIntialText": "<br />Updated once a spill location has been idenitified", // Shown in the weather panel before location has been set
+
     "temperature": "Temperature", // Shown in the temperature label in weather panel
     "wind": "Wind", // Shown in the wind label in weather panel
     "c": "C", // Shown in the celsius (centigrade) label in weather panel

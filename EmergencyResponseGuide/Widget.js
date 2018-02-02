@@ -125,8 +125,7 @@ define([
       _lastOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _currentOpenPanel: "ergMainPage", //Flag to hold last open panel, default will be main page
       _useWeather: false, //Flag to hold if weather is to be used
-      _weatherURL: 'https://query.yahooapis.com/v1/public/yql?', //Weather URL for Yahoo
-      //_weatherURL: 'http://coolmaps.esri.com/Weather/info.php?v=1', //Weather URL for DarkSky
+      _weatherURL: '', //Weather URL for Yahoo
       _weatherSource: 'Yahoo', //options Yahoo or DarkSky
       _SettingsInstance: null, //Object to hold Settings instance
       _spillLocationSym: null, //Object to hold spill Location Symbol
@@ -196,7 +195,7 @@ define([
           }));
         }
         
-        this.inherited(arguments); 
+        this.inherited(arguments)
         
         //set up the symbology used for the interactive point draw tools        
         this.pointSymbol = {
@@ -292,7 +291,7 @@ define([
         this._createSettings();
       },
 
-      startup: function () {        
+      startup: function ()         
         this.inherited(arguments);
         this.busyIndicator = busyIndicator.create({
           target: this.domNode.parentNode.parentNode.parentNode, 
@@ -366,7 +365,7 @@ define([
             })            
           }          
         };
-        $(this.materialType).easyAutocomplete(options);        
+        $(this.materialType).easyAutocomplete(options);
       },
 
       /**
@@ -1082,7 +1081,7 @@ define([
           this._showPanel("resultsPage");
         }
       },
-      
+        
       /**
       * Handle different theme styles
       **/
