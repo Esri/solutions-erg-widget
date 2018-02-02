@@ -20,12 +20,13 @@ define({
     "fireLabel": "Show Fire Isolation Zone", // Shown as label for fire toggle
     
     "weatherLabel": "Current Weather at Spill Location", // Shown as title for weather container
-    "weatherIntialText": "Updated once a spill location has been idenitified", // Shown in the weather panel before location has been set
+    "weatherIntialText": "<br />Updated once a spill location has been idenitified", // Shown in the weather panel before location has been set
+
     "temperature": "Temperature", // Shown in the temperature label in weather panel
     "wind": "Wind", // Shown in the wind label in weather panel
     "c": "C", // Shown in the celsius (centigrade) label in weather panel
     "f": "F", // Shown in the fahrenheit label in weather panel
-    "weatherErrorMessage": "Current Weather information could not be obtained. Manually update the Wind Speed and Time of Spill values",
+    "weatherErrorMessage": "Weather info not obtained. Update Wind Speed and Time of Spill values manually",
         
     "windDirection": "Wind Direction (blowing to)", // Shown as label for wind direction
     

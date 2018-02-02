@@ -21,7 +21,6 @@ define([
   esriRequest,
   JSON
 ) {
-  
   var portalUtil = {};
   
   portalUtil.getFeatureServiceParams = function (featureServiceName, map) {
@@ -219,4 +218,3 @@ define([
   
   return portalUtil;
 });
-
