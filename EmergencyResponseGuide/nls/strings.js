@@ -12,6 +12,7 @@ define({
     "material": "Material", // Shown as title for material input 
     "materialPlaceholder": "Start typing to search for a material", // Shown as prompt text in material input field
     "table3Message": "The material you have selected requires additional information if you are dealing with a large spill.\n\nPlease ensure you have the correct values selected for wind speed and transport container.", // Shown as message box it material is table 3
+    "table2Message": "The material you have selected may produces a large amount of Toxic Inhalation Hazard gases when spilled in water.\n\nYou may want to consider using the following material(s):\n\n", // Shown as message box it material is table 2
     
     "spillSize": "Spill Size", // Shown as title for spill size dropdown
     "small": "Small", // Shown as label for small in spill size dropdown

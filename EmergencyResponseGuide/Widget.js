@@ -324,7 +324,12 @@ define([
             onChooseEvent: lang.hitch(this, function() {
               var index = $(this.materialType).getSelectedItemIndex();
               this._selectedMaterial = 
-                $(this.materialType).getSelectedItemData(index);              
+                $(this.materialType).getSelectedItemData(index);
+              if (this._selectedMaterial.TABLE2){
+                new Message({
+                  message: this.nls.table2Message + this._selectedMaterial.TIH.replace(/\,/g,"\n")
+                });                
+              }                
               if (this._selectedMaterial.TABLE3 && this.spillSize.getValue() === 'LG'){
                 new Message({
                   message: this.nls.table3Message
