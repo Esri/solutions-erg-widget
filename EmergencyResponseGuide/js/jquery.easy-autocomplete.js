@@ -11,7 +11,7 @@
  * EasyAutocomplete - Configuration 
  */
 define([
-  'jimu/loaderplugins/jquery-loader!./widgets/EmergencyResponseGuide/js/jquery-1.11.2.min.js'
+  'jimu/loaderplugins/jquery-loader! ./libs/jquery/jquery-1-11-1.js'
 ],
     
 (function ($) {
@@ -368,11 +368,9 @@ define([
     scope.Logger = function Logger() {
 
       this.error = function(message) {
-        console.log("ERROR: " + message);
       };
 
       this.warning = function(message) {
-        console.log("WARNING: " + message);
       };
     };
 

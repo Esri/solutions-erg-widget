@@ -4,10 +4,10 @@ define({
     
     //ERG Main Page Panel    
     "ergMainPageTitle": "Based on the Emergency Response Guidebook 2016", // Shown as title for new ERG from point panel
-    "coordInputLabelStart": 'Spill Location (DD)', // Shown as label for coordinate input box (DD) denotes that decimal degrees is set as the default
-    "coordInputLabel": 'Spill Location', // Shown as label for coordinate input box
-    "addPointToolTip": 'Add Spill Location', // Show as tooltip help on the draw point icon    
-    "drawPointToolTip": 'Click to add spill location', // Shown as tooltip help on the cursor when using the draw point tool
+    "coordInputLabelStart": "Spill Location (DD)", // Shown as label for coordinate input box (DD) denotes that decimal degrees is set as the default
+    "coordInputLabel": "Spill Location", // Shown as label for coordinate input box
+    "addPointToolTip": "Add Spill Location", // Show as tooltip help on the draw point icon    
+    "drawPointToolTip": "Click to add spill location", // Shown as tooltip help on the cursor when using the draw point tool
     
     "material": "Material", // Shown as title for material input 
     "materialPlaceholder": "Start typing to search for a material", // Shown as prompt text in material input field
@@ -58,88 +58,86 @@ define({
     //Settings Panel
     "settingsTitle": "Settings", // Shown as Title for Grid Settings page and label on settings buttons
     
-    "spillLocationLabel": 'Spill Location', // Shown as Title for Spill Location Settings dropdown
-    "spillLocationButtonLabel": 'Configure Spill Location Settings', // Shown as tooltip for Spill Location Settings dropdown
+    "spillLocationLabel": "Spill Location", // Shown as Title for Spill Location Settings dropdown
+    "spillLocationButtonLabel": "Configure Spill Location Settings", // Shown as tooltip for Spill Location Settings dropdown
     
-    "IISettingsLabel": 'Initial Isolation Zone', // Shown as Title for Initial Isolation Zone Settings dropdown
-    "IIButtonLabel": 'Configure Initial Isolation Settings', // Shown as tooltip for Initial Isolation Zone Settings dropdown
+    "IISettingsLabel": "Initial Isolation Zone", // Shown as Title for Initial Isolation Zone Settings dropdown
+    "IIButtonLabel": "Configure Initial Isolation Settings", // Shown as tooltip for Initial Isolation Zone Settings dropdown
     
-    "PASettingsLabel": 'Protective Action Zone', // Shown as Title for Protective Action Zone Settings dropdown
-    "PAButtonLabel": 'Configure Protective Action Settings', // Shown as tooltip for Protective Action Zone Settings dropdown
+    "PASettingsLabel": "Protective Action Zone", // Shown as Title for Protective Action Zone Settings dropdown
+    "PAButtonLabel": "Configure Protective Action Settings", // Shown as tooltip for Protective Action Zone Settings dropdown
     
-    "downwindSettingsLabel": 'Down Wind Zone', // Shown as Title for Down Wind Zone Settings dropdown
-    "downwindButtonLabel": 'Configure Down Wind Settings', // Shown as tooltip for Down Wind Zone Settings dropdown
+    "downwindSettingsLabel": "Down Wind Zone", // Shown as Title for Down Wind Zone Settings dropdown
+    "downwindButtonLabel": "Configure Down Wind Settings", // Shown as tooltip for Down Wind Zone Settings dropdown
         
-    "fireSettingsLabel": 'Fire Isolation Zone', // Shown as Title for Fire Isolation Zone Settings dropdown
-    "fireButtonLabel": 'Configure Fire Isolation Settings', // Shown as tooltip for Fire Isolation Zone Settings dropdown
+    "fireSettingsLabel": "Fire Isolation Zone", // Shown as Title for Fire Isolation Zone Settings dropdown
+    "fireButtonLabel": "Configure Fire Isolation Settings", // Shown as tooltip for Fire Isolation Zone Settings dropdown
     
-    "bleveSettingsLabel": 'BLEVE Isolation Zone', // Shown as Title for BLEVE Isolation Zone Settings dropdown
-    "bleveButtonLabel": 'Configure BLEVE Settings', // Shown as tooltip for BLEVE Isolation Zone Settings dropdown
+    "bleveSettingsLabel": "BLEVE Isolation Zone", // Shown as Title for BLEVE Isolation Zone Settings dropdown
+    "bleveButtonLabel": "Configure BLEVE Settings", // Shown as tooltip for BLEVE Isolation Zone Settings dropdown
     
-    "outlineStyle": 'Outline Style', // Shown as Title for Fill Style dropdown
+    "outlineStyle": "Outline Style", // Shown as Title for Fill Style dropdown
     
-    "dash": 'Dash',
-    "dashdot": 'Dash Dot',
-    "dashdotdot": 'Dash Dot Dot',
-    "dot": 'Dot',
-    "longdash": 'Long Dash',
-    "longdashdot": 'Long Dash Dot',
-    "null": 'Null',
-    "shortdash": 'Short Dash',
-    "shortdashdot": 'Short Dash Dot',
-    "shortdashdotdot": 'Short Dash Dot Dot',
-    "shortdot": 'Short Dot',
-    "solid": 'Solid',
+    "dash": "Dash", 
+    "dashdot": "Dash Dot", 
+    "dashdotdot": "Dash Dot Dot", 
+    "dot": "Dot", 
+    "longdash": "Long Dash", 
+    "longdashdot": "Long Dash Dot", 
+    "null": "Null", 
+    "shortdash": "Short Dash", 
+    "shortdashdot": "Short Dash Dot", 
+    "shortdashdotdot": "Short Dash Dot Dot", 
+    "shortdot": "Short Dot", 
+    "solid": "Solid", 
     
-    "fillStyle": 'Fill Style', // Shown as Title for Fill Style dropdown
+    "fillStyle": "Fill Style", // Shown as Title for Fill Style dropdown
     
-    "backward": 'Backward',
-    "cross": 'Cross',
-    "diagonal": 'Diagonal',
-    "forward": 'Forward',
-    "horizontal": 'Horizontal',
-    "null": 'Null',
-    "solid": 'Solid',
-    "vertical": 'Vertical',
-    
+    "backward": "Backward", 
+    "cross": "Cross", 
+    "diagonal": "Diagonal", 
+    "forward": "Forward", 
+    "horizontal": "Horizontal", 
+    "null": "Null", 
+    "solid": "Solid", 
+    "vertical": "Vertical",     
     
     //results Panel
     "resultsTitle": "Results", // Shown as Title for Grid Settings page and label on settings buttons
-    "publishERGBtn": 'Publish', // Shown as label on publish ERG button   
-    "ERGLayerName": 'Published ERG Layer Name', // Shown as label for layer name box
-    "invalidERGLayerName": 'Layer name must only contain alpha-numeric characters and underscores', //Shown as validation error on published layer name
-    "missingERGLayerName": 'You must enter a name for the ERG', //Shown as validation error on empty published layer name
+    "publishERGBtn": "Publish", // Shown as label on publish ERG button   
+    "ERGLayerName": "Published ERG Layer Name", // Shown as label for layer name box
+    "invalidERGLayerName": "Layer name must only contain alpha-numeric characters and underscores", //Shown as validation error on published layer name
+    "missingERGLayerName": "You must enter a name for the ERG", //Shown as validation error on empty published layer name
     
     //publishing error messages
-    "publishingFailedLayerExists": 'Publishing Failed: You already have a feature service named {0}. Please choose another name.', //Shown as error for layer name already used when publishing {0} will be replaced with the layer name in the code so do not remove
-    "checkService": 'Check Service: {0}', //{0} will be replaced in the code so do not remove
-    "createService": 'Create Service: {0}', //{0} will be replaced in the code so do not remove
-    "unableToCreate": 'Unable to create: {0}', //{0} will be replaced in the code so do not remove
-    "addToDefinition": 'Add to definition: {0}', //{0} will be replaced in the code so do not remove
-    "successfullyPublished": 'Successfully published web layer{0}Manage the web layer', //{0} will be replaced in the code so do not remove
+    "publishingFailedLayerExists": "Publishing Failed: You already have a feature service named {0}. Please choose another name.", //Shown as error for layer name already used when publishing {0} will be replaced with the layer name in the code so do not remove
+    "checkService": "Check Service: {0}", //{0} will be replaced in the code so do not remove
+    "createService": "Create Service: {0}", //{0} will be replaced in the code so do not remove
+    "unableToCreate": "Unable to create: {0}", //{0} will be replaced in the code so do not remove
+    "addToDefinition": "Add to definition: {0}", //{0} will be replaced in the code so do not remove
+    "successfullyPublished": "Successfully published web layer{0}Manage the web layer", //{0} will be replaced in the code so do not remove
     
     //common
-    "transparency": 'Transparency', // Shown as label on transparency sliders
-    "outline": 'Outline', // Shown as label for outline color picker
-    "fill": 'Fill (Color only applies when style set to solid)', // Shown as label for outline color picker
-    "createERGBtn": 'Create Zones', // Shown as label on create button
-    "clearERGBtn": 'Clear', // Shown as label on clear button
-    "labelFormat": 'Label Format', // Shown as label above label format input box
-    "helpIconTooltip": 'The threshold between small and large spill sizes are:\nLiquids - 55 gallons (208 liters)\nSolids - 60 pounds (300 kilograms)', // Shown as help info on spill size
-    "cellWidth": 'Cell Width (x)', // Shown as label above cell width input
-    "cellHeight": 'Cell Height (y)', // Shown as label above cell height input
-    "invalidNumberMessage": 'The value entered is not valid', //Shown as validation error on invalid entries
-    "invalidRangeMessage": 'Value must be greater than 0', //Shown as validation error on invalid entries
-    "gridAngleInvalidRangeMessage": 'Value must be between -89.9 and 89.9', //Shown as validation error for the angle input     
-    "formatIconTooltip": 'Format Input', // Shown as tooltip on the format input coordinate button
-    "setCoordFormat": 'Set Coordinate Format String', // Shown as label for set format string
-    "prefixNumbers": 'Add "+/-" prefix to positive and negative numbers', // Shown as text next to the add prefix check box
-    "cancelBtn": 'Cancel', // Shown as label on cancel button
-    "applyBtn": 'Apply', // Shown as label on apply button
-    "comfirmInputNotation": 'Confirm Input Notation',  //Shown as panel title when more than one notation match
-    "notationsMatch": 'notations match your input please confirm which you would like to use:', // Shown as message when more than one notation match
-    "missingLayerNameMessage": 'You must enter a valid layer name before you can publish', //shown as error message for invalid layer name     
-    "parseCoordinatesError": 'Unable to parse coordinates. Please check your input.' //Shown as error message for unknown coordinates
-    
+    "transparency": "Transparency", // Shown as label on transparency sliders
+    "outline": "Outline", // Shown as label for outline color picker
+    "fill": "Fill (Color only applies when style set to solid)", // Shown as label for outline color picker
+    "createERGBtn": "Create Zones", // Shown as label on create button
+    "clearERGBtn": "Clear", // Shown as label on clear button
+    "labelFormat": "Label Format", // Shown as label above label format input box
+    "helpIconTooltip": "The threshold between small and large spill sizes are:\nLiquids - 55 gallons (208 liters)\nSolids - 60 pounds (300 kilograms)", // Shown as help info on spill size
+    "cellWidth": "Cell Width (x)", // Shown as label above cell width input
+    "cellHeight": "Cell Height (y)", // Shown as label above cell height input
+    "invalidNumberMessage": "The value entered is not valid", //Shown as validation error on invalid entries
+    "invalidRangeMessage": "Value must be greater than 0", //Shown as validation error on invalid entries
+    "gridAngleInvalidRangeMessage": "Value must be between -89.9 and 89.9", //Shown as validation error for the angle input     
+    "formatIconTooltip": "Format Input", // Shown as tooltip on the format input coordinate button
+    "setCoordFormat": "Set Coordinate Format String", // Shown as label for set format string
+    "prefixNumbers": "Add '+/-' prefix to positive and negative numbers", // Shown as text next to the add prefix check box
+    "cancelBtn": "Cancel", // Shown as label on cancel button
+    "applyBtn": "Apply", // Shown as label on apply button
+    "comfirmInputNotation": "Confirm Input Notation",   //Shown as panel title when more than one notation match
+    "notationsMatch": "notations match your input please confirm which you would like to use:", // Shown as message when more than one notation match
+    "missingLayerNameMessage": "You must enter a valid layer name before you can publish", //shown as error message for invalid layer name     
+    "parseCoordinatesError": "Unable to parse coordinates. Please check your input." //Shown as error message for unknown coordinates    
   })
 });

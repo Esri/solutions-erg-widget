@@ -50,7 +50,6 @@ define([
     },
 
     postMixinProperties: function () {
-        console.log('Post Create');
     },
 
     /**
