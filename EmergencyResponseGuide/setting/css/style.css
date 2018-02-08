@@ -56,11 +56,11 @@
     white-space: nowrap;
 }
 
-.SubTitle {
+.jimu-widget-ERG-setting.SubTitle {
   font-weight: bold;
 }
 
-.SubTitleRed {
+.jimu-widget-ERG-setting .SubTitleRed {
   line-height: 28px;
   font-weight: bold;
   color: #ff0000;

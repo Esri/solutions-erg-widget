@@ -413,14 +413,12 @@ define([
       * Performs activities like resizing widget components, connect map click etc on widget open
       */
       onOpen: function () {
-        console.log('widget opened');
       },
 
       /**
       * Performs activities like disconnect map handlers, close popup etc on widget close
       */
       onClose: function () {
-        console.log('widget closed');
       },        
 
       /**
