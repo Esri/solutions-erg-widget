@@ -89,7 +89,7 @@ define([
      **/
     constructor: function (args) {
       dojoDeclare.safeMixin(this, args);
-      this.util = new CoordinateUtilities(this.appConfig.geometryService);
+      this.util = new CoordinateUtilities(args);
     },
 
     /**
