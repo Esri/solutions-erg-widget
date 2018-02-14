@@ -1156,39 +1156,34 @@ define([
       _initSaveToPortal: function(layerName) {        
         esriId.registerOAuthInfos();        
         var featureServiceName = layerName;
-        esriId.getCredential(this.appConfig.portalUrl + "/sharing", { 
-          oAuthPopupConfirmation: false }).then(lang.hitch(this, function() {
+        esriId.getCredential(this.appConfig.portalUrl + 
+          "/sharing", { oAuthPopupConfirmation: false }).then(lang.hitch(this, function() {
           //sign in
-          new esriPortal.Portal(this.appConfig.portalUrl).signIn().then(
-            lang.hitch(this, function(portalUser) {
+          new esriPortal.Portal(
+            this.appConfig.portalUrl).signIn().then(lang.hitch(this, function(portalUser) {
            //Get the token
             var token = portalUser.credential.token;
             var orgId = portalUser.orgId;
-            var userName = portalUser.username;
-            
-            var checkServiceNameUrl = 
-              this.appConfig.portalUrl + "sharing/rest/portals/" + 
-              orgId + "/isServiceNameAvailable";
-            var createServiceUrl = 
-              this.appConfig.portalUrl + 
-              "sharing/content/users/" + userName + "/createService"; 
-
-            portalutils.isNameAvailable(checkServiceNameUrl, token, featureServiceName).then(
-              lang.hitch(this, function(response0) {
+            var userName = portalUser.username;            
+            var checkServiceNameUrl = this.appConfig.portalUrl + 
+              "sharing/rest/portals/" + orgId + "/isServiceNameAvailable";
+            var createServiceUrl = this.appConfig.portalUrl + 
+              "sharing/content/users/" + userName + "/createService";
+            portalutils.isNameAvailable(checkServiceNameUrl, token,
+              featureServiceName).then(lang.hitch(this, function(response0) {
               if (response0.available) {
                 //set the widget to busy
                 this.busyIndicator.show();
                 //create the service
                 portalutils.createFeatureService(createServiceUrl, token, 
-                  portalutils.getFeatureServiceParams(featureServiceName, this.map)).then(
-                    lang.hitch(this, function(response1) {
+                  portalutils.getFeatureServiceParams(featureServiceName, 
+                    this.map)).then(lang.hitch(this, function(response1) {
                   if (response1.success) {
-                    var addToDefinitionUrl = 
-                      response1.serviceurl.replace(new RegExp('rest', 'g'), "rest/admin") + 
-                        "/addToDefinition";
-                    portalutils.addDefinitionToService(addToDefinitionUrl, 
-                      token, portalutils.getLayerParams(featureServiceName, 
-                        this.map, this._renderer)).then(lang.hitch(this, function(response2) {
+                    var addToDefinitionUrl = response1.serviceurl.replace(
+                      new RegExp('rest', 'g'), "rest/admin") + "/addToDefinition";
+                    portalutils.addDefinitionToService(addToDefinitionUrl, token,   portalutils.getLayerParams(featureServiceName, this.map,
+                      this._renderer)).then(lang.hitch(this, 
+                        function(response2) {
                       if (response2.success) {
                         //Push features to new layer
                         var newFeatureLayer = 
@@ -1198,9 +1193,9 @@ define([
                           });                        
                         this.map.addLayers([newFeatureLayer]);
                         
-                        var featureLayerInfo;
                         // must ensure the layer is loaded before we can access 
                         // it to turn on the labels if required
+                        var featureLayerInfo;                        
                         if(newFeatureLayer.loaded){
                           featureLayerInfo = 
                             jimuLayerInfos.getInstanceSync().getLayerInfoById(featureServiceName);
@@ -1231,33 +1226,36 @@ define([
                           this.nls.successfullyPublished.format(newURL) + '</a>';
                         
                       }                      
-                    }), function(err2) {
+                    }), lang.hitch(this, function(err2) {
                       this.busyIndicator.hide();
                       this.publishMessage.innerHTML = 
                         this.nls.addToDefinition.format(err2.message); 
-                    });                    
+                    }));                    
                   } else {
                     this.busyIndicator.hide();
                     this.publishMessage.innerHTML = 
                       this.nls.unableToCreate.format(featureServiceName);                    
                   }
-                }), function(err1) {
+                }), lang.hitch(this, function(err1) {
                   this.busyIndicator.hide();
                   this.publishMessage.innerHTML = 
                     this.nls.createService.format(err1.message);                  
-                });
+                }));
               } else {
                   this.busyIndicator.hide();
                   this.publishMessage.innerHTML = 
                     this.nls.publishingFailedLayerExists.format(featureServiceName); 
                   
               }
-            }), function(err0) {
+            }), lang.hitch(this, function(err0) {
               this.busyIndicator.hide();
               this.publishMessage.innerHTML = this.nls.checkService.format(err0.message);
-            });
-          }));
-        }));        
+            }));
+          }), lang.hitch(this, function(err) {
+              this.publishMessage.innerHTML = err.message;
+            }));
+        }));
+        esriId.destroyCredentials();        
       }     
     });
   });
