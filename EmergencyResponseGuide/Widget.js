@@ -1164,7 +1164,12 @@ define([
            //Get the token
             var token = portalUser.credential.token;
             var orgId = portalUser.orgId;
-            var userName = portalUser.username;            
+            var userName = portalUser.username;
+            //check the user is not just a publisher
+            if(portalUser.role === "org_user") {
+              this.publishMessage.innerHTML = this.nls.createService.format(this.nls.userRole);
+              return;
+            }
             var checkServiceNameUrl = this.appConfig.portalUrl + 
               "sharing/rest/portals/" + orgId + "/isServiceNameAvailable";
             var createServiceUrl = this.appConfig.portalUrl + 

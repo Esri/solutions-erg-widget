@@ -116,6 +116,7 @@ define({
     "unableToCreate": "Unable to create: {0}", //{0} will be replaced in the code so do not remove
     "addToDefinition": "Add to definition: {0}", //{0} will be replaced in the code so do not remove
     "successfullyPublished": "Successfully published web layer{0}Manage the web layer", //{0} will be replaced in the code so do not remove
+    "userRole": "Unable to create service because user does not have permissions", //displayed as warning when publishing service
     
     //common
     "transparency": "Transparency", // Shown as label on transparency sliders
@@ -165,5 +166,40 @@ define({
     "USNGNotation": "USNG", // Shown as USNG label in confirm coordinate type dropdown
     "UTMBandNotation": "UTM - Band Letter", // Shown as UTM - Band Letter label in confirm coordinate type dropdown
     "UTMHemNotation": "UTM - Hemisphere (N/S)" // Shown as UTM - Hemisphere (N/S)de label in confirm coordinate type dropdown
-  })
+  }),
+  "ar": 0,
+  "bs": 0,
+  "cs": 0,
+  "da": 0,
+  "de": 0,
+  "el": 0,
+  "es": 0,
+  "et": 0,
+  "fi": 0,
+  "fr": 0,
+  "he": 0,
+  "hi": 0,
+  "hr": 0,
+  "it": 0,
+  "id": 0,
+  "ja": 0,
+  "ko": 0,
+  "lt": 0,
+  "lv": 0,
+  "nb": 0,
+  "nl": 0,
+  "pl": 0,
+  "pt-br": 0,
+  "pt-pt": 0,
+  "ro": 0,
+  "ru": 0,
+  "sl": 0,
+  "sr": 0,
+  "sv": 0,
+  "th": 0,
+  "tr": 0,
+  "vi": 0,
+  "zh-cn": 0,
+  "zh-hk": 0,
+  "zh-tw": 0
 });
