@@ -19,7 +19,7 @@ define({
     "PASettingsLabel": 'Protective Action Zone', // Shown as Title for Protective Action Zone Settings dropdown
     "PAButtonLabel": 'Configure Protective Action Settings', // Shown as tooltip for Protective Action Zone Settings dropdown
     
-    "downwindSettingsLabel": 'Down Wind Zone', // Shown as Title for Down Wind Zone Settings dropdown
+    "downwindSettingsLabel": 'Downwind Zone', // Shown as Title for Downwind Zone Settings dropdown
     "downwindButtonLabel": 'Configure Down Wind Settings', // Shown as tooltip for Down Wind Zone Settings dropdown
         
     "fireSettingsLabel": 'Fire Isolation Zone', // Shown as Title for Fire Isolation Zone Settings dropdown
@@ -56,7 +56,7 @@ define({
     "horizontal": 'Horizontal',
     "null": 'Null',
     "solid": 'Solid',
-    "vertical": 'Vertical'  
+    "vertical": 'Vertical'
   }),
   "ar": 0,
   "bs": 0,
