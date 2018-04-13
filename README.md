@@ -1,3 +1,5 @@
+This repository is no longer maintained. The GRG widget is now releasd in [Web AppBilder for ArcGIS](https://doc.arcgis.com/en/web-appbuilder). To understand more about the GRG the documentation can be found here: https://doc.arcgis.com/en/web-appbuilder/create-apps/widget-emergency-response-guide.htm
+
 # ERG Widget
 
 The Emergency Response Guide (ERG) widget allows users to determine potential hazards based on the type of chemical spill and user-selected location on the map.
