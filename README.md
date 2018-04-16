@@ -1,73 +1,63 @@
-# emergency-response-guide-webappbuilder-widget
+# ERG Widget
 
 The Emergency Response Guide (ERG) widget allows users to determine potential hazards based on the type of chemical spill and user-selected location on the map.
 
-The ERG widget references the [ERG Guidebook 2016](https://www.phmsa.dot.gov/hazmat/outreach-training/erg). Note: Table 3 of the 2016 Guidebook is not implemented in the current version of the widget.
+![App](solutions-erg-widget.png)
 
+[View it live](https://nationalsecurity.esri.com/solutionsweb/EmergencyResponseGuide)
 
+The ERG widget references the [ERG Guidebook 2016](https://www.phmsa.dot.gov/hazmat/outreach-training/erg).
 
 ## Sections
 
 * [Features](#features)
-* [Requirements](#requirements)
 * [Instructions](#instructions)
+* [Requirements](#requirements)
 * [Resources](#resources)
-* [New to Github?](#new-to-github)
 * [Issues](#issues)
 * [Contributing](#contributing)
 * [Licensing](#licensing)
 
 ## Features
 
-* Select chemical type
-* Select spill size
+* Select material type
+   * By Name
+   * By UN/NA Number
+* Select spill or container size
 * Select wind direction and speed
 * Select time of day the spill occurred
-* Ability to allow user select a location on the map
-* Displays affected location, demography and facilities
-
-## Requirements
-
-* Web Appbuilder for ArcGIS Version 2.2+
-    * See [ArcGIS Web Appbuilder for ArcGIS](http://developers.arcgis.com/web-appbuilder/)
+* Select a location on the map
 
 ## Instructions
 
-* Update/Publish the Geoprocessing and Map services
-    * The widget relies on Geoprocessing and Map services. The SD files for those services can be found in the EmergencyOperations.zip file in the [services folder](./ERG/services). 
-    * The zip file contains ERG.sd which is the Geoprocessing service along with the EmergencyOperation.sd which is the accompanying map service. Please update the ERG [config.json](./ERG/config.json) file once these SD files are published in ArcGIS Server.
+In order to develop and test widgets you need to deploy the GRG directory to the `stemapp/widgets` directory in your Web AppBuilder installation.
 
-* Deploying Widgets
-    * To deploy a widget, copy the folder of the desired deployment widget to the stemapp/widgets directory. This is located in %webappbuilder_install%/client directory.
-    * For more resources on developing, modifying, and deploying widgets please visit the
-[Web AppBuilder for ArcGIS Documentation](https://developers.arcgis.com/web-appbuilder)
+## Requirements
+
+* Minimum requirement is ArcGIS Web AppBuilder v.1.0.
+* Widget has been updated to v.2.6.
 
 ## Resources
-
-* Learn more about Esri's Solutions [Focused Maps and Apps for Your Organization](http://solutions.arcgis.com/).
-* [Web AppBuilder API](https://developers.arcgis.com/web-appbuilder/api-reference/css-framework.htm)
-* [ArcGIS API for JavaScript](https://developers.arcgis.com/javascript/)
+* [Web AppBuilder for ArcGIS (Developer Edition)](https://developers.arcgis.com/web-appbuilder/)
+* [ArcGIS Solutions](http://solutions.arcgis.com/)
+* [ArcGIS for JavaScript API Resource Center](http://help.arcgis.com/en/webapi/javascript/arcgis/index.html)
 * [ArcGIS Blog](http://blogs.esri.com/esri/arcgis/)
-
-## New to Github
-
-* [New to Github? Get started here.](https://github.com/Esri/esri.github.com/blob/master/help/esri-getting-to-know-github.html)
+* [twitter@esri](http://twitter.com/esri)
 
 ## Issues
 
-* Find a bug or want to request a new feature?  Please let us know by submitting an issue.
-
-## New to Github
-
-[New to Github? Get started here.](http://htmlpreview.github.com/?https://github.com/Esri/esri.github.com/blob/master/help/esri-getting-to-know-github.html)
+Find a bug or want to request a new feature?  Please let us know by submitting an [issue](https://github.com/Esri/solutions-erg-widget/issues/new).
 
 ## Contributing
 
-Please see our [guidelines for contributing](../../CONTRIBUTING.md).
+Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
+
+If you are using [JS Hint](http://http://www.jshint.com/) there is a .jshintrc file included in the root folder which enforces this style.
+We allow for 120 characters per line instead of the highly restrictive 80.
 
 ## Licensing
 
-Copyright 2016-2017 Esri
+Copyright 2017 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -82,4 +72,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 A copy of the license is available in the repository's
-[license.txt](license.txt) file.
+[LICENSE](LICENSE) file.
