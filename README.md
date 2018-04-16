@@ -1,4 +1,4 @@
-This repository is no longer maintained. The Emergency Response Guide (ERG) widget is now releasd in [Web AppBilder for ArcGIS](https://doc.arcgis.com/en/web-appbuilder). To understand more about the ERG the documentation can be found here: https://doc.arcgis.com/en/web-appbuilder/create-apps/widget-emergency-response-guide.htm
+This repository is no longer maintained. The Emergency Response Guide (ERG) widget is now releasd in [Web AppBilder for ArcGIS](https://doc.arcgis.com/en/web-appbuilder). To understand more about the ERG widget, the documentation can be found here: https://doc.arcgis.com/en/web-appbuilder/create-apps/widget-emergency-response-guide.htm
 
 # ERG Widget
 
